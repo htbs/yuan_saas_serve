@@ -1,0 +1,12 @@
+jwt:
+  secret: "your-strong-secret-key-with-at-least-256-bits"
+  expiration: 1800000 # 30??
+  refresh-expiration: 604800000 # 7?
+  
+  security:
+    max-login-attempts: 5
+    lock-time-minutes: 30
+  
+  wechat:
+    app-id: "your-wechat-app-id"
+    app-secret: "your-wechat-app-secret"
