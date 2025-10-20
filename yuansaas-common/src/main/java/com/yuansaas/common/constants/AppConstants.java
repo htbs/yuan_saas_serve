@@ -32,6 +32,8 @@ public final class AppConstants {
     public static final String MALE = "male";
     public static final String FEMALE = "female";
     public static final String OTHER = "other";
+    public static final String Y = "Y";
+    public static final String N = "N";
 
     // 数字常量
     public static final int ZERO = 0;

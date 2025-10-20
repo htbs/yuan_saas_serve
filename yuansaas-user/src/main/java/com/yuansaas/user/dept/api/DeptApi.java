@@ -7,7 +7,9 @@ import com.yuansaas.user.auth.security.annotations.SecurityAuth;
 import com.yuansaas.user.dept.params.FindDeptParam;
 import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.params.UpdateDeptParam;
+import com.yuansaas.user.dept.service.DeptService;
 import com.yuansaas.user.dept.vo.DeptListVo;
+import com.yuansaas.user.dept.vo.DeptTreeListVo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +30,15 @@ import java.util.List;
 @RequestMapping("/dept")
 public class DeptApi {
 
+    private final DeptService deptService;
+
     /**
      * 列表查询
      */
     @GetMapping("/list")
     @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<RPage<DeptListVo>>> list(FindDeptParam findDeptParam) {
-        return ResponseBuilder.okResponse();
+    public ResponseEntity<ResponseModel<List<DeptTreeListVo> >> list(FindDeptParam findDeptParam) {
+        return ResponseBuilder.okResponse(deptService.list(findDeptParam));
     }
 
     /**
@@ -42,24 +46,24 @@ public class DeptApi {
      */
     @PostMapping("/save")
     @SecurityAuth(authenticated = false)
-    public ResponseModel<Boolean> save(@Validated @RequestBody SaveDeptParam saveDeptParam) {
-        return ResponseBuilder.okResponse();
+    public ResponseEntity<ResponseModel<Boolean>> save(@Validated @RequestBody SaveDeptParam saveDeptParam) {
+        return ResponseBuilder.okResponse(deptService.save(saveDeptParam));
     }
     /**
      * 修改部门
      */
     @PutMapping("/update")
     @SecurityAuth(authenticated = false)
-    public ResponseModel<Boolean> update(@Validated @RequestBody UpdateDeptParam updateDeptParam) {
-        return ResponseBuilder.okResponse();
+    public ResponseEntity<ResponseModel<Boolean>> update(@Validated @RequestBody UpdateDeptParam updateDeptParam) {
+        return ResponseBuilder.okResponse(deptService.update(updateDeptParam));
     }
     /**
      * 删除部门
      */
     @GetMapping("/delete/{id}")
     @SecurityAuth(authenticated = false)
-    public ResponseModel<Boolean> delete(@RequestPart("id") Long id ) {
-        return ResponseBuilder.okResponse();
+    public ResponseEntity<ResponseModel<Boolean>> delete(@RequestPart("id") Long id ) {
+        return ResponseBuilder.okResponse(deptService.delete(id));
     }
     /**
      * 部门详情
@@ -67,6 +71,6 @@ public class DeptApi {
     @GetMapping("/{id}")
     @SecurityAuth(authenticated = false)
     public ResponseEntity<ResponseModel<DeptListVo>> getById(@RequestPart("id") Long id ) {
-        return ResponseBuilder.okResponse();
+        return ResponseBuilder.okResponse(deptService.getById(id));
     }
 }

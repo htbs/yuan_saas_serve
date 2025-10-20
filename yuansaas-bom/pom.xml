@@ -23,6 +23,10 @@
         <guava.version>33.4.8-jre</guava.version>
         <commons-lang3.version>3.18.0</commons-lang3.version>
         <hutool.version>5.8.25</hutool.version>
+        <querydsl-jpa.version>5.1.0</querydsl-jpa.version>
+        <querydsl-apt.version>5.1.0</querydsl-apt.version>
+        <querydsl-sql.version>5.1.0</querydsl-sql.version>
+        <apt-maven-plugin.version>1.1.3</apt-maven-plugin.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -108,6 +112,26 @@
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
+
+            <!-- 引入QueryDSL -->
+            <dependency>
+                <groupId>com.querydsl</groupId>
+                <artifactId>querydsl-jpa</artifactId>
+                <version>${querydsl-jpa.version}</version>
+                <classifier>jakarta</classifier>
+            </dependency>
+            <dependency>
+                <groupId>com.querydsl</groupId>
+                <artifactId>querydsl-apt</artifactId>
+                <version>${querydsl-apt.version}</version>
+                <classifier>jakarta</classifier>
+            </dependency>
+            <dependency>
+                <groupId>com.querydsl</groupId>
+                <artifactId>querydsl-sql</artifactId>
+                <version>${querydsl-sql.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
     <build>
@@ -121,6 +145,15 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
+                            </path>
+                            <path>
+                                <groupId>com.querydsl</groupId>
+                                <artifactId>querydsl-apt</artifactId>
+                                <classifier>jakarta</classifier>
+                            </path>
+                            <path>
+                                <groupId>jakarta.persistence</groupId>
+                                <artifactId>jakarta.persistence-api</artifactId>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>
@@ -161,6 +194,24 @@
                         <projectName>${project.description}</projectName>
                     </configuration>
                 </plugin>
+<!--                生成Q类-->
+                <plugin>
+                    <groupId>com.mysema.maven</groupId>
+                    <artifactId>apt-maven-plugin</artifactId>
+                    <version>${apt-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>process</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>target/generated-sources</outputDirectory>
+                                <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
             </plugins>
         </pluginManagement>
     </build>

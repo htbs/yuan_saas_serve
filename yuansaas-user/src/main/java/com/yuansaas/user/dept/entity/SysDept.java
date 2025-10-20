@@ -4,6 +4,7 @@ import com.yuansaas.core.jpa.model.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *
@@ -11,6 +12,7 @@ import lombok.Data;
  *
  * @author LXZ 2025/10/16 16:53
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(name = "sys_dept")
@@ -18,7 +20,7 @@ public class SysDept extends BaseEntity {
     /**
      * 商家code
      */
-    private Long merchantCode;
+    private String merchantCode;
     /**
      * 上级id
      */
