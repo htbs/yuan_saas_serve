@@ -1,20 +1,18 @@
-package com.yuansaas.user.dept.vo;
+package com.yuansaas.user.dept.model;
 
-import com.yuansaas.user.dept.model.DeptTreeModel;
+import com.yuansaas.user.dept.vo.DeptTreeListVo;
 import lombok.Data;
 
-import java.util.Date;
 import java.util.List;
 
 /**
  *
- * 部门树列表vo
+ * 部门树结构model
  *
- * @author LXZ 2025/10/16 16:44
+ * @author LXZ 2025/10/17 20:48
  */
 @Data
-public class DeptTreeListVo {
-
+public class DeptTreeModel {
     /**
      * 部门id
      */

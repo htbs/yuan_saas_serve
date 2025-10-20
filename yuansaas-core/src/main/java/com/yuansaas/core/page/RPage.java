@@ -1,14 +1,11 @@
 package com.yuansaas.core.page;
 
 import ch.qos.logback.core.CoreConstants;
-import jodd.system.SystemUtil;
+import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 
-import java.beans.Beans;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -151,14 +148,13 @@ public class RPage<T> {
         return rPage;
     }
 
-    public static <R, T> RPage<T> convert(Page<R> page, Object target) {
+    public static <R, T> RPage<T> convert(Page<R> page, Class<T> target) {
         RPage<T> rPage = new RPage<>();
         rPage.number = page.getNumber() + 1;
         rPage.size = page.getSize();
         rPage.totalElements = page.getTotalElements();
         rPage.totalPages = page.getTotalPages();
-        CollectionUtils。
-        rPage.content = BeanUtils.copyProperties(page.getContent(), target);
+        rPage.content = BeanUtil.copyToList(page.getContent(), target);
         return rPage;
     }
 
@@ -170,7 +166,7 @@ public class RPage<T> {
 
     public <R> RPage<R> convertElements(Class<R> clazz) {
         RPage<R> renew = renew();
-        renew.content = Bean.copyToBeans(this.getContent(), clazz);
+        renew.content = BeanUtil.copyToList(this.getContent(), clazz);
         return renew;
     }
 

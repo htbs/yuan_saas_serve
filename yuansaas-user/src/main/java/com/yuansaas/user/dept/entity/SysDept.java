@@ -30,9 +30,9 @@ public class SysDept extends BaseEntity {
     /**
      * 启用状态
      */
-    private String lockStatus;
+    private String lockStatus = "N";
     /**
      * 删除状态
      */
-    private String deleteStatus;
+    private String deleteStatus = "N";
 }

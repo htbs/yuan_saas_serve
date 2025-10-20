@@ -3,11 +3,7 @@ package com.yuansaas.core.page;
 import jakarta.validation.constraints.Min;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.el.util.Validation;
-import org.hibernate.query.Page;
-import org.springframework.data.web.PagedModel;
 import org.springframework.util.ObjectUtils;
-import org.springframework.validation.ValidationUtils;
 
 import java.util.List;
 
@@ -35,7 +31,7 @@ public class PageModel {
     /**
      * 分页对象
      */
-    private Page rPage;
+    private RPage rPage;
 
     public PageModel(Integer pageNo, Integer pageSize) {
         this.pageNo = pageNo;
@@ -52,15 +48,15 @@ public class PageModel {
         return this.pageSize;
     }
 
-    public PagedModel.PageMetadata getPage() {
+    public <T> RPage<T> getRPage() {
         if (ObjectUtils.isEmpty(rPage)) {
-            rPage = Page.page(this.getPageNo(), this.getPageSize());
+            rPage =new RPage<T>(this.getPageNo(), this.getPageSize());
         }
         return rPage;
     }
 
-    public <T> Page<T> getRPage(List<T> content, long totalElements) {
-        Page rPage = getPage();
+    public <T> RPage<T> getRPage(List<T> content, long totalElements) {
+        RPage<T> rPage = getRPage();
         rPage.setContent(content);
         rPage.setTotalElements(totalElements);
         return rPage;
@@ -69,7 +65,7 @@ public class PageModel {
     /**
      * 获取查询的offset
      *
-     * @return
+     * @return offset 偏移量
      */
     public Integer obtainOffset() {
         return (this.getPageNo() <= 0 ? 0 : this.getPageNo() - 1) * getPageSize();

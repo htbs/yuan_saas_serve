@@ -22,6 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <guava.version>33.4.8-jre</guava.version>
         <commons-lang3.version>3.18.0</commons-lang3.version>
+        <hutool.version>5.8.25</hutool.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -101,6 +102,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
