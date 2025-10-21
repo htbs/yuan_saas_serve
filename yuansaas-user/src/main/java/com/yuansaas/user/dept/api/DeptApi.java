@@ -34,6 +34,8 @@ public class DeptApi {
 
     /**
      * 列表查询
+     * @param findDeptParam 查询参数
+     * @return 部门列表
      */
     @GetMapping("/list")
     @SecurityAuth(authenticated = false)
@@ -43,6 +45,8 @@ public class DeptApi {
 
     /**
      * 新增部门
+     * @param saveDeptParam 新增参数
+     * @return 新增结果
      */
     @PostMapping("/save")
     @SecurityAuth(authenticated = false)
@@ -51,6 +55,8 @@ public class DeptApi {
     }
     /**
      * 修改部门
+     * @param updateDeptParam 修改参数
+     * @return 修改结果
      */
     @PutMapping("/update")
     @SecurityAuth(authenticated = false)
@@ -59,6 +65,8 @@ public class DeptApi {
     }
     /**
      * 删除部门
+     * @param id 部门id
+     * @return 删除结果
      */
     @GetMapping("/delete/{id}")
     @SecurityAuth(authenticated = false)
@@ -67,6 +75,8 @@ public class DeptApi {
     }
     /**
      * 部门详情
+     * @param id 部门id
+     * @return 部门详情
      */
     @GetMapping("/{id}")
     @SecurityAuth(authenticated = false)
