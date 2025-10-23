@@ -68,4 +68,18 @@ public final class AppConstants {
     public static final int DEFAULT_MAX_POOL_SIZE = 50;
     public static final int DEFAULT_KEEP_ALIVE_SECONDS = 60;
 
+
+    public static final String PERCENT_CHAR = "%";
+    public static final String LEFT_PARENTHESIS_CHAR = "(";
+    public static final String RIGHT_PARENTHESIS_CHAR = ")";
+    public static final String ESCAPE_CHAR = "\\";
+    public static final String CURLY_LEFT = "{";
+    public static final String CURLY_RIGHT = "}";
+    public static final String COMMA_CHAR = ",";
+    public static final String DOUBLE_QUOTE_CHAR = "'";
+    public static final String SINGLE_QUOTE_CHAR = "'";
+    public static final String COLON_CHAR = ":";
+    public static final String DASH_CHAR = "-";
+    public static final String DEFAULT_VALUE_SEPARATOR = ":-";
+
 }

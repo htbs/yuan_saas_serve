@@ -14,7 +14,7 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "menu")
+@Table(name = "sys_menu")
 public class Menu extends BaseEntity {
     /**
      * 商家code
@@ -23,11 +23,11 @@ public class Menu extends BaseEntity {
     /**
      * 菜单code
      */
-    private Long   menuCode;
+    private String menuCode;
     /**
      * 上级ID，一级菜单为0
      */
-    private Long   pid;
+    private Long pid;
     /**
      * 名称
      */

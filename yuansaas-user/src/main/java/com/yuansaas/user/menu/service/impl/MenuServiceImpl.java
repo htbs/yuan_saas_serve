@@ -1,8 +1,12 @@
 package com.yuansaas.user.menu.service.impl;
 
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.user.menu.entity.Menu;
+import com.yuansaas.user.menu.model.MenuModel;
 import com.yuansaas.user.menu.params.FindMenuParam;
 import com.yuansaas.user.menu.params.SaveMenuParam;
 import com.yuansaas.user.menu.params.UpdateMenuParam;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -48,11 +53,20 @@ public class MenuServiceImpl implements MenuService {
      */
     @Override
     public Boolean save(SaveMenuParam saveMenuParam) {
-        Menu menu = new Menu();
-        BeanUtils.copyProperties(saveMenuParam, menu);
-        menu.setCreateAt(LocalDateTime.now());
-        menu.setCreateBy("admin");
-        menuRepository.save(menu);
+        // 校验参数
+        MenuModel menuModel = new MenuModel();
+        BeanUtils.copyProperties(saveMenuParam, menuModel);
+        Menu menu = validated(menuModel);
+        // 获取菜单编码
+        String menuCode = getMenuCode(ObjectUtil.isEmpty(menu) ? "":menu.getMenuCode(),saveMenuParam.getMerchantCode());
+
+        // 保存菜单
+        Menu menuNew = new Menu();
+        BeanUtils.copyProperties(saveMenuParam, menuNew);
+        menuNew.setMenuCode(menuCode);
+        menuNew.setCreateAt(LocalDateTime.now());
+        menuNew.setCreateBy("admin");
+        menuRepository.save(menuNew);
         return true;
     }
 
@@ -64,10 +78,10 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public Boolean update(UpdateMenuParam updateMenuParam) {
         menuRepository.findById(updateMenuParam.getId()).ifPresentOrElse(menu->{
-            menu.setName(updateMenuParam.getMenuName());
-            menu.setUrl(updateMenuParam.getMenuUrl());
+            menu.setName(updateMenuParam.getName());
+            menu.setUrl(updateMenuParam.getUrl());
             menu.setSort(updateMenuParam.getSort());
-            menu.setIcon(updateMenuParam.getMenuIcon());
+            menu.setIcon(updateMenuParam.getIcon());
             menu.setUpdateAt(LocalDateTime.now());
             menu.setUpdateBy("admin");
             menuRepository.save(menu);
@@ -125,4 +139,48 @@ public class MenuServiceImpl implements MenuService {
         BeanUtils.copyProperties(menu, menuVo);
         return menuVo;
     }
+
+    /**
+     * 验证父级菜单是否存在
+     * @param menuModel 校验model
+     */
+    public Menu validated(MenuModel menuModel) {
+        if (menuModel.getMenuType() == AppConstants.ZERO && ObjectUtil.isNull(menuModel.getUrl())) {
+            throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("菜单类型时，路由地址不能为空");
+        }
+        if (menuModel.getMenuType() == AppConstants.ONE && Objects.isNull(menuModel.getPermissions())) {
+            throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("按钮类型时，权限标识不能为空");
+        }
+
+        if (menuModel.getPid() == 0) {
+            return null;
+        }
+        return menuRepository.findById(menuModel.getPid()).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("父级菜单不存在"));
+    }
+
+    public String getMenuCode(String menuCode ,String merchantCode ) {
+        String code = "";
+        if (ObjectUtil.isEmpty(menuCode)) {
+            code =  RandomUtil.randomStringUpper(AppConstants.FOUR);
+        } else {
+            code = menuCode.concat(AppConstants.DASH_CHAR).concat(RandomUtil.randomStringUpper(AppConstants.FOUR));
+        }
+        if (validatedMenuCodeIsExists(code, merchantCode)) {
+            getMenuCode(menuCode,merchantCode);
+        }
+        return code ;
+    }
+
+    /**
+     * 验证菜单编码是否存在
+     * @param menuCode 菜单编码
+     */
+    public Boolean validatedMenuCodeIsExists(String menuCode ,String merchantCode) {
+        Long num = menuRepository.countByMerchantCodeAndMenuCode(merchantCode, menuCode);
+        if (num > 0) {
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -79,12 +79,13 @@ public class RoleApi {
     public ResponseEntity<ResponseModel<RoleVo>> getById(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.getById(id));
     }
-    /**
-     * 角色授权
-     */
-    @GetMapping("/authorize")
-    @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<Boolean>> authorize(@RequestPart("id") Long id ) {
-        return ResponseBuilder.okResponse(roleService.authorize(id));
-    }
+//    /**
+//     * 角色授权
+//     * @param id
+//     */
+//    @GetMapping("/authorize")
+//    @SecurityAuth(authenticated = false)
+//    public ResponseEntity<ResponseModel<Boolean>> authorize(@RequestPart("id") Long id ) {
+//        return ResponseBuilder.okResponse(roleService.authorize(id));
+//    }
 }

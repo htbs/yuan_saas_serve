@@ -26,16 +26,16 @@ public class UpdateMenuParam {
      * 菜单名称
      */
     @NotBlank(message = "菜单名称不能为空")
-    private String menuName;
+    private String name;
     /**
      * 菜单URL
      */
     @NotBlank(message = "菜单URL不能为空")
-    private String menuUrl;
+    private String url;
     /**
      * 菜单图标
      */
-    private String menuIcon;
+    private String icon;
     /**
      * 菜单排序
      */
