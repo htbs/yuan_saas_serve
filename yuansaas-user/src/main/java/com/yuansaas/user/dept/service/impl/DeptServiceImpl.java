@@ -1,14 +1,11 @@
 package com.yuansaas.user.dept.service.impl;
 
-import ch.qos.logback.core.CoreConstants;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
-import com.yuansaas.core.page.RPage;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.model.DeptTreeModel;
@@ -19,7 +16,7 @@ import com.yuansaas.user.dept.repository.DeptRepository;
 import com.yuansaas.user.dept.service.DeptService;
 import com.yuansaas.user.dept.vo.DeptListVo;
 import com.yuansaas.user.dept.vo.DeptTreeListVo;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +32,7 @@ import java.util.Objects;
  * @author LXZ 2025/10/17 11:59
  */
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DeptServiceImpl implements DeptService {
 
     private final DeptRepository deptRepository;
@@ -47,21 +44,28 @@ public class DeptServiceImpl implements DeptService {
      * @param findDeptParam 查询参数
      */
     @Override
-    public List<DeptTreeListVo> list(FindDeptParam findDeptParam) {
+    public DeptTreeListVo list(FindDeptParam findDeptParam) {
 
         QSysDept qDept = QSysDept.sysDept;
+        BoolBuilder boolBuilder = BoolBuilder.getInstance();
+        boolBuilder.and(findDeptParam.getMerchantCode() , qDept.merchantCode::eq);
+        if (!ObjectUtil.isEmpty(findDeptParam.getMerchantCode()) && Objects.equals(AppConstants.ZERO_S , findDeptParam.getMerchantCode()) && ObjectUtil.isEmpty(findDeptParam.getDeptName())) {
+            boolBuilder.and(0L , qDept.pid::eq);
+        }else {
+            boolBuilder.and(findDeptParam.getDeptName() , qDept.name::eq);
+        }
+
         SysDept deptList = jpaQueryFactory.selectFrom(qDept)
-                .where(BoolBuilder.getInstance()
-                        .and(findDeptParam.getMerchantCode() , qDept.merchantCode::eq)
-                        .and(findDeptParam.getDeptName() , qDept.name::contains)
-                        .and(AppConstants.N, qDept.lockStatus::eq)
-                        .getWhere())
+                .where(boolBuilder.and(AppConstants.N, qDept.lockStatus::eq).getWhere())
                 .fetchOne();
         if (ObjectUtil.isEmpty(deptList)) {
             throw DataErrorCode.DATA_NOT_FOUND.buildException("部门不存在");
         }
         List<DeptTreeModel> deptTreeList = getDeptTreeList(deptList.getId());
-        return BeanUtil.copyToList(deptTreeList, DeptTreeListVo.class);
+        DeptTreeListVo deptTreeListVo = new DeptTreeListVo();
+        BeanUtils.copyProperties(deptList , deptTreeListVo);
+        deptTreeListVo.setChildrenDeptList(deptTreeList);
+        return deptTreeListVo;
     }
 
     /**
@@ -75,6 +79,7 @@ public class DeptServiceImpl implements DeptService {
         BeanUtils.copyProperties(saveDeptParam, sysDept);
         sysDept.setCreateBy("admin");
         sysDept.setCreateAt(LocalDateTime.now());
+        deptRepository.save(sysDept);
         return true;
     }
 
@@ -86,9 +91,10 @@ public class DeptServiceImpl implements DeptService {
     @Override
     public Boolean update(UpdateDeptParam updateDeptParam) {
         deptRepository.findById(updateDeptParam.getId()).ifPresentOrElse(dept ->{
-            dept.setName(updateDeptParam.getDeptName());
+            dept.setName(updateDeptParam.getName());
             dept.setUpdateBy("admin");
             dept.setUpdateAt(LocalDateTime.now());
+            deptRepository.save(dept);
         } , () ->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("部门不存在");
         });
@@ -115,11 +121,15 @@ public class DeptServiceImpl implements DeptService {
     /**
      * 部门详情
      *
+     * @param merchantCode
      * @param id
      */
     @Override
-    public DeptListVo getById(Long id) {
-        SysDept sysDept = deptRepository.findById(id).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("部门不存在"));
+    public DeptListVo getById(String merchantCode, Long id) {
+        SysDept sysDept = deptRepository.findByMerchantCodeAndId(merchantCode,id);
+        if (ObjectUtil.isEmpty(sysDept)) {
+            throw DataErrorCode.DATA_NOT_FOUND.buildException("部门不存在");
+        }
         return BeanUtil.copyProperties(sysDept , DeptListVo.class);
     }
 

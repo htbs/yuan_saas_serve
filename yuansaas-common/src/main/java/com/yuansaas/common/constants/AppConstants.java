@@ -52,6 +52,14 @@ public final class AppConstants {
     public static final int MILLION = 1000000;
     public static final int BILLION = 1000000000;
 
+    public static final String ZERO_S = "0";
+    public static final String ONE_S = "1";
+    public static final String TWO_S = "2";
+
+    public static final Long ZERO_L = 0L;
+    public static final Long ONE_L = 1L;
+    public static final Long TWO_L = 2L;
+
     // 超时时间
     public static final int DEFAULT_TIMEOUT = 5000; // 5秒
     public static final int DEFAULT_RETRY_TIMES = 3;

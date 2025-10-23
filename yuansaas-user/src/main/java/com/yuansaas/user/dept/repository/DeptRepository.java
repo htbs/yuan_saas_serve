@@ -18,6 +18,9 @@ public interface DeptRepository extends JpaRepository<SysDept, Long> {
      * @return 子部门列表
      */
     List<SysDept> findByPid(Long pid);
-
+    /**
+     * 根据商家id和部门id查询部门信息
+     */
+    SysDept findByMerchantCodeAndId(String merchantCode, Long id);
 
 }

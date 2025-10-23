@@ -6,12 +6,14 @@ import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
 import com.yuansaas.user.common.enums.UserType;
 import com.yuansaas.user.system.entity.SysUser;
+import com.yuansaas.user.system.param.SysUserCreateParam;
 import com.yuansaas.user.system.service.SysUserService;
 import com.yuansaas.user.system.vo.SysUserVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -42,16 +44,46 @@ public class SysUserApi {
         return ResponseBuilder.okResponse(sysUserVo);
     }
 
-//    /**
-//     * 创建用户
-//     * @param request 用户创建请求
-//     * @return 创建成功的用户信息
-//     */
-//    @PostMapping
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<ResponseModel<SysUser>> createUser(@RequestBody @Valid  SysUserCreateRequest request) {
-//        SysUser user = userService.createUser(request);
-//        return ResponseBuilder.okResponse( user);
-//    }
+    /**
+     * 创建用户
+     * @param sysUserCreateParam 用户创建请求
+     * @return 创建成功的用户信息
+     */
+    @PostMapping("/save")
+//    @SecurityAuth(authenticated = false)
+    public ResponseEntity<ResponseModel<SysUser>> createUser(@RequestBody @Validated SysUserCreateParam sysUserCreateParam) {
+        SysUser user = userService.createUser(sysUserCreateParam);
+        return ResponseBuilder.okResponse( user);
+    }
+
+    /**
+     * 冻结用户
+     * @param id 用户id
+     * @return 冻结成功的用户信息 true or false
+     */
+    @PutMapping("/lcok/{id}")
+        public ResponseEntity<ResponseModel<Boolean>> lockUser(@PathVariable Long id) {
+        return ResponseBuilder.okResponse(userService.lockUser(id));
+    }
+
+    /**
+     * 解锁用户
+     * @param id 用户id
+     * @return 解释成功的用户信息 true or false
+     */
+    @PutMapping("/unlock/{id}")
+    public ResponseEntity<ResponseModel<Boolean>> unlockUser(@PathVariable Long id) {
+        return ResponseBuilder.okResponse( userService.unlockUser(id));
+    }
+
+    /**
+     * 删除用户
+     * @param id 用户id
+     * @return  删除成功的用户信息 true or false
+     */
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ResponseModel<Boolean>> deleteUser(@PathVariable Long id) {
+        return ResponseBuilder.okResponse( userService.deleteUser(id));
+    }
 
 }

@@ -14,7 +14,7 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "role")
+@Table(name = "sys_role")
 public class Role extends BaseEntity {
     /**
      * 商家编码

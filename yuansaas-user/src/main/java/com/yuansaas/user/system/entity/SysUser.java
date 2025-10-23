@@ -1,6 +1,8 @@
 package com.yuansaas.user.system.entity;
 
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.jpa.model.BaseEntity;
+import com.yuansaas.user.common.enums.UserStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -18,6 +20,10 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "sys_user")
 public class SysUser extends BaseEntity {
 
+    /**
+     * 商户编号
+     */
+    private String merchantCode;
     /**
      * 用户名
      */
@@ -37,6 +43,11 @@ public class SysUser extends BaseEntity {
     private String email;
 
     /**
+     * 头像
+     */
+    private String headUrl;
+
+    /**
      *  手机号
      */
     @Column(name = "phone", length = 20)
@@ -50,8 +61,6 @@ public class SysUser extends BaseEntity {
     /**
      * 账户状态
      */
-    @ColumnDefault("'ACTIVE'")
-    @Column(name = "status", length = 60)
-    private String status;
+    private String status = UserStatus.active.name();
 
 }

@@ -29,26 +29,32 @@ import java.util.List;
 public interface RoleService {
     /**
      * 列表查询
+     * @param findRoleParam 查询角色参数
      */
     RPage<RoleListVo> getByPage(FindRoleParam findRoleParam);
     /**
      * 新增角色
+     * @param saveRoleParam  保存角色信息参数
      */
     Boolean save(SaveRoleParam saveRoleParam);
     /**
      * 修改角色
+     * @param updateRoleParam  修改角色信息参数
      */
     Boolean update(UpdateRoleParam updateRoleParam);
     /**
      * 删除角色
+     * @param id 角色id
      */
     Boolean delete(Long id );
     /**
      * 角色详情
+     * @param id 角色id
      */
     RoleVo getById(Long id );
     /**
      * 角色授权
+     * @param id 角色id
      */
     Boolean authorize( Long id );
 }

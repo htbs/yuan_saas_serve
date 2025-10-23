@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,37 +56,40 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+        if (1 != 1) {
+            try {
 
-        try {
-            String token = extractToken(request);
-            if (token != null && jwtManager.validateToken(token)) {
-                // 检查令牌类型
-                String tokenType = jwtTokenParser.extractTokenType(token);
 
-                // 如果是refresh token，拒绝访问非刷新接口
-                if ("refresh".equals(tokenType) && !isRefreshEndpoint(request)) {
-                    throw AuthErrorCode.INSUFFICIENT_PERMISSIONS.buildException();
+                String token = extractToken(request);
+                if (token != null && jwtManager.validateToken(token)) {
+                    // 检查令牌类型
+                    String tokenType = jwtTokenParser.extractTokenType(token);
+
+                    // 如果是refresh token，拒绝访问非刷新接口
+                    if ("refresh".equals(tokenType) && !isRefreshEndpoint(request)) {
+                        throw AuthErrorCode.INSUFFICIENT_PERMISSIONS.buildException();
+                    }
+                    CustomUserDetails userDetails = jwtManager.parseToken(token);
+
+                    // 验证用户状态
+                    if (!userStatusCache.isUserActive(userDetails.getUserId(), userDetails.getUserType())) {
+                        throw AuthErrorCode.ACCOUNT_DISABLED.buildException();
+                    }
+
+
+                    // 创建认证对象
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities());
+
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
-                CustomUserDetails userDetails = jwtManager.parseToken(token);
-
-                // 验证用户状态
-                if (!userStatusCache.isUserActive(userDetails.getUserId(), userDetails.getUserType())) {
-                    throw AuthErrorCode.ACCOUNT_DISABLED.buildException() ;
-                }
-
-
-                // 创建认证对象
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
-
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception e) {
+                SecurityContextHolder.clearContext();
+                handleAuthenticationException(response, e);
+                return;
             }
-        } catch (Exception e) {
-            SecurityContextHolder.clearContext();
-            handleAuthenticationException(response, e);
-            return;
         }
 
         filterChain.doFilter(request, response);

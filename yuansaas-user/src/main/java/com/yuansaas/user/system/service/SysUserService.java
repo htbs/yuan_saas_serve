@@ -1,6 +1,13 @@
 package com.yuansaas.user.system.service;
 
+import com.yuansaas.core.response.ResponseBuilder;
+import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.system.entity.SysUser;
+import com.yuansaas.user.system.param.SysUserCreateParam;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Optional;
 
@@ -28,16 +35,27 @@ public interface SysUserService {
     Optional<SysUser> findByUsername(String username);
 
     /**
+     * 创建用户
+     * @param sysUserCreateParam 用户创建请求
+     * @return 创建成功的用户信息
+     */
+    SysUser createUser(SysUserCreateParam sysUserCreateParam);
+    /**
      * 锁定用户
      * @param userId  用户id
      */
-    void lockUser(Long userId);
+    Boolean lockUser(Long userId);
 
     /**
      * 解锁用户
      * @param userId  用户id
      */
-    void unlockUser(Long userId);
+    Boolean unlockUser(Long userId);
 
 
+    /**
+     * 删除用户
+     * @param userId  用户id
+     */
+    Boolean deleteUser(Long userId);
 }

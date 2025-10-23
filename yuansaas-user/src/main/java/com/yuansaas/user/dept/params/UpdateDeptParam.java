@@ -18,5 +18,5 @@ public class UpdateDeptParam {
     /**
      * 部门名称
      */
-    private String deptName;
+    private String name;
 }

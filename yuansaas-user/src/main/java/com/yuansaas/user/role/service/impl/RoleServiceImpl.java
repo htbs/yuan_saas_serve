@@ -8,6 +8,7 @@ import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.user.dept.entity.QSysDept;
+import com.yuansaas.user.dept.service.DeptService;
 import com.yuansaas.user.dept.vo.DeptListVo;
 import com.yuansaas.user.role.entity.QRole;
 import com.yuansaas.user.role.entity.Role;
@@ -35,6 +36,7 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
     private final JPAQueryFactory jpaQueryFactory;
+    private final DeptService deptService;
 
     /**
      * 列表查询
@@ -73,6 +75,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Boolean save(SaveRoleParam saveRoleParam) {
+        validated(saveRoleParam.getMerchantCode(),saveRoleParam.getDeptId());
         Role role = new Role();
         BeanUtil.copyProperties(saveRoleParam, role);
         role.setCreateAt(LocalDateTime.now());
@@ -88,8 +91,9 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Boolean update(UpdateRoleParam updateRoleParam) {
-        roleRepository.findById(updateRoleParam.getRoleId()).ifPresentOrElse(role ->{
-            role.setName(updateRoleParam.getRoleName());
+        roleRepository.findById(updateRoleParam.getId()).ifPresentOrElse(role ->{
+            validated(role.getMerchantCode(),updateRoleParam.getDeptId());
+            role.setName(updateRoleParam.getName());
             role.setDeptId(updateRoleParam.getDeptId());
             role.setDescription(updateRoleParam.getDescription());
             role.setUpdateAt(LocalDateTime.now());
@@ -134,5 +138,12 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean authorize(Long id) {
         return null;
+    }
+
+    /**
+     * 校验 角色 相关信息
+     */
+    public void validated ( String merchantCode , Long deptId ) {
+        deptService.getById(merchantCode, deptId);
     }
 }

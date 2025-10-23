@@ -1,6 +1,5 @@
 package com.yuansaas.user.dept.api;
 
-import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
@@ -11,13 +10,9 @@ import com.yuansaas.user.dept.service.DeptService;
 import com.yuansaas.user.dept.vo.DeptListVo;
 import com.yuansaas.user.dept.vo.DeptTreeListVo;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
 
 /**
  *
@@ -39,7 +34,7 @@ public class DeptApi {
      */
     @GetMapping("/list")
     @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<List<DeptTreeListVo> >> list(FindDeptParam findDeptParam) {
+    public ResponseEntity<ResponseModel<DeptTreeListVo>> list(FindDeptParam findDeptParam) {
         return ResponseBuilder.okResponse(deptService.list(findDeptParam));
     }
 
@@ -68,9 +63,8 @@ public class DeptApi {
      * @param id 部门id
      * @return 删除结果
      */
-    @GetMapping("/delete/{id}")
-    @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<Boolean>> delete(@RequestPart("id") Long id ) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable(value = "id") Long id ) {
         return ResponseBuilder.okResponse(deptService.delete(id));
     }
     /**
@@ -80,7 +74,7 @@ public class DeptApi {
      */
     @GetMapping("/{id}")
     @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<DeptListVo>> getById(@RequestPart("id") Long id ) {
-        return ResponseBuilder.okResponse(deptService.getById(id));
+    public ResponseEntity<ResponseModel<DeptListVo>> getById(@PathVariable("id") Long id ) {
+        return ResponseBuilder.okResponse(deptService.getById("0", id));
     }
 }

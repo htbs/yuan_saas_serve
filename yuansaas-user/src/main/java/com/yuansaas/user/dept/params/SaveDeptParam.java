@@ -16,7 +16,7 @@ public class SaveDeptParam {
      * 商户编号
      */
     @NotNull(message = "商户编号不能为空")
-    private Long merchantCode;
+    private String merchantCode;
     /**
      * 父部门ID
      */
@@ -26,5 +26,5 @@ public class SaveDeptParam {
      * 部门名称
      */
     @NotBlank(message = "部门名称不能为空")
-    private String deptName;
+    private String name;
 }

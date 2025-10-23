@@ -11,9 +11,17 @@ import lombok.Data;
 public class SysUserCreateParam {
 
     /**
+     * 商户编号
+     */
+    private String merchantCode;
+    /**
      * 用户名
      */
     private String userName;
+    /**
+     * 头像
+     */
+    private String headUrl;
 
     /**
      * 真实姓名

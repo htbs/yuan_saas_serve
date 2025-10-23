@@ -7,11 +7,13 @@ import com.yuansaas.user.client.entity.ClientUser;
 import com.yuansaas.user.client.service.ClientUserService;
 import com.yuansaas.user.common.enums.UserType;
 import com.yuansaas.user.common.service.UserStatusCache;
+import com.yuansaas.user.config.ServiceManager;
 import com.yuansaas.user.system.entity.SysUser;
 import com.yuansaas.user.system.service.SysUserService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -28,8 +30,6 @@ import java.util.Date;
 public class JwtManager {
 
     private final JwtProperties jwtProperties;
-
-    private final  SysUserService sysUserService;
 
     private final ClientUserService clientUserService;
 
@@ -120,7 +120,7 @@ public class JwtManager {
 
     private CustomUserDetails loadUserDetails(UserType userType, Long userId, String username) {
         if (userType == UserType.SYSTEM_USER) {
-            SysUser user = sysUserService.findById(userId)
+            SysUser user = ServiceManager.sysUserService.findById(userId)
                     .orElseThrow(() -> new UsernameNotFoundException("系统用户不存在"));
             return new CustomUserDetails(user);
         } else {

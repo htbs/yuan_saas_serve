@@ -66,7 +66,7 @@ public class RoleApi {
      */
     @GetMapping("/delete/{id}")
     @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<Boolean>> delete(@RequestPart("id") Long id ) {
+    public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.delete(id));
     }
     /**
@@ -76,7 +76,7 @@ public class RoleApi {
      */
     @GetMapping("/{id}")
     @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<RoleVo>> getById(@RequestPart("id") Long id ) {
+    public ResponseEntity<ResponseModel<RoleVo>> getById(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.getById(id));
     }
     /**

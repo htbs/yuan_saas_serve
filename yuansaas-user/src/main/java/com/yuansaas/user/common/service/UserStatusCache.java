@@ -6,6 +6,7 @@ import com.yuansaas.user.client.entity.ClientUser;
 import com.yuansaas.user.client.service.ClientUserService;
 import com.yuansaas.user.common.enums.UserStatus;
 import com.yuansaas.user.common.enums.UserType;
+import com.yuansaas.user.config.ServiceManager;
 import com.yuansaas.user.system.entity.SysUser;
 import com.yuansaas.user.system.service.SysUserService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class UserStatusCache {
 
-    private final SysUserService sysUserService;
+//    private final SysUserService sysUserService;
     private final ClientUserService clientUserService;
 
     /**
@@ -59,7 +60,7 @@ public class UserStatusCache {
      */
     private boolean loadUserStatus(Long userId, UserType userType) {
         if (userType == UserType.SYSTEM_USER) {
-            SysUser user = sysUserService.findById(userId)
+            SysUser user = ServiceManager.sysUserService.findById(userId)
                     .orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在") );
             return UserStatus.active.matches(user.getStatus()) ;
         } else {

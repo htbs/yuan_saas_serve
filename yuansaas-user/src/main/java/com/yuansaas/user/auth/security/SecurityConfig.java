@@ -5,6 +5,7 @@ import com.yuansaas.user.auth.security.annotations.service.SecurityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -38,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll() // 放行认证接口
                         .requestMatchers("/wx/mp/callback/**").permitAll()
                         .requestMatchers("/wx/mp/auth/qrcode/temp/url").permitAll()
+                        .requestMatchers("/*/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
