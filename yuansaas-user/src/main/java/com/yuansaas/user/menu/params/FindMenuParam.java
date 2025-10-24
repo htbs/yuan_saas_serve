@@ -13,4 +13,8 @@ public class FindMenuParam {
 
     private String merchantCode;
 
+    /**
+     * 类型   0：菜单   1：按钮
+     */
+    private Integer menuType;
 }

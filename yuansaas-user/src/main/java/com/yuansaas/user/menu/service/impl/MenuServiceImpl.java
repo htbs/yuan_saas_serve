@@ -1,11 +1,17 @@
 package com.yuansaas.user.menu.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
+import com.yuansaas.core.jpa.querydsl.BoolBuilder;
+import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.menu.entity.Menu;
+import com.yuansaas.user.menu.entity.QMenu;
 import com.yuansaas.user.menu.model.MenuModel;
 import com.yuansaas.user.menu.params.FindMenuParam;
 import com.yuansaas.user.menu.params.SaveMenuParam;
@@ -34,6 +40,7 @@ public class MenuServiceImpl implements MenuService {
 
     private final MenuRepository menuRepository;
 
+    private final JPAQueryFactory jpaQueryFactory;
 
     /**
      * 列表查询
@@ -43,7 +50,33 @@ public class MenuServiceImpl implements MenuService {
      */
     @Override
     public List<MenuListVo> list(FindMenuParam findMenuParam) {
-        return List.of();
+
+        QMenu menu = QMenu.menu;
+        List<MenuListVo> listVos = jpaQueryFactory.select(Projections.bean(MenuListVo.class,
+                        menu.id,
+                        menu.name,
+                        menu.url,
+                        menu.permissions,
+                        menu.icon,
+                        menu.sort,
+                        menu.menuType,
+                        menu.pid,
+                        menu.merchantCode,
+                        menu.createAt,
+                        menu.updateAt,
+                        menu.deleteStatus,
+                        menu.lockStatus,
+                        menu.createBy,
+                        menu.updateBy))
+                .from(menu)
+                .where(BoolBuilder.getInstance()
+                        .and(findMenuParam.getMerchantCode(), menu.merchantCode::eq)
+                        .and(findMenuParam.getMenuType(), menu.menuType::eq)
+                        .and(menu.deleteStatus.eq(AppConstants.N))
+                        .getWhere())
+                .fetch();
+        // 构建树形结构
+        return TreeUtils.build(listVos , AppConstants.ZERO_L);
     }
 
     /**

@@ -35,4 +35,8 @@ public class MenuVo {
      * 排序
      */
     private Integer sort;
+    /**
+     * 授权(多个用逗号分隔，如：sys:user:list,sys:user:save)
+     */
+    private String permissions;
 }

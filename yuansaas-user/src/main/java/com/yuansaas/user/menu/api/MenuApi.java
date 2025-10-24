@@ -73,7 +73,7 @@ public class MenuApi {
      */
     @GetMapping("/delete/{id}")
     @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<Boolean>> delete(@RequestPart("id") Long id ) {
+    public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(menuService.delete(id));
     }
     /**
@@ -83,7 +83,7 @@ public class MenuApi {
      */
     @GetMapping("/lock/{id}")
     @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<Boolean>> lock(@RequestPart("id") Long id ) {
+    public ResponseEntity<ResponseModel<Boolean>> lock(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(menuService.lock(id));
     }
     /**
@@ -93,7 +93,7 @@ public class MenuApi {
      */
     @GetMapping("/{id}")
     @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<MenuVo>> getById(@RequestPart("id") Long id ) {
+    public ResponseEntity<ResponseModel<MenuVo>> getById(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(menuService.getById(id));
     }
 }
