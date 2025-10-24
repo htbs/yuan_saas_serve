@@ -174,6 +174,16 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /**
+     * 批量获取菜单 (原始信息)
+     *
+     * @param ids
+     */
+    @Override
+    public List<Menu> getByList(List<Long> ids) {
+        return menuRepository.findAllById(ids);
+    }
+
+    /**
      * 验证父级菜单是否存在
      * @param menuModel 校验model
      */

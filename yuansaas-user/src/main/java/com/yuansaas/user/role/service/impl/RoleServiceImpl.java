@@ -1,6 +1,7 @@
 package com.yuansaas.user.role.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -10,11 +11,16 @@ import com.yuansaas.core.page.RPage;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.service.DeptService;
 import com.yuansaas.user.dept.vo.DeptListVo;
+import com.yuansaas.user.menu.entity.Menu;
+import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.role.entity.QRole;
 import com.yuansaas.user.role.entity.Role;
+import com.yuansaas.user.role.entity.RoleMenu;
+import com.yuansaas.user.role.params.AuthorizeMenuParam;
 import com.yuansaas.user.role.params.FindRoleParam;
 import com.yuansaas.user.role.params.SaveRoleParam;
 import com.yuansaas.user.role.params.UpdateRoleParam;
+import com.yuansaas.user.role.repository.RoleMenuRepository;
 import com.yuansaas.user.role.repository.RoleRepository;
 import com.yuansaas.user.role.service.RoleService;
 import com.yuansaas.user.role.vo.RoleListVo;
@@ -23,7 +29,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -37,6 +45,8 @@ public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final DeptService deptService;
+    private final MenuService menuService;
+    private final RoleMenuRepository roleMenuRepository;
 
     /**
      * 列表查询
@@ -133,12 +143,28 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 角色授权
      *
-     * @param id
+     * @param authorizeMenuParam 角色授权菜单参数
      */
     @Override
-    public Boolean authorize(Long id) {
-        return null;
+    public Boolean authorize(AuthorizeMenuParam authorizeMenuParam) {
+        // 验证可用的菜单
+        List<Menu> menuList = menuService.getByList(authorizeMenuParam.getMenuIds());
+        if (ObjectUtil.isEmpty(menuList)) {
+             throw DataErrorCode.DATA_NOT_FOUND.buildException("菜单不存在");
+        }
+        List<RoleMenu> roleMenuList = new ArrayList<>();
+        menuList.forEach(menu -> {
+            RoleMenu roleMenu = new RoleMenu();
+            roleMenu.setMenuId(menu.getId());
+            roleMenu.setRoleId(authorizeMenuParam.getRoleId());
+            roleMenu.setCreateAt(LocalDateTime.now());
+            roleMenu.setCreateBy("admin");
+            roleMenuList.add(roleMenu);
+        });
+        roleMenuRepository.saveAll(roleMenuList);
+        return true;
     }
+
 
     /**
      * 校验 角色 相关信息

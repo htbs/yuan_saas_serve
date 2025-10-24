@@ -3,6 +3,7 @@ package com.yuansaas.user.menu.service;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
+import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.params.FindMenuParam;
 import com.yuansaas.user.menu.params.SaveMenuParam;
 import com.yuansaas.user.menu.params.UpdateMenuParam;
@@ -47,4 +48,8 @@ public interface MenuService {
      * 菜单详情
      */
     MenuVo getById(Long id);
+    /**
+     * 批量获取菜单 (原始信息)
+     */
+    List<Menu> getByList(List<Long> ids);
 }

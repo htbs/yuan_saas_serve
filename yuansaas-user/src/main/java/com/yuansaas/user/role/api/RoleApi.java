@@ -4,6 +4,7 @@ import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
+import com.yuansaas.user.role.params.AuthorizeMenuParam;
 import com.yuansaas.user.role.params.FindRoleParam;
 import com.yuansaas.user.role.params.SaveRoleParam;
 import com.yuansaas.user.role.params.UpdateRoleParam;
@@ -79,13 +80,14 @@ public class RoleApi {
     public ResponseEntity<ResponseModel<RoleVo>> getById(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.getById(id));
     }
-//    /**
-//     * 角色授权
-//     * @param id
-//     */
-//    @GetMapping("/authorize")
-//    @SecurityAuth(authenticated = false)
-//    public ResponseEntity<ResponseModel<Boolean>> authorize(@RequestPart("id") Long id ) {
-//        return ResponseBuilder.okResponse(roleService.authorize(id));
-//    }
+    /**
+     * 角色授权
+     * @param authorizeMenuParam 授权参数
+     * @return true/false
+     */
+    @PostMapping("/authorize")
+    @SecurityAuth(authenticated = false)
+    public ResponseEntity<ResponseModel<Boolean>> authorize(@RequestBody @Validated AuthorizeMenuParam authorizeMenuParam) {
+        return ResponseBuilder.okResponse(roleService.authorize(authorizeMenuParam));
+    }
 }
