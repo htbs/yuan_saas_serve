@@ -6,6 +6,8 @@ import com.yuansaas.user.dept.params.UpdateDeptParam;
 import com.yuansaas.user.dept.vo.DeptListVo;
 import com.yuansaas.user.dept.vo.DeptTreeListVo;
 
+import java.util.List;
+
 /**
  *
  * 部门管理
@@ -16,9 +18,10 @@ public interface DeptService {
 
     /**
      * 列表查询
-     * @param findDeptParam  查询列表信息
+     *
+     * @param findDeptParam 查询列表信息
      */
-    DeptTreeListVo list(FindDeptParam findDeptParam);
+    List<DeptTreeListVo> list(FindDeptParam findDeptParam);
 
     /**
      * 新增部门

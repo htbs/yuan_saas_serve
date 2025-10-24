@@ -2,10 +2,12 @@ package com.yuansaas.user.dept.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
+import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.model.DeptTreeModel;
@@ -44,28 +46,30 @@ public class DeptServiceImpl implements DeptService {
      * @param findDeptParam 查询参数
      */
     @Override
-    public DeptTreeListVo list(FindDeptParam findDeptParam) {
-
+    public List<DeptTreeListVo> list(FindDeptParam findDeptParam) {
         QSysDept qDept = QSysDept.sysDept;
-        BoolBuilder boolBuilder = BoolBuilder.getInstance();
-        boolBuilder.and(findDeptParam.getMerchantCode() , qDept.merchantCode::eq);
-        if (!ObjectUtil.isEmpty(findDeptParam.getMerchantCode()) && Objects.equals(AppConstants.ZERO_S , findDeptParam.getMerchantCode()) && ObjectUtil.isEmpty(findDeptParam.getDeptName())) {
-            boolBuilder.and(0L , qDept.pid::eq);
-        }else {
-            boolBuilder.and(findDeptParam.getDeptName() , qDept.name::eq);
-        }
-
-        SysDept deptList = jpaQueryFactory.selectFrom(qDept)
-                .where(boolBuilder.and(AppConstants.N, qDept.lockStatus::eq).getWhere())
-                .fetchOne();
-        if (ObjectUtil.isEmpty(deptList)) {
+        List<DeptTreeListVo> deptLists = jpaQueryFactory.select(Projections.bean(DeptTreeListVo.class,
+                        qDept.id,
+                        qDept.name,
+                        qDept.pid,
+                        qDept.lockStatus,
+                        qDept.createAt,
+                        qDept.createBy,
+                        qDept.updateAt,
+                        qDept.updateBy,
+                        qDept.merchantCode))
+                .from(qDept)
+                .where(BoolBuilder.getInstance()
+                        .and(findDeptParam.getMerchantCode() , qDept.merchantCode::eq)
+                        .and(findDeptParam.getDeptName() , qDept.name::eq)
+                        .and(qDept.lockStatus.eq(AppConstants.N))
+                        .and(qDept.deleteStatus.eq(AppConstants.N))
+                        .getWhere())
+                .fetch();
+        if (ObjectUtil.isEmpty(deptLists)) {
             throw DataErrorCode.DATA_NOT_FOUND.buildException("部门不存在");
         }
-        List<DeptTreeModel> deptTreeList = getDeptTreeList(deptList.getId());
-        DeptTreeListVo deptTreeListVo = new DeptTreeListVo();
-        BeanUtils.copyProperties(deptList , deptTreeListVo);
-        deptTreeListVo.setChildrenDeptList(deptTreeList);
-        return deptTreeListVo;
+        return TreeUtils.build(deptLists);
     }
 
     /**

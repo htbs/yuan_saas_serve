@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  *
  * 部门管理Api
@@ -34,7 +36,7 @@ public class DeptApi {
      */
     @GetMapping("/list")
     @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<DeptTreeListVo>> list(FindDeptParam findDeptParam) {
+    public ResponseEntity<ResponseModel<List<DeptTreeListVo>>> list(FindDeptParam findDeptParam) {
         return ResponseBuilder.okResponse(deptService.list(findDeptParam));
     }
 
