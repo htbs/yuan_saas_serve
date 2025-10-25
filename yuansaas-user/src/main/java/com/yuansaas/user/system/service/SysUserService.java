@@ -2,13 +2,16 @@ package com.yuansaas.user.system.service;
 
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
+import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.system.entity.SysUser;
 import com.yuansaas.user.system.param.SysUserCreateParam;
+import com.yuansaas.user.system.param.UserUpdateParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -39,7 +42,13 @@ public interface SysUserService {
      * @param sysUserCreateParam 用户创建请求
      * @return 创建成功的用户信息
      */
-    SysUser createUser(SysUserCreateParam sysUserCreateParam);
+    SysUser saveUser(SysUserCreateParam sysUserCreateParam);
+    /**
+     * 更新用户
+     * @param userUpdateParam 用户更新请求
+     * @return 更新成功的用户信息 true/false
+     */
+    Boolean updateUser(UserUpdateParam userUpdateParam);
     /**
      * 锁定用户
      * @param userId  用户id
@@ -58,4 +67,10 @@ public interface SysUserService {
      * @param userId  用户id
      */
     Boolean deleteUser(Long userId);
+    /**
+     * 根据用户id查询菜单列表
+     * @param userId 用户id
+     * @return 菜单列表
+     */
+    List<MenuListVo> findMenuListByUserId(Long userId);
 }

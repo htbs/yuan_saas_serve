@@ -22,7 +22,9 @@ import com.yuansaas.user.role.params.SaveRoleParam;
 import com.yuansaas.user.role.params.UpdateRoleParam;
 import com.yuansaas.user.role.repository.RoleMenuRepository;
 import com.yuansaas.user.role.repository.RoleRepository;
+import com.yuansaas.user.role.service.RoleMenuService;
 import com.yuansaas.user.role.service.RoleService;
+import com.yuansaas.user.role.service.RoleUserService;
 import com.yuansaas.user.role.vo.RoleListVo;
 import com.yuansaas.user.role.vo.RoleVo;
 import lombok.AllArgsConstructor;
@@ -45,8 +47,9 @@ public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final DeptService deptService;
-    private final MenuService menuService;
-    private final RoleMenuRepository roleMenuRepository;
+    private final RoleMenuService roleMenuService;
+    private final RoleUserService roleUserService;
+
 
     /**
      * 列表查询
@@ -122,7 +125,12 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Boolean delete(Long id) {
+        // 删除角色
         roleRepository.deleteById(id);
+        // 删除角色菜单关联
+        roleMenuService.deleteByRoleIds(id);
+        // 删除角色用户关联
+        roleUserService.deleteByRoleIds(id);
         return true;
     }
 
@@ -147,22 +155,19 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Boolean authorize(AuthorizeMenuParam authorizeMenuParam) {
-        // 验证可用的菜单
-        List<Menu> menuList = menuService.getByList(authorizeMenuParam.getMenuIds());
-        if (ObjectUtil.isEmpty(menuList)) {
-             throw DataErrorCode.DATA_NOT_FOUND.buildException("菜单不存在");
-        }
-        List<RoleMenu> roleMenuList = new ArrayList<>();
-        menuList.forEach(menu -> {
-            RoleMenu roleMenu = new RoleMenu();
-            roleMenu.setMenuId(menu.getId());
-            roleMenu.setRoleId(authorizeMenuParam.getRoleId());
-            roleMenu.setCreateAt(LocalDateTime.now());
-            roleMenu.setCreateBy("admin");
-            roleMenuList.add(roleMenu);
-        });
-        roleMenuRepository.saveAll(roleMenuList);
+        roleMenuService.saveOrUpdate(authorizeMenuParam.getRoleId() , authorizeMenuParam.getMenuIds());
         return true;
+    }
+
+    /**
+     * 通过角色id查询角色信息
+     *
+     * @param ids 角色id列表
+     * @return 角色列表
+     */
+    @Override
+    public List<Role> getByIdAll(List<Long> ids) {
+        return roleRepository.findAllById(ids);
     }
 
 

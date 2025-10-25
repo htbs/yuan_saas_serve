@@ -9,6 +9,7 @@ import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.params.UpdateDeptParam;
 import com.yuansaas.user.dept.vo.DeptListVo;
 import com.yuansaas.user.dept.vo.DeptTreeListVo;
+import com.yuansaas.user.role.entity.Role;
 import com.yuansaas.user.role.params.AuthorizeMenuParam;
 import com.yuansaas.user.role.params.FindRoleParam;
 import com.yuansaas.user.role.params.SaveRoleParam;
@@ -54,8 +55,15 @@ public interface RoleService {
      */
     RoleVo getById(Long id );
     /**
-     * 角色授权
+     * 角色授权菜单
      * @param authorizeMenuParam 角色授权菜单参数
      */
     Boolean authorize( AuthorizeMenuParam authorizeMenuParam);
+
+    /**
+     * 通过角色id查询角色信息
+     * @param Id 角色id列表
+     * @return 角色列表
+     */
+    List<Role> getByIdAll(List<Long> Id);
 }

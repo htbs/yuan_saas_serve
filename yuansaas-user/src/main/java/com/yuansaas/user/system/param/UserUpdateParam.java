@@ -12,13 +12,13 @@ import java.util.List;
  * @author HTB 2025/8/11 15:28
  */
 @Data
-public class SysUserCreateParam {
+public class UserUpdateParam {
 
     /**
-     * 商户编号
+     * 用户编号
      */
-    @NotBlank(message = "商户编号不能为空")
-    private String merchantCode;
+    @NotBlank(message = "用户编号不能为空")
+    private Long id;
     /**
      * 用户名
      */
@@ -35,12 +35,6 @@ public class SysUserCreateParam {
      */
     @NotBlank(message = "真实姓名不能为空")
     private String realName;
-
-    /**
-     * 密码
-     */
-    @NotBlank(message = "密码不能为空")
-    private String password;
 
     /**
      * 邮箱
