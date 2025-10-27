@@ -39,6 +39,8 @@ public class WxMpAuthApi {
     /**
      * 微信公众号临时二维码Ticket
      * todo 用于临时测试，后续需要删除
+     * @param sceneId 场景ID
+     * @param expireSeconds 过期时间
      * @return 临时二维码
      */
     @Deprecated

@@ -32,7 +32,7 @@ public class DeptApi {
     /**
      * 列表查询
      * @param findDeptParam 查询参数
-     * @return 部门列表
+     * @return 部门列表 DeptTreeListVo
      */
     @GetMapping("/list")
     @SecurityAuth(authenticated = false)
@@ -43,7 +43,7 @@ public class DeptApi {
     /**
      * 新增部门
      * @param saveDeptParam 新增参数
-     * @return 新增结果
+     * @return 新增结果 true/false
      */
     @PostMapping("/save")
     @SecurityAuth(authenticated = false)
@@ -53,7 +53,7 @@ public class DeptApi {
     /**
      * 修改部门
      * @param updateDeptParam 修改参数
-     * @return 修改结果
+     * @return 修改结果 true/false
      */
     @PutMapping("/update")
     @SecurityAuth(authenticated = false)
@@ -63,7 +63,7 @@ public class DeptApi {
     /**
      * 删除部门
      * @param id 部门id
-     * @return 删除结果
+     * @return 删除结果 true/false
      */
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable(value = "id") Long id ) {
@@ -72,7 +72,7 @@ public class DeptApi {
     /**
      * 部门详情
      * @param id 部门id
-     * @return 部门详情
+     * @return 部门详情 DeptListVo
      */
     @GetMapping("/{id}")
     @SecurityAuth(authenticated = false)

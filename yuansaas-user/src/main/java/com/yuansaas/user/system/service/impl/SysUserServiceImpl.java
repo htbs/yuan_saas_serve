@@ -6,12 +6,11 @@ import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.common.enums.UserStatus;
+import com.yuansaas.user.dept.service.DeptUserService;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.menu.vo.MenuListVo;
-import com.yuansaas.user.role.entity.Role;
 import com.yuansaas.user.role.service.RoleMenuService;
-import com.yuansaas.user.role.service.RoleService;
 import com.yuansaas.user.role.service.RoleUserService;
 import com.yuansaas.user.system.entity.SysUser;
 import com.yuansaas.user.system.param.SysUserCreateParam;
@@ -20,7 +19,6 @@ import com.yuansaas.user.system.repository.SysUserRepository;
 import com.yuansaas.user.system.service.SysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +39,7 @@ public class SysUserServiceImpl implements SysUserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleUserService roleUserService;
     private final RoleMenuService roleMenuService;
+    private final DeptUserService deptUserService;
     private final MenuService menuService;
 
 
@@ -71,6 +70,8 @@ public class SysUserServiceImpl implements SysUserService {
         sysUserRepository.save(sysUser);
         // 授权角色权限
         roleUserService.saveOrUpdate(sysUser.getId(), sysUserCreateParam.getRoleList());
+        // 授权部门权限
+        deptUserService.saveOrUpdate(sysUser.getId(),sysUserCreateParam.getDeptId());
         return sysUser;
     }
 
@@ -122,6 +123,10 @@ public class SysUserServiceImpl implements SysUserService {
             sysUser.setUpdateAt(LocalDateTime.now());
             sysUser.setUpdateBy(AppContextUtil.getUserInfo());
             sysUserRepository.save(sysUser);
+            // 解除角色权限
+            roleUserService.deleteByUserIds(userId);
+            // 解除部门权限
+            deptUserService.deleteByUserId(userId);
         }, () -> {
             throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
         });

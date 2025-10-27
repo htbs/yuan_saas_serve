@@ -54,9 +54,15 @@ public class SysUserCreateParam {
     private String phone;
 
     /**
-     * 角色类型
+     * 角色ids
      */
-    @NotNull(message = "角色类型不能为空")
+    @NotNull(message = "角色id不能为空")
     private List<Long> roleList;
+
+    /**
+     * 部门
+     */
+    @NotNull(message = "部门id不能为空")
+    private Long deptId;
 
 }

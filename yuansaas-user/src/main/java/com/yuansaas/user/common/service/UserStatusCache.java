@@ -1,5 +1,6 @@
 package com.yuansaas.user.common.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.user.client.entity.ClientUser;
@@ -36,8 +37,8 @@ public class UserStatusCache {
      * @return 用户是否活跃
      */
     public boolean isUserActive(Long userId, UserType userType) {
-        RedisUtil.getOrLoad(RedisUtil.genKey("userStatus", userType.name() , userId),
-                Boolean.class,
+        RedisUtil.getOrLoad(RedisUtil.genKey("userStatus", userType.name(), userId),
+                new TypeReference<Boolean>() {},
                 () -> loadUserStatus(userId, userType),
                 60 * 60 * 24,
                 TimeUnit.SECONDS);

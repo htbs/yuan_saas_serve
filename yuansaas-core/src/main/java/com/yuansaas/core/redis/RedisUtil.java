@@ -1,6 +1,7 @@
 package com.yuansaas.core.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
@@ -121,6 +122,24 @@ public class RedisUtil {
             throw new RuntimeException("Redis反序列化失败", e);
         }
     }
+    /**
+     * 获取缓存，反序列化成指定类型
+     *
+     * @param key   缓存 Key
+     * @param clazz 目标类型 Class
+     * @param <T>   TypeReference
+     * @return 缓存对象，缓存不存在或空值返回 null
+     */
+    public static <T> T get(String key, TypeReference<T> clazz) {
+        String json = redisTemplate.opsForValue().get(key);
+        if (json == null) return null;
+        if (NULL_PLACEHOLDER.equals(json)) return null; // 处理空值占位符
+        try {
+            return objectMapper.readValue(json, clazz);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Redis反序列化失败", e);
+        }
+    }
 
     /**
      * 删除缓存 Key
@@ -217,7 +236,7 @@ public class RedisUtil {
      * @param <T>     泛型类型
      * @return 查询结果，可能为 null
      */
-    public static <T> T getOrLoad(String key, Class<T> clazz, Supplier<T> dbQuery, long timeout, TimeUnit unit) {
+    public static <T> T getOrLoad(String key, TypeReference<T> clazz, Supplier<T> dbQuery, long timeout, TimeUnit unit) {
         T value = get(key, clazz);
         if (value != null) return value;
 
@@ -235,7 +254,7 @@ public class RedisUtil {
     /**
      * getOrLoad 变体，不指定过期时间（默认无过期）
      */
-    public static <T> T getOrLoad(String key, Class<T> clazz, Supplier<T> dbQuery) {
+    public static <T> T getOrLoad(String key, TypeReference<T> clazz, Supplier<T> dbQuery) {
         return getOrLoad(key, clazz, dbQuery, -1, TimeUnit.SECONDS);
     }
 

@@ -1,21 +1,20 @@
-package com.yuansaas.user.dept.enums;
+package com.yuansaas.user.menu.enums;
 
 import com.yuansaas.common.enums.IBaseEnum;
-import com.yuansaas.user.common.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
  *
- * 部门缓存枚举
+ * 菜单缓存枚举
  *
  * @author LXZ 2025/10/17 18:11
  */
 @Getter
 @AllArgsConstructor
-public enum DeptCacheEnum implements IBaseEnum<DeptCacheEnum> {
+public enum MenuCacheEnum implements IBaseEnum<MenuCacheEnum> {
 
-    DEPT_TREE_LIST("dept_tree_list", "部门树状列表缓存"),
+    MENU_LIST("menu_list", "菜单列表缓存"),
     ;
 
     private final String key;

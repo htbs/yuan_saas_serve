@@ -4,14 +4,17 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
+import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.entity.QMenu;
+import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.model.MenuModel;
 import com.yuansaas.user.menu.params.FindMenuParam;
 import com.yuansaas.user.menu.params.SaveMenuParam;
@@ -50,33 +53,36 @@ public class MenuServiceImpl implements MenuService {
      */
     @Override
     public List<MenuListVo> list(FindMenuParam findMenuParam) {
+     return    RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),findMenuParam.getMerchantCode()), new TypeReference<List<MenuListVo>>() {
+        }, () -> {
+            QMenu menu = QMenu.menu;
+            List<MenuListVo> listVos = jpaQueryFactory.select(Projections.bean(MenuListVo.class,
+                            menu.id,
+                            menu.name,
+                            menu.url,
+                            menu.permissions,
+                            menu.icon,
+                            menu.sort,
+                            menu.menuType,
+                            menu.pid,
+                            menu.merchantCode,
+                            menu.createAt,
+                            menu.updateAt,
+                            menu.deleteStatus,
+                            menu.lockStatus,
+                            menu.createBy,
+                            menu.updateBy))
+                    .from(menu)
+                    .where(BoolBuilder.getInstance()
+                            .and(findMenuParam.getMerchantCode(), menu.merchantCode::eq)
+                            .and(findMenuParam.getMenuType(), menu.menuType::eq)
+                            .and(menu.deleteStatus.eq(AppConstants.N))
+                            .getWhere())
+                    .fetch();
+            // 构建树形结构
+            return TreeUtils.build(listVos, AppConstants.ZERO_L);
+        });
 
-        QMenu menu = QMenu.menu;
-        List<MenuListVo> listVos = jpaQueryFactory.select(Projections.bean(MenuListVo.class,
-                        menu.id,
-                        menu.name,
-                        menu.url,
-                        menu.permissions,
-                        menu.icon,
-                        menu.sort,
-                        menu.menuType,
-                        menu.pid,
-                        menu.merchantCode,
-                        menu.createAt,
-                        menu.updateAt,
-                        menu.deleteStatus,
-                        menu.lockStatus,
-                        menu.createBy,
-                        menu.updateBy))
-                .from(menu)
-                .where(BoolBuilder.getInstance()
-                        .and(findMenuParam.getMerchantCode(), menu.merchantCode::eq)
-                        .and(findMenuParam.getMenuType(), menu.menuType::eq)
-                        .and(menu.deleteStatus.eq(AppConstants.N))
-                        .getWhere())
-                .fetch();
-        // 构建树形结构
-        return TreeUtils.build(listVos , AppConstants.ZERO_L);
     }
 
     /**
@@ -100,6 +106,8 @@ public class MenuServiceImpl implements MenuService {
         menuNew.setCreateAt(LocalDateTime.now());
         menuNew.setCreateBy("admin");
         menuRepository.save(menuNew);
+        // 清除缓存
+        RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),saveMenuParam.getMerchantCode()));
         return true;
     }
 
@@ -118,6 +126,8 @@ public class MenuServiceImpl implements MenuService {
             menu.setUpdateAt(LocalDateTime.now());
             menu.setUpdateBy("admin");
             menuRepository.save(menu);
+            // 清除缓存
+            RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),menu.getMerchantCode()));
         } ,()->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("菜单不存在");
         });
@@ -136,6 +146,8 @@ public class MenuServiceImpl implements MenuService {
             menu.setUpdateAt(LocalDateTime.now());
             menu.setUpdateBy("admin");
             menuRepository.save(menu);
+            // 清除缓存
+            RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),menu.getMerchantCode()));
         } ,()->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("菜单不存在");
         });

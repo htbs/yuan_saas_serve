@@ -6,7 +6,6 @@ import com.yuansaas.user.role.entity.Role;
 import com.yuansaas.user.role.entity.RoleUser;
 import com.yuansaas.user.role.repository.RoleRepository;
 import com.yuansaas.user.role.repository.RoleUserRepository;
-import com.yuansaas.user.role.service.RoleService;
 import com.yuansaas.user.role.service.RoleUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -65,11 +64,11 @@ public class RoleUserServiceImpl implements RoleUserService {
     /**
      * 根据用户id，删除角色用户关系
      *
-     * @param userIds 用户ids
+     * @param userId 用户ids
      */
     @Override
-    public void deleteByUserIds(Long userIds) {
-        roleUserRepository.deleteByUserId(userIds);
+    public void deleteByUserIds(Long userId) {
+        roleUserRepository.deleteByUserId(userId);
     }
 
     /**

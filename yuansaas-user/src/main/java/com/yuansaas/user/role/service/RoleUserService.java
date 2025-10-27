@@ -32,9 +32,9 @@ public interface RoleUserService {
 
     /**
      * 根据用户id，删除角色用户关系
-     * @param userIds 用户ids
+     * @param userId 用户id
      */
-    void deleteByUserIds(Long userIds);
+    void deleteByUserIds(Long userId);
 
     /**
      * 角色ID列表
