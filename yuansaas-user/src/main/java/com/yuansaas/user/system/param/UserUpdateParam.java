@@ -17,7 +17,7 @@ public class UserUpdateParam {
     /**
      * 用户编号
      */
-    @NotBlank(message = "用户编号不能为空")
+    @NotNull(message = "用户编号不能为空")
     private Long id;
     /**
      * 用户名
@@ -27,7 +27,7 @@ public class UserUpdateParam {
     /**
      * 头像
      */
-    @NotNull(message = "头像不能为空")
+    @NotBlank(message = "头像不能为空")
     private String headUrl;
 
     /**
@@ -52,5 +52,11 @@ public class UserUpdateParam {
      */
     @NotNull(message = "角色类型不能为空")
     private List<Long> roleList;
+
+    /**
+     * 部门id
+     */
+    @NotNull(message = "部门id不能为空")
+    private Long deptId;
 
 }

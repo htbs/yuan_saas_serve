@@ -2,17 +2,23 @@ package com.yuansaas.user.role.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
+import com.yuansaas.core.redis.RedisUtil;
+import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.service.DeptService;
 import com.yuansaas.user.dept.vo.DeptListVo;
 import com.yuansaas.user.menu.entity.Menu;
+import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.service.MenuService;
+import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.role.entity.QRole;
 import com.yuansaas.user.role.entity.Role;
 import com.yuansaas.user.role.entity.RoleMenu;
@@ -27,6 +33,7 @@ import com.yuansaas.user.role.service.RoleService;
 import com.yuansaas.user.role.service.RoleUserService;
 import com.yuansaas.user.role.vo.RoleListVo;
 import com.yuansaas.user.role.vo.RoleVo;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +56,7 @@ public class RoleServiceImpl implements RoleService {
     private final DeptService deptService;
     private final RoleMenuService roleMenuService;
     private final RoleUserService roleUserService;
+    private final MenuService menuService;
 
 
     /**
@@ -121,15 +129,16 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 删除角色
      *
-     * @param id
+     * @param id 角色ID
      */
     @Override
+    @Transactional
     public Boolean delete(Long id) {
         // 删除角色
         roleRepository.deleteById(id);
-        // 删除角色菜单关联
+        // 删除角色菜单关联和缓存
         roleMenuService.deleteByRoleIds(id);
-        // 删除角色用户关联
+        // 删除角色用户关联和用户通过角色授权的菜单缓存
         roleUserService.deleteByRoleIds(id);
         return true;
     }
@@ -168,6 +177,21 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<Role> getByIdAll(List<Long> ids) {
         return roleRepository.findAllById(ids);
+    }
+
+    /**
+     * 查询角色授权的菜单列表
+     *
+     * @param roleId 角色ID
+     * @return MenuListVo
+     */
+    @Override
+    public List<MenuListVo> getAuthorizeMenuListByRoleId(Long roleId) {
+        return RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.ROLE_MENU_LIST.getKey() , roleId) , new TypeReference<List<MenuListVo>>(){},() ->{
+            List<Long> menuIdList = roleMenuService.getMenuIdList(roleId);
+            List<Menu> byList = menuService.getByList(menuIdList);
+            return TreeUtils.build(BeanUtil.copyToList(byList , MenuListVo.class), AppConstants.ZERO_L);
+        });
     }
 
 

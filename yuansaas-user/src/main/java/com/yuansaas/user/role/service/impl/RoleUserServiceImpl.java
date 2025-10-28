@@ -2,11 +2,14 @@ package com.yuansaas.user.role.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.yuansaas.core.redis.RedisUtil;
+import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.role.entity.Role;
 import com.yuansaas.user.role.entity.RoleUser;
 import com.yuansaas.user.role.repository.RoleRepository;
 import com.yuansaas.user.role.repository.RoleUserRepository;
 import com.yuansaas.user.role.service.RoleUserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,14 +34,15 @@ public class RoleUserServiceImpl implements RoleUserService {
      * @param roleIdList 角色ID列表
      */
     @Override
+    @Transactional
     public void saveOrUpdate(Long userId, List<Long> roleIdList) {
-        // 先删除原有关系
-        roleUserRepository.deleteByUserId(userId);
         //用户没有一个角色权限的情况
         List<Role> byIdAll = roleRepository.findAllById(roleIdList);
         if(ObjectUtil.isEmpty(byIdAll)){
             return ;
         }
+        // 先删除原有关系
+        roleUserRepository.deleteByUserId(userId);
         //保存角色用户关系
         List<RoleUser> roleUserList = CollUtil.newArrayList();
         for(Role roleId : byIdAll){
@@ -54,11 +58,20 @@ public class RoleUserServiceImpl implements RoleUserService {
     /**
      * 根据角色ids，删除角色用户关系
      *
-     * @param roleIds 角色ids
+     * @param roleId 角色id
      */
     @Override
-    public void deleteByRoleIds(Long roleIds) {
-        roleUserRepository.deleteByRoleId(roleIds);
+    @Transactional
+    public void deleteByRoleIds(Long roleId) {
+        // 同步吧用户通过该角色关联的菜单缓存删除
+        List<RoleUser> byRoleId = roleUserRepository.findByRoleId(roleId);
+        if (!ObjectUtil.isEmpty(byRoleId)) {
+            byRoleId.forEach(roleUser -> {
+                RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.USER_MENU_LIST.getKey(), roleUser.getUserId()));
+            });
+        }
+        // 删除角色用户关系
+        roleUserRepository.deleteByRoleId(roleId);
     }
 
     /**
@@ -67,6 +80,7 @@ public class RoleUserServiceImpl implements RoleUserService {
      * @param userId 用户ids
      */
     @Override
+    @Transactional
     public void deleteByUserIds(Long userId) {
         roleUserRepository.deleteByUserId(userId);
     }

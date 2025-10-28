@@ -4,6 +4,7 @@ import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
+import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.role.params.AuthorizeMenuParam;
 import com.yuansaas.user.role.params.FindRoleParam;
 import com.yuansaas.user.role.params.SaveRoleParam;
@@ -15,6 +16,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  *
@@ -89,5 +92,16 @@ public class RoleApi {
     @SecurityAuth(authenticated = false)
     public ResponseEntity<ResponseModel<Boolean>> authorize(@RequestBody @Validated AuthorizeMenuParam authorizeMenuParam) {
         return ResponseBuilder.okResponse(roleService.authorize(authorizeMenuParam));
+    }
+
+    /**
+     * 查询角色授权的菜单列表
+     * @param roleId 角色ID
+     * @return MenuListVo
+     */
+    @GetMapping("/authorize/menu/list")
+    @SecurityAuth(authenticated = false)
+    public ResponseEntity<ResponseModel<List<MenuListVo>>> getAuthorizeMenuListByRoleId(@RequestParam("roleId") Long roleId) {
+        return ResponseBuilder.okResponse(roleService.getAuthorizeMenuListByRoleId(roleId));
     }
 }

@@ -14,11 +14,10 @@ import java.time.LocalDateTime;
  *
  * @author LXZ 2025/10/16 16:53
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(name = "sys_dept_user")
-public class SysDeptUser extends BaseEntity {
+public class SysDeptUser {
     @Id
     @GenericGenerator(
             name = "id",

@@ -1,13 +1,16 @@
 package com.yuansaas.user.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
+import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.common.enums.UserStatus;
 import com.yuansaas.user.dept.service.DeptUserService;
 import com.yuansaas.user.menu.entity.Menu;
+import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.role.service.RoleMenuService;
@@ -84,6 +87,8 @@ public class SysUserServiceImpl implements SysUserService {
             sysUserRepository.save(sysUser);
             // 授权角色权限
             roleUserService.saveOrUpdate(sysUser.getId(), userUpdateParam.getRoleList());
+            // 授权部门权限
+            deptUserService.saveOrUpdate(sysUser.getId(),userUpdateParam.getDeptId());
         },()->{
             throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
         });
@@ -127,6 +132,8 @@ public class SysUserServiceImpl implements SysUserService {
             roleUserService.deleteByUserIds(userId);
             // 解除部门权限
             deptUserService.deleteByUserId(userId);
+            // 删除菜单缓存
+            RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.USER_MENU_LIST, userId));
         }, () -> {
             throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
         });
@@ -141,12 +148,14 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public List<MenuListVo> findMenuListByUserId(Long userId) {
-        // 查询角色列表
-        List<Long> roleIdList = roleUserService.getRoleIdList(userId);
-        // 查询菜单列表
-        List<Long> menuIdList = roleMenuService.getMenuIdList(roleIdList);
-        // 构建树形菜单
-        List<Menu> menuList = menuService.getByList(menuIdList);
-        return TreeUtils.build(BeanUtil.copyToList(menuList, MenuListVo.class) , AppConstants.ZERO_L);
+        return RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.USER_MENU_LIST, userId), new TypeReference<List<MenuListVo>>() {}, () -> {
+            // 查询角色列表
+            List<Long> roleIdList = roleUserService.getRoleIdList(userId);
+            // 查询菜单列表
+            List<Long> menuIdList = roleMenuService.getMenuIdList(roleIdList);
+            // 构建树形菜单
+            List<Menu> menuList = menuService.getByList(menuIdList);
+            return TreeUtils.build(BeanUtil.copyToList(menuList, MenuListVo.class), AppConstants.ZERO_L);
+        });
     }
 }

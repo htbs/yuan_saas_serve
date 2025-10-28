@@ -14,7 +14,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MenuCacheEnum implements IBaseEnum<MenuCacheEnum> {
 
-    MENU_LIST("menu_list", "菜单列表缓存"),
+    MENU_LIST("MENU_LIST", "菜单列表缓存"),
+
+    USER_MENU_LIST("USER_MENU_LIST", "用户菜单列表缓存"),
+
+    ROLE_MENU_LIST("ROLE_MENU_LIST", "角色菜单列表缓存"),
     ;
 
     private final String key;

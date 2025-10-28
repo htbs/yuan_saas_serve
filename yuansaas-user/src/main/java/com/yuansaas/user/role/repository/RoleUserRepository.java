@@ -24,4 +24,9 @@ public interface RoleUserRepository extends JpaRepository<RoleUser, Long> {
      * 根据用户ID查询角色用户关系
      */
     List<RoleUser> findByUserId(Long userId);
+
+    /**
+     * 根据角色ID查询有关系的用户
+     */
+    List<RoleUser> findByRoleId(Long roleId);
 }

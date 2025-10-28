@@ -9,6 +9,7 @@ import com.yuansaas.user.dept.repository.DeptUserRepository;
 import com.yuansaas.user.dept.service.DeptUserService;
 import com.yuansaas.user.role.entity.Role;
 import com.yuansaas.user.role.entity.RoleUser;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,11 +34,13 @@ public class DeptUserServiceImpl implements DeptUserService {
      * @param deptId     部门ID
      */
     @Override
+    @Transactional
     public void saveOrUpdate(Long userId,Long deptId) {
         // 先删除原有关系
-        if (!ObjectUtil.isEmpty(deptId)) {
-            deptUserRepository.deleteByDeptIdAndUserId(deptId,userId);
+        if (ObjectUtil.isEmpty(deptId)) {
+            return;
         }
+        deptUserRepository.deleteByDeptIdAndUserId(deptId,userId);
         // 查询部门是否存在
         SysDept sysDept = deptRepository.findById(deptId).orElse(null);
         if(ObjectUtil.isEmpty(sysDept)){
@@ -56,6 +59,7 @@ public class DeptUserServiceImpl implements DeptUserService {
      * @param deptId 角色ids
      */
     @Override
+    @Transactional
     public void deleteByDeptIds(Long deptId) {
         deptUserRepository.deleteByDeptId(deptId);
     }
@@ -66,6 +70,7 @@ public class DeptUserServiceImpl implements DeptUserService {
      * @param userId 用户id
      */
     @Override
+    @Transactional
     public void deleteByUserId(Long userId) {
         deptUserRepository.deleteByUserId(userId);
     }

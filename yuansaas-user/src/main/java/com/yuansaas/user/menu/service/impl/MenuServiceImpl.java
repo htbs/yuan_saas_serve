@@ -12,6 +12,7 @@ import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.core.utils.TreeUtils;
+import com.yuansaas.user.config.ServiceManager;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.entity.QMenu;
 import com.yuansaas.user.menu.enums.MenuCacheEnum;
@@ -23,6 +24,9 @@ import com.yuansaas.user.menu.repository.MenuRepository;
 import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.menu.vo.MenuVo;
+import com.yuansaas.user.role.entity.QRoleMenu;
+import com.yuansaas.user.role.entity.QRoleUser;
+import com.yuansaas.user.role.service.RoleMenuService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -42,7 +46,6 @@ import java.util.Objects;
 public class MenuServiceImpl implements MenuService {
 
     private final MenuRepository menuRepository;
-
     private final JPAQueryFactory jpaQueryFactory;
 
     /**
@@ -128,6 +131,7 @@ public class MenuServiceImpl implements MenuService {
             menuRepository.save(menu);
             // 清除缓存
             RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),menu.getMerchantCode()));
+            isMenuAffectingUserid(menu.getId());
         } ,()->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("菜单不存在");
         });
@@ -148,6 +152,7 @@ public class MenuServiceImpl implements MenuService {
             menuRepository.save(menu);
             // 清除缓存
             RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),menu.getMerchantCode()));
+            isMenuAffectingUserid(menu.getId());
         } ,()->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("菜单不存在");
         });
@@ -166,6 +171,7 @@ public class MenuServiceImpl implements MenuService {
             menu.setUpdateAt(LocalDateTime.now());
             menu.setUpdateBy("admin");
             menuRepository.save(menu);
+            isMenuAffectingUserid(menu.getId());
         } ,()->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("菜单不存在");
         });
@@ -238,4 +244,38 @@ public class MenuServiceImpl implements MenuService {
         return false;
     }
 
+    /**
+     * 根据菜单id获取用户id列表
+     * @param menuId 菜单id
+     * @return 用户id列表
+     */
+    public List<Long> getUserIdsByMenuId(Long menuId) {
+        QRoleMenu roleMenu = QRoleMenu.roleMenu;
+        QRoleUser qRoleUser = QRoleUser.roleUser;
+        List<Long> userIdList = jpaQueryFactory.select(qRoleUser.userId)
+                .from(qRoleUser)
+                .innerJoin(roleMenu).on(qRoleUser.roleId.eq(roleMenu.roleId))
+                .where(roleMenu.menuId.eq(menuId)).fetch();
+        return userIdList;
+    }
+
+
+    /**
+     * 判断菜单是否影响用户 并清除缓存
+     * @param menuId 菜单id
+     */
+    public void isMenuAffectingUserid(Long menuId) {
+        // 判断菜单影响的用户
+        List<Long> userIds = getUserIdsByMenuId(menuId);
+        // 清除缓存
+        userIds.forEach(id -> {
+            RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.USER_MENU_LIST.getName(),id));
+        });
+        // 判断菜单是否影响角色
+        List<Long> roleIdListByMenuIds = ServiceManager.roleMenuService.getRoleIdListByMenuIds(menuId);
+        roleIdListByMenuIds.forEach(roleId -> {
+            RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.ROLE_MENU_LIST.getName(),roleId));
+        });
+
+    }
 }
