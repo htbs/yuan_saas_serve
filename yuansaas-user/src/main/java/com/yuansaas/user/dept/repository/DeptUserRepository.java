@@ -19,4 +19,6 @@ public interface DeptUserRepository extends JpaRepository<SysDeptUser, Long> {
     void deleteByUserId(Long userId);
 
     List<SysDeptUser> findByDeptId(Long deptId);
+
+    SysDeptUser findByUserId(Long userId);
 }

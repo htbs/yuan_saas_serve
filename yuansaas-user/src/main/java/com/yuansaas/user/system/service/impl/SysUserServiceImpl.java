@@ -1,13 +1,22 @@
 package com.yuansaas.user.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
+import com.yuansaas.core.jpa.querydsl.BoolBuilder;
+import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.common.enums.UserStatus;
+import com.yuansaas.user.dept.entity.QSysDept;
+import com.yuansaas.user.dept.entity.QSysDeptUser;
 import com.yuansaas.user.dept.service.DeptUserService;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.enums.MenuCacheEnum;
@@ -15,11 +24,15 @@ import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.role.service.RoleMenuService;
 import com.yuansaas.user.role.service.RoleUserService;
+import com.yuansaas.user.system.entity.QSysUser;
 import com.yuansaas.user.system.entity.SysUser;
+import com.yuansaas.user.system.param.FindUserParam;
 import com.yuansaas.user.system.param.SysUserCreateParam;
 import com.yuansaas.user.system.param.UserUpdateParam;
 import com.yuansaas.user.system.repository.SysUserRepository;
 import com.yuansaas.user.system.service.SysUserService;
+import com.yuansaas.user.system.vo.SysUserListVo;
+import com.yuansaas.user.system.vo.SysUserVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -44,11 +58,36 @@ public class SysUserServiceImpl implements SysUserService {
     private final RoleMenuService roleMenuService;
     private final DeptUserService deptUserService;
     private final MenuService menuService;
+    private final JPAQueryFactory jpaQueryFactory;
 
 
     @Override
     public Optional<SysUser> findById(Long id) {
         return sysUserRepository.findById( id);
+    }
+
+    /**
+     * 通过id查询系统用户并关联的角色、部门信息
+     *
+     * @param id id
+     * @return 系统用户
+     */
+    @Override
+    public SysUserVo findLinkDateById(Long id) {
+        SysUser sysUser = findById(id).orElse(null);
+        if (ObjectUtil.isEmpty(sysUser)) {
+            return null;
+        }
+        // 查询部门id
+        Long deptId = deptUserService.getDeptIdList(id);
+        // 查询角色id
+        List<Long> roleIdList = roleUserService.getRoleIdList(id);
+        // 查询菜单列表
+        SysUserVo sysUserVo = new SysUserVo();
+        BeanUtil.copyProperties(sysUser , sysUserVo);
+        sysUserVo.setDeptId(deptId);
+        sysUserVo.setRoleIds(roleIdList);
+        return sysUserVo;
     }
 
     @Override
@@ -157,5 +196,45 @@ public class SysUserServiceImpl implements SysUserService {
             List<Menu> menuList = menuService.getByList(menuIdList);
             return TreeUtils.build(BeanUtil.copyToList(menuList, MenuListVo.class), AppConstants.ZERO_L);
         });
+    }
+
+    /**
+     * 列表查询
+     *
+     * @param findUserParam 查询参数
+     * @return roleListVo
+     */
+    @Override
+    public RPage<SysUserListVo> getByPage(FindUserParam findUserParam) {
+        QSysUser sysUser = QSysUser.sysUser;
+        QSysDept qSysDept = QSysDept.sysDept;
+        QSysDeptUser qSysDeptUser = QSysDeptUser.sysDeptUser;
+        QueryResults<SysUserListVo> page = jpaQueryFactory.select(Projections.bean(SysUserListVo.class,
+                        sysUser.id,
+                        sysUser.userName,
+                        sysUser.realName,
+                        sysUser.phone,
+                        sysUser.email,
+                        sysUser.status,
+                        sysUser.createAt,
+                        sysUser.createBy,
+                        sysUser.updateAt,
+                        sysUser.updateBy,
+                        qSysDept.id.as("deptId"),
+                        qSysDept.name.as("deptName")))
+                .from(sysUser)
+                .leftJoin(qSysDeptUser).on(sysUser.id.eq(qSysDeptUser.userId))
+                .leftJoin(qSysDept).on(qSysDeptUser.deptId.eq(qSysDept.id))
+                .where(
+                        BoolBuilder.getInstance()
+                                .and(findUserParam.getUserName(), sysUser.userName::contains)
+                                .and(findUserParam.getPhone(), sysUser.phone::eq)
+                                .and(sysUser.status.eq(UserStatus.active.name()))
+                                .getWhere()
+                ).orderBy(sysUser.createAt.desc())
+                .offset(findUserParam.obtainOffset())
+                .limit(findUserParam.getPageSize())
+                .fetchResults();
+        return findUserParam.getRPage(page.getResults(),page.getTotal());
     }
 }

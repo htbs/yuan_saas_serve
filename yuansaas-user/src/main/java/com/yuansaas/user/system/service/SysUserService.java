@@ -1,13 +1,19 @@
 package com.yuansaas.user.system.service;
 
+import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
+import com.yuansaas.user.auth.security.annotations.SecurityAuth;
 import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.system.entity.SysUser;
+import com.yuansaas.user.system.param.FindUserParam;
 import com.yuansaas.user.system.param.SysUserCreateParam;
 import com.yuansaas.user.system.param.UserUpdateParam;
+import com.yuansaas.user.system.vo.SysUserListVo;
+import com.yuansaas.user.system.vo.SysUserVo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,6 +34,14 @@ public interface SysUserService {
      * @return 系统用户
      */
     Optional<SysUser> findById(Long id);
+
+    /**
+     * 通过id查询系统用户并关联的角色、部门信息
+     *
+     * @param id  id
+     * @return 系统用户
+     */
+    SysUserVo findLinkDateById(Long id);
 
     /**
      * 通过用户名查询系统用户
@@ -73,4 +87,10 @@ public interface SysUserService {
      * @return 菜单列表
      */
     List<MenuListVo> findMenuListByUserId(Long userId);
+    /**
+     * 列表查询
+     * @param findUserParam 查询参数
+     * @return roleListVo
+     */
+    RPage<SysUserListVo> getByPage(FindUserParam findUserParam);
 }

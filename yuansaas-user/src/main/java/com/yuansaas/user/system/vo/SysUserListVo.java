@@ -2,7 +2,7 @@ package com.yuansaas.user.system.vo;
 
 import lombok.Data;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 /**
  * 系统用户VO
@@ -10,7 +10,7 @@ import java.util.List;
  * @author HTB 2025/8/12 14:24
  */
 @Data
-public class SysUserVo {
+public class SysUserListVo {
 
     /**
      * 用户ID
@@ -40,15 +40,28 @@ public class SysUserVo {
      * 账户状态
      */
     private String status;
-
     /**
      * 部门id
      */
     private Long deptId;
-
     /**
-     * 角色集合
+     * 部门名字
      */
-    private List<Long> roleIds;
-
+    private String deptName;
+    /**
+     * 创建人
+     */
+    private String createBy;
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createAt;
+    /**
+     * 更新人
+     */
+    private String updateBy;
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updateAt;
 }

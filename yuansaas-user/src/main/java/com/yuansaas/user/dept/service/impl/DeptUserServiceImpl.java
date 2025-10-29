@@ -84,4 +84,18 @@ public class DeptUserServiceImpl implements DeptUserService {
     public List<Long> getUserIdList(Long deptId) {
         return deptUserRepository.findByDeptId(deptId).stream().map(SysDeptUser::getUserId).toList();
     }
+
+    /**
+     * 用户ID查询部门ID
+     *
+     * @param userId deptIdID
+     */
+    @Override
+    public Long getDeptIdList(Long userId) {
+        SysDeptUser byUserId = deptUserRepository.findByUserId(userId);
+        if (ObjectUtil.isEmpty(byUserId)){
+            return null;
+        }
+        return byUserId.getDeptId();
+    }
 }

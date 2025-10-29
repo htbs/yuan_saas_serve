@@ -19,6 +19,7 @@ import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.params.UpdateDeptParam;
 import com.yuansaas.user.dept.repository.DeptRepository;
 import com.yuansaas.user.dept.service.DeptService;
+import com.yuansaas.user.dept.service.DeptUserService;
 import com.yuansaas.user.dept.vo.DeptListVo;
 import com.yuansaas.user.dept.vo.DeptTreeListVo;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class DeptServiceImpl implements DeptService {
 
     private final DeptRepository deptRepository;
     private final JPAQueryFactory jpaQueryFactory;
+    private final DeptUserService deptUserService;
 
     /**
      * 列表查询
@@ -126,6 +128,8 @@ public class DeptServiceImpl implements DeptService {
             List<SysDept> byPid = getDeptList(dept.getId());
             byPid.add(dept);
             deptRepository.deleteAll(byPid);
+            // 删除部门用户关联关系
+            deptUserService.deleteByDeptIds(dept.getId());
             // 清除缓存
             RedisUtil.delete(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, dept.getMerchantCode()));
         } , () ->{

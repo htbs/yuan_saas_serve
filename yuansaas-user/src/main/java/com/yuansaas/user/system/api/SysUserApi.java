@@ -1,15 +1,20 @@
 package com.yuansaas.user.system.api;
 
 import com.yuansaas.core.exception.ex.DataErrorCode;
+import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
 import com.yuansaas.user.common.enums.UserType;
 import com.yuansaas.user.menu.vo.MenuListVo;
+import com.yuansaas.user.role.params.FindRoleParam;
+import com.yuansaas.user.role.vo.RoleListVo;
 import com.yuansaas.user.system.entity.SysUser;
+import com.yuansaas.user.system.param.FindUserParam;
 import com.yuansaas.user.system.param.SysUserCreateParam;
 import com.yuansaas.user.system.param.UserUpdateParam;
 import com.yuansaas.user.system.service.SysUserService;
+import com.yuansaas.user.system.vo.SysUserListVo;
 import com.yuansaas.user.system.vo.SysUserVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -39,13 +44,9 @@ public class SysUserApi {
      * @return 用户信息
      */
     @GetMapping("/{id}")
-    @SecurityAuth(userTypes = {UserType.SYSTEM_USER})
+//    @SecurityAuth(userTypes = {UserType.SYSTEM_USER})
     public ResponseEntity<ResponseModel<SysUserVo>> getUserById(@PathVariable Long id) {
-        SysUser user = userService.findById(id)
-                .orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在"));
-        SysUserVo sysUserVo = new SysUserVo();
-        BeanUtils.copyProperties(user, sysUserVo) ;
-        return ResponseBuilder.okResponse(sysUserVo);
+        return ResponseBuilder.okResponse(userService.findLinkDateById(id));
     }
 
     /**
@@ -110,6 +111,17 @@ public class SysUserApi {
     @GetMapping("/get/menu/list/{id}")
     public ResponseEntity<ResponseModel<List<MenuListVo>>> findMenuListByUserId(@PathVariable Long id) {
         return ResponseBuilder.okResponse( userService.findMenuListByUserId(id));
+    }
+
+    /**
+     * 列表查询
+     * @param findUserParam 查询参数
+     * @return roleListVo
+     */
+    @GetMapping("/page")
+    @SecurityAuth(authenticated = false)
+    public ResponseEntity<ResponseModel<RPage<SysUserListVo>>> getByPage(FindUserParam findUserParam) {
+        return ResponseBuilder.okResponse(userService.getByPage(findUserParam));
     }
 
 

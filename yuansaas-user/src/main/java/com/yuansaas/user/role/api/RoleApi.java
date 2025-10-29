@@ -104,4 +104,6 @@ public class RoleApi {
     public ResponseEntity<ResponseModel<List<MenuListVo>>> getAuthorizeMenuListByRoleId(@RequestParam("roleId") Long roleId) {
         return ResponseBuilder.okResponse(roleService.getAuthorizeMenuListByRoleId(roleId));
     }
+
+
 }

@@ -33,4 +33,10 @@ public interface DeptUserService {
      * @param deptId  deptIdID
      */
     List<Long> getUserIdList(Long deptId);
+
+    /**
+     * 用户ID查询部门ID
+     * @param userId  deptIdID
+     */
+    Long getDeptIdList(Long userId);
 }
