@@ -3,6 +3,7 @@ package com.yuansaas.user.role.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.user.menu.entity.Menu;
@@ -45,7 +46,7 @@ public class RoleMenuServiceImpl implements RoleMenuService {
         // 先删除原有关系
         deleteByRoleIds(roleId);
         // 验证可用的菜单
-        List<Menu> menuList = menuService.getByList(menuIdList);
+        List<Menu> menuList = menuService.getByList(menuIdList, AppConstants.N);
         if (ObjectUtil.isEmpty(menuList)) {
             throw DataErrorCode.DATA_NOT_FOUND.buildException("菜单不存在");
         }

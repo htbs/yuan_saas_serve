@@ -193,12 +193,20 @@ public class MenuServiceImpl implements MenuService {
 
     /**
      * 批量获取菜单 (原始信息)
-     *
-     * @param ids
+     * @param lockStatus     锁定状态
+     * @param ids            菜单id列表
+     * @return 菜单列表
      */
     @Override
-    public List<Menu> getByList(List<Long> ids) {
-        return menuRepository.findAllById(ids);
+    public List<Menu> getByList(List<Long> ids, String lockStatus) {
+        QMenu menu = QMenu.menu;
+        return jpaQueryFactory.select(menu)
+                .from(menu)
+                .where(BoolBuilder.getInstance()
+                        .and(lockStatus, menu.lockStatus::eq)
+                        .and(ids, menu.id::in)
+                        .getWhere()
+                ).fetch();
     }
 
     /**

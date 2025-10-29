@@ -193,7 +193,7 @@ public class SysUserServiceImpl implements SysUserService {
             // 查询菜单列表
             List<Long> menuIdList = roleMenuService.getMenuIdList(roleIdList);
             // 构建树形菜单
-            List<Menu> menuList = menuService.getByList(menuIdList);
+            List<Menu> menuList = menuService.getByList(menuIdList,AppConstants.N);
             return TreeUtils.build(BeanUtil.copyToList(menuList, MenuListVo.class), AppConstants.ZERO_L);
         });
     }

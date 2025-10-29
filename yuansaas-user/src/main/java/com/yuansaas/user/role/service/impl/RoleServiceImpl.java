@@ -189,7 +189,7 @@ public class RoleServiceImpl implements RoleService {
     public List<MenuListVo> getAuthorizeMenuListByRoleId(Long roleId) {
         return RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.ROLE_MENU_LIST.getKey() , roleId) , new TypeReference<List<MenuListVo>>(){},() ->{
             List<Long> menuIdList = roleMenuService.getMenuIdList(roleId);
-            List<Menu> byList = menuService.getByList(menuIdList);
+            List<Menu> byList = menuService.getByList(menuIdList,AppConstants.N);
             return TreeUtils.build(BeanUtil.copyToList(byList , MenuListVo.class), AppConstants.ZERO_L);
         });
     }

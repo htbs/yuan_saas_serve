@@ -51,5 +51,5 @@ public interface MenuService {
     /**
      * 批量获取菜单 (原始信息)
      */
-    List<Menu> getByList(List<Long> ids);
+    List<Menu> getByList(List<Long> ids , String lockStatus);
 }
