@@ -39,8 +39,9 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll() // 放行认证接口
                         .requestMatchers("/wx/mp/callback/**").permitAll()
                         .requestMatchers("/wx/mp/auth/qrcode/temp/url").permitAll()
-                        .requestMatchers("/*/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest()
+                                .permitAll()
+//                                .authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

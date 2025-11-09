@@ -1,8 +1,11 @@
 package com.yuansaas.user.auth.security.annotations.service;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.yuansaas.user.auth.model.CustomUserDetails;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
 import com.yuansaas.user.common.enums.UserType;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,17 @@ public class SecurityService {
         UserType[] userTypes = annotation.userTypes();
         String[] roles = annotation.roles();
         String[] permissions = annotation.permissions();
+
+        // 检查接口是否需要token
+        if (annotation.authenticated() ) {
+            if (authentication instanceof UsernamePasswordAuthenticationToken && ObjectUtil.isNull(authentication.getPrincipal())) {
+                return false;
+            }
+            if (authentication instanceof AnonymousAuthenticationToken) {
+                return false;
+            }
+        }
+
         // 1. 检查认证状态
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;

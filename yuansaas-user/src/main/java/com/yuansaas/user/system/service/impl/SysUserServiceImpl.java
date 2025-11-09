@@ -63,6 +63,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     public Optional<SysUser> findById(Long id) {
+        // todo 优化查询 改成先查询缓存
         return sysUserRepository.findById( id);
     }
 

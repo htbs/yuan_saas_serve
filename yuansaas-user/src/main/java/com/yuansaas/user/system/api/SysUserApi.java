@@ -44,7 +44,7 @@ public class SysUserApi {
      * @return 用户信息
      */
     @GetMapping("/{id}")
-//    @SecurityAuth(userTypes = {UserType.SYSTEM_USER})
+    @SecurityAuth(authenticated = true)
     public ResponseEntity<ResponseModel<SysUserVo>> getUserById(@PathVariable Long id) {
         return ResponseBuilder.okResponse(userService.findLinkDateById(id));
     }
@@ -55,7 +55,7 @@ public class SysUserApi {
      * @return 创建成功的用户信息
      */
     @PostMapping("/save")
-//    @SecurityAuth(authenticated = false)
+    @SecurityAuth(authenticated = false)
     public ResponseEntity<ResponseModel<SysUser>> createUser(@RequestBody @Validated SysUserCreateParam sysUserCreateParam) {
         SysUser user = userService.saveUser(sysUserCreateParam);
         return ResponseBuilder.okResponse( user);

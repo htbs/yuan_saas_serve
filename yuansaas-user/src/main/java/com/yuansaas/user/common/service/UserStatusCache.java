@@ -37,12 +37,12 @@ public class UserStatusCache {
      * @return 用户是否活跃
      */
     public boolean isUserActive(Long userId, UserType userType) {
-        RedisUtil.getOrLoad(RedisUtil.genKey("userStatus", userType.name(), userId),
+        return  RedisUtil.getOrLoad(RedisUtil.genKey("userStatus", userType.name(), userId),
                 new TypeReference<Boolean>() {},
                 () -> loadUserStatus(userId, userType),
                 60 * 60 * 24,
                 TimeUnit.SECONDS);
-        return loadUserStatus(userId, userType);
+//         loadUserStatus(userId, userType);
     }
 
     /**

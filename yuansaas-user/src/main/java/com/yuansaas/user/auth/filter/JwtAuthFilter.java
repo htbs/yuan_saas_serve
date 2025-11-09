@@ -56,10 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-        if (1 != 1) {
             try {
-
-
                 String token = extractToken(request);
                 if (token != null && jwtManager.validateToken(token)) {
                     // 检查令牌类型
@@ -69,13 +66,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     if ("refresh".equals(tokenType) && !isRefreshEndpoint(request)) {
                         throw AuthErrorCode.INSUFFICIENT_PERMISSIONS.buildException();
                     }
+                    // 解析 JWT 访问令牌 并设置认证信息
                     CustomUserDetails userDetails = jwtManager.parseToken(token);
 
                     // 验证用户状态
                     if (!userStatusCache.isUserActive(userDetails.getUserId(), userDetails.getUserType())) {
                         throw AuthErrorCode.ACCOUNT_DISABLED.buildException();
                     }
-
 
                     // 创建认证对象
                     UsernamePasswordAuthenticationToken authentication =
@@ -90,7 +87,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 handleAuthenticationException(response, e);
                 return;
             }
-        }
 
         filterChain.doFilter(request, response);
     }
@@ -112,9 +108,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      */
     private String extractToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        //  && bearerToken.startsWith("Bearer ")
         if (StringUtils.hasText(bearerToken)) {
-//            return bearerToken.substring(7);
             return bearerToken;
         }
         log.error("无效的认证令牌 token: {}", bearerToken);
