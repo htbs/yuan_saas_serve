@@ -38,7 +38,7 @@ public class RoleApi {
      * @return roleListVo
      */
     @GetMapping("/page")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<RPage<RoleListVo>>> getByPage(FindRoleParam findRoleParam) {
         return ResponseBuilder.okResponse(roleService.getByPage(findRoleParam));
     }
@@ -49,7 +49,7 @@ public class RoleApi {
      * @return true/false
      */
     @PostMapping("/save")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> save(@Validated @RequestBody SaveRoleParam saveRoleParam) {
         return ResponseBuilder.okResponse(roleService.save(saveRoleParam));
     }
@@ -59,7 +59,7 @@ public class RoleApi {
      * @return true/false
      */
     @PutMapping("/update")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> update(@Validated @RequestBody UpdateRoleParam updateRoleParam) {
         return ResponseBuilder.okResponse(roleService.update(updateRoleParam));
     }
@@ -69,7 +69,7 @@ public class RoleApi {
      * @return true/false
      */
     @GetMapping("/delete/{id}")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.delete(id));
     }

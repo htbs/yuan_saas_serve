@@ -44,7 +44,7 @@ public class SysUserApi {
      * @return 用户信息
      */
     @GetMapping("/{id}")
-    @SecurityAuth(authenticated = true)
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<SysUserVo>> getUserById(@PathVariable Long id) {
         return ResponseBuilder.okResponse(userService.findLinkDateById(id));
     }
@@ -55,7 +55,7 @@ public class SysUserApi {
      * @return 创建成功的用户信息
      */
     @PostMapping("/save")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<SysUser>> createUser(@RequestBody @Validated SysUserCreateParam sysUserCreateParam) {
         SysUser user = userService.saveUser(sysUserCreateParam);
         return ResponseBuilder.okResponse( user);
@@ -67,7 +67,7 @@ public class SysUserApi {
      * @return 修改成功的用户信息
      */
     @PostMapping("/update")
-//    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> updateUser(@RequestBody @Validated UserUpdateParam userUpdateParam) {
         return ResponseBuilder.okResponse( userService.updateUser(userUpdateParam));
     }
@@ -78,7 +78,8 @@ public class SysUserApi {
      * @return 冻结成功的用户信息 true or false
      */
     @PutMapping("/lcok/{id}")
-        public ResponseEntity<ResponseModel<Boolean>> lockUser(@PathVariable Long id) {
+    @SecurityAuth()
+    public ResponseEntity<ResponseModel<Boolean>> lockUser(@PathVariable Long id) {
         return ResponseBuilder.okResponse(userService.lockUser(id));
     }
 
@@ -88,6 +89,7 @@ public class SysUserApi {
      * @return 解释成功的用户信息 true or false
      */
     @PutMapping("/unlock/{id}")
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> unlockUser(@PathVariable Long id) {
         return ResponseBuilder.okResponse( userService.unlockUser(id));
     }
@@ -98,6 +100,7 @@ public class SysUserApi {
      * @return  删除成功的用户信息 true or false
      */
     @DeleteMapping("/delete/{id}")
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> deleteUser(@PathVariable Long id) {
         return ResponseBuilder.okResponse( userService.deleteUser(id));
     }
@@ -109,6 +112,7 @@ public class SysUserApi {
      * @return  用户可访问的菜单列表
      */
     @GetMapping("/get/menu/list/{id}")
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<List<MenuListVo>>> findMenuListByUserId(@PathVariable Long id) {
         return ResponseBuilder.okResponse( userService.findMenuListByUserId(id));
     }
@@ -119,7 +123,7 @@ public class SysUserApi {
      * @return roleListVo
      */
     @GetMapping("/page")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<RPage<SysUserListVo>>> getByPage(FindUserParam findUserParam) {
         return ResponseBuilder.okResponse(userService.getByPage(findUserParam));
     }
