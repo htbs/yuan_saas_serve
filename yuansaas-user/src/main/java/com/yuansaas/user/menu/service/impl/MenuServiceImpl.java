@@ -8,6 +8,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
+import com.yuansaas.core.context.AppContextHolder;
+import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.redis.RedisUtil;
@@ -107,7 +109,7 @@ public class MenuServiceImpl implements MenuService {
         BeanUtils.copyProperties(saveMenuParam, menuNew);
         menuNew.setMenuCode(menuCode);
         menuNew.setCreateAt(LocalDateTime.now());
-        menuNew.setCreateBy("admin");
+        menuNew.setCreateBy(AppContextUtil.getUserInfo());
         menuRepository.save(menuNew);
         // 清除缓存
         RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),saveMenuParam.getMerchantCode()));
