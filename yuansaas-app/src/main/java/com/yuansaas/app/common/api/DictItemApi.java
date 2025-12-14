@@ -76,7 +76,7 @@ public class DictItemApi {
      * @param findDictParam 字典id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/delete/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/page",method = RequestMethod.GET)
     @SecurityAuth
     public ResponseEntity<ResponseModel<RPage<SysDictTypeVo>>> findByPage(FindDictParam findDictParam) {
         return ResponseBuilder.okResponse(dictItemService.findByPage(findDictParam));

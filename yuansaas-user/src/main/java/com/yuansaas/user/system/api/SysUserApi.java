@@ -55,7 +55,7 @@ public class SysUserApi {
      * @return 创建成功的用户信息
      */
     @PostMapping("/save")
-    @SecurityAuth()
+    @SecurityAuth(authenticated = false)
     public ResponseEntity<ResponseModel<SysUser>> createUser(@RequestBody @Validated SysUserCreateParam sysUserCreateParam) {
         SysUser user = userService.saveUser(sysUserCreateParam);
         return ResponseBuilder.okResponse( user);

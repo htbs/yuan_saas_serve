@@ -129,14 +129,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         response.setCharacterEncoding("UTF-8");
 
         String errorMessage;
+        ResponseModel<String> responseModel ;
         if (e instanceof ExpiredJwtException) {
             errorMessage = "令牌已过期";
+            responseModel = ResponseBuilder.error(AuthErrorCode.TOKEN_EXPIRED.getCode(), errorMessage);
         } else if (e instanceof DisabledException || e instanceof AppException) {
             errorMessage = e.getMessage();
+            responseModel = ResponseBuilder.error(AuthErrorCode.AUTHENTICATION_FAILED.getCode(), errorMessage);
         } else {
             errorMessage = "无效的认证令牌";
+            responseModel = ResponseBuilder.error(AuthErrorCode.INVALID_TOKEN.getCode(), errorMessage);
         }
-        ResponseModel<String> responseModel = ResponseBuilder.error(AuthErrorCode.AUTHENTICATION_FAILED.getCode(), errorMessage);
         globalMapper.writeValue(response.getWriter(), responseModel);
     }
 }
