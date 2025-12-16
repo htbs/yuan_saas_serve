@@ -1,6 +1,7 @@
 package com.yuansaas.app.shop.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import com.yuansaas.common.model.AddressModel;
 import com.yuansaas.core.jpa.model.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -75,7 +76,7 @@ public class Shop extends BaseEntity {
      */
     @Type(value = JsonStringType.class)
     @Column(columnDefinition = "json")
-    private String  address;
+    private AddressModel address;
     /**
      * '法人名字'
      */
@@ -107,7 +108,7 @@ public class Shop extends BaseEntity {
     /**
      * '签约人Id'
      */
-    private String  signedUserId;
+    private Long  signedUserId;
     /**
      * '签约人'
      */

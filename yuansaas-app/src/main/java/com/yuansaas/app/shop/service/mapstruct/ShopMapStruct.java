@@ -23,11 +23,11 @@ public class ShopMapStruct {
     public Shop toSaveShop (SaveShopParam shopParam) {
         Shop shop = new Shop();
         shop.setName(shopParam.getName());
-        shop.setType(shopParam.getType());
-//        shop.setProvinceCode();
-//        shop.setCityCode();
-//        shop.setDistrictCode();
-//        shop.setAddress();
+        shop.setType(shopParam.getType().name());
+        shop.setProvinceCode(shopParam.getAddress().getProvinceCode());
+        shop.setCityCode(shopParam.getAddress().getCityCode()   );
+        shop.setDistrictCode(shopParam.getAddress().getDistrictCode());
+        shop.setAddress(shopParam.getAddress());
         shop.setLegalPersonName(shopParam.getLegalPersonName());
         shop.setLegalPersonPhone(shopParam.getLegalPersonPhone());
         shop.setLegalPersonEmail(shopParam.getLegalPersonEmail());
@@ -35,6 +35,7 @@ public class ShopMapStruct {
         shop.setIdCardFront(shopParam.getIdCardFront());
         shop.setIdCardBack(shopParam.getIdCardBack());
         shop.setBusinessLicense(shopParam.getBusinessLicense());
+        shop.setSignedStatus(shopParam.getSignedStatus());
         shop.setLockStatus(AppConstants.N);
         shop.setDeleteStatus(AppConstants.N);
         shop.setCreateBy(AppContextUtil.getUserInfo());
@@ -44,11 +45,10 @@ public class ShopMapStruct {
 
     public void toUpdateShop ( Shop shop , UpdateShopParam shopParam) {
         shop.setName(shopParam.getName());
-        shop.setType(shopParam.getType());
-//        shop.setProvinceCode();
-//        shop.setCityCode();
-//        shop.setDistrictCode();
-//        shop.setAddress();
+        shop.setProvinceCode(shopParam.getAddress().getProvinceCode());
+        shop.setCityCode(shopParam.getAddress().getCityCode()   );
+        shop.setDistrictCode(shopParam.getAddress().getDistrictCode());
+        shop.setAddress(shopParam.getAddress());
         shop.setLegalPersonName(shopParam.getLegalPersonName());
         shop.setLegalPersonPhone(shopParam.getLegalPersonPhone());
         shop.setLegalPersonEmail(shopParam.getLegalPersonEmail());
@@ -56,6 +56,7 @@ public class ShopMapStruct {
         shop.setIdCardFront(shopParam.getIdCardFront());
         shop.setIdCardBack(shopParam.getIdCardBack());
         shop.setBusinessLicense(shopParam.getBusinessLicense());
+        shop.setSignedStatus(shop.getSignedStatus());
         shop.setLockStatus(AppConstants.N);
         shop.setDeleteStatus(AppConstants.N);
         shop.setCreateBy(AppContextUtil.getUserInfo());

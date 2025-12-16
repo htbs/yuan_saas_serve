@@ -1,6 +1,6 @@
 jwt:
   secret: "your-strong-secret-key-with-at-least-256-bits"
-  expiration: 1800000 # 30??
+  expiration:  120000   # 1800000 # 30??
   refresh-expiration: 604800000 # 7?
   
   security:

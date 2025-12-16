@@ -1,5 +1,6 @@
 package com.yuansaas.app.shop.param;
 
+import com.yuansaas.core.page.PageModel;
 import lombok.Data;
 
 /**
@@ -9,7 +10,7 @@ import lombok.Data;
  * @author LXZ 2025/12/12 10:40
  */
 @Data
-public class FindShopParam {
+public class FindShopParam extends PageModel {
 
     /**
      * 商家名称
@@ -22,5 +23,5 @@ public class FindShopParam {
     /**
      * 签约类型
      */
-    private String signedType;
+    private String signedStatus;
 }

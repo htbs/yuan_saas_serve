@@ -1,5 +1,6 @@
 package com.yuansaas.app.shop.param;
 
+import com.yuansaas.common.model.AddressModel;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -24,20 +25,10 @@ public class UpdateShopParam {
     @NotBlank(message = "商家名称不能为空")
     private String name;
     /**
-     * 商家类型
-     */
-    @NotBlank(message = "商家类型不能为空")
-    private String type;
-    /**
      * 商家地址
      */
-    @NotBlank(message = "商家地址不能为空")
-    private String address;
-    /**
-     * 签约类型
-     */
-    @NotBlank(message = "签约类型不能为空")
-    private String signedType;
+    @NotNull(message = "商家地址不能为空")
+    private AddressModel address;
     /**
      * 统一社会信用代码
      */

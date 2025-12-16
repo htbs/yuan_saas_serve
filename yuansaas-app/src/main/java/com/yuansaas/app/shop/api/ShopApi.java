@@ -1,9 +1,10 @@
 package com.yuansaas.app.shop.api;
 
-import com.yuansaas.app.common.params.UpdateDictItemParam;
 import com.yuansaas.app.shop.param.FindShopParam;
 import com.yuansaas.app.shop.param.SaveShopParam;
+import com.yuansaas.app.shop.param.SignedParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
+import com.yuansaas.app.shop.service.ShopService;
 import com.yuansaas.app.shop.vo.ShopListVo;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
@@ -20,10 +21,12 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author LXZ 2025/12/12 10:04
  */
-@RequestMapping("/api/Shop")
+@RequestMapping("/api/shop")
 @RestController
 @RequiredArgsConstructor
 public class ShopApi {
+
+    private final ShopService shopService;
 
 
     /**
@@ -34,7 +37,7 @@ public class ShopApi {
     @RequestMapping(value = "/add",method = RequestMethod.POST)
     @SecurityAuth
     public ResponseEntity<ResponseModel<Boolean>> add(@RequestBody @Validated SaveShopParam saveShopParam) {
-        return ResponseBuilder.okResponse();
+        return ResponseBuilder.okResponse(shopService.add(saveShopParam));
     }
 
     /**
@@ -45,7 +48,7 @@ public class ShopApi {
     @RequestMapping(value = "/update",method = RequestMethod.POST)
     @SecurityAuth
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated UpdateShopParam updateShopParam) {
-        return ResponseBuilder.okResponse();
+        return ResponseBuilder.okResponse(shopService.update(updateShopParam));
     }
 
     /**
@@ -53,10 +56,10 @@ public class ShopApi {
      * @param id 商家id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/lock/{id}",method = RequestMethod.POST)
+    @RequestMapping(value = "/lock/{id}",method = RequestMethod.PUT)
     @SecurityAuth
     public ResponseEntity<ResponseModel<Boolean>> lock(@PathVariable(value = "id") Long id) {
-        return ResponseBuilder.okResponse();
+        return ResponseBuilder.okResponse(shopService.lock(id));
     }
 
     /**
@@ -64,10 +67,10 @@ public class ShopApi {
      * @param id 商家id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/delete/{id}",method = RequestMethod.POST)
+    @RequestMapping(value = "/delete/{id}",method = RequestMethod.DELETE)
     @SecurityAuth
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable(value = "id") Long id) {
-        return ResponseBuilder.okResponse();
+        return ResponseBuilder.okResponse(shopService.delete(id));
     }
 
     /**
@@ -76,9 +79,21 @@ public class ShopApi {
      * @return 商家列表
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/page",method = RequestMethod.POST)
+    @RequestMapping(value = "/page",method = RequestMethod.GET)
     @SecurityAuth
-    public ResponseEntity<ResponseModel<RPage<ShopListVo>>> getByPage(@RequestBody FindShopParam findShopParam) {
-        return ResponseBuilder.okResponse();
+    public ResponseEntity<ResponseModel<RPage<ShopListVo>>> getByPage( FindShopParam findShopParam) {
+        return ResponseBuilder.okResponse(shopService.getByPage(findShopParam));
+    }
+
+
+    /**
+     * 签约操作
+     * @param signedParam 签约参数
+     * @author  lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/signed",method = RequestMethod.PUT)
+    @SecurityAuth
+    public ResponseEntity<ResponseModel<Boolean>> signed(@RequestBody  @Validated SignedParam signedParam) {
+        return ResponseBuilder.okResponse(shopService.signed(signedParam));
     }
 }

@@ -2,9 +2,17 @@ package com.yuansaas.app.shop.service;
 
 import com.yuansaas.app.shop.param.FindShopParam;
 import com.yuansaas.app.shop.param.SaveShopParam;
+import com.yuansaas.app.shop.param.SignedParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
 import com.yuansaas.app.shop.vo.ShopListVo;
 import com.yuansaas.core.page.RPage;
+import com.yuansaas.core.response.ResponseBuilder;
+import com.yuansaas.core.response.ResponseModel;
+import com.yuansaas.user.auth.security.annotations.SecurityAuth;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  *
@@ -49,4 +57,10 @@ public interface ShopService {
      * @author  lxz 2025/11/16 14:35
      */
     RPage<ShopListVo> getByPage(FindShopParam findShopParam);
+    /**
+     * 签约操作
+     * @param signedParam 签约参数
+     * @author  lxz 2025/11/16 14:35
+     */
+    Boolean signed(SignedParam signedParam);
 }

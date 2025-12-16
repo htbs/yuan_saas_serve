@@ -1,6 +1,11 @@
 package com.yuansaas.app.shop.param;
 
+import com.yuansaas.app.shop.enums.ShopTypeEnum;
+import com.yuansaas.common.model.AddressModel;
+import com.yuansaas.core.annotation.EnumValidate;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -19,18 +24,18 @@ public class SaveShopParam {
     /**
      * 商家类型
      */
-    @NotBlank(message = "商家类型不能为空")
-    private String type;
+    @EnumValidate(enumClass = ShopTypeEnum.class, message = "商家类型不正确")
+    private ShopTypeEnum type;
     /**
      * 商家地址
      */
-    @NotBlank(message = "商家地址不能为空")
-    private String address;
+    @NotNull(message = "商家地址不能为空")
+    private AddressModel address;
     /**
-     * 签约类型
+     * 签约状态 (N 已签约 | Y 未签约)
      */
-    @NotBlank(message = "签约类型不能为空")
-    private String signedType;
+    @NotBlank(message = "签约状态不能为空")
+    private String signedStatus;
     /**
      * 统一社会信用代码
      */

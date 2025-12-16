@@ -1,6 +1,8 @@
 package com.yuansaas.core.response;
 
 
+import com.yuansaas.core.context.AppContext;
+import com.yuansaas.core.context.AppContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -17,6 +19,7 @@ public class ResponseBuilder {
         return ResponseModel.<T>builder()
                 .status("SUCCESS")
                 .code("0000")
+                .traceId(AppContextHolder.getTraceId().get())
                 .build();
     }
 
@@ -25,6 +28,7 @@ public class ResponseBuilder {
                 .status("SUCCESS")
                 .code("0000")
                 .data(data)
+                .traceId(AppContextHolder.getTraceId().get())
                 .build();
     }
 
@@ -34,6 +38,7 @@ public class ResponseBuilder {
                 .data(data)
                 .code("0000")
                 .message(message)
+                .traceId(AppContextHolder.getTraceId().get())
                 .build();
     }
 
@@ -43,6 +48,7 @@ public class ResponseBuilder {
                 .status("FAIL")
                 .code("500")
                 .message(message)
+                .traceId(AppContextHolder.getTraceId().get())
                 .build();
     }
 
@@ -51,6 +57,7 @@ public class ResponseBuilder {
                 .status("FAIL")
                 .code(code)
                 .message(message)
+                .traceId(AppContextHolder.getTraceId().get())
                 .build();
     }
 
@@ -60,6 +67,7 @@ public class ResponseBuilder {
                 .code(code)
                 .message(message)
                 .data(data)
+                .traceId(AppContextHolder.getTraceId().get())
                 .build();
     }
 
@@ -69,6 +77,7 @@ public class ResponseBuilder {
                 .status("ERROR")
                 .message(message)
                 .code(code)
+                .traceId(AppContextHolder.getTraceId().get())
                 .build();
     }
 
@@ -78,6 +87,7 @@ public class ResponseBuilder {
                 .message(message)
                 .code("400")
                 .data(data)
+                .traceId(AppContextHolder.getTraceId().get())
                 .build();
     }
 
