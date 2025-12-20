@@ -24,6 +24,8 @@ public class ShopMapStruct {
         Shop shop = new Shop();
         shop.setName(shopParam.getName());
         shop.setType(shopParam.getType().name());
+        shop.setLogo(shopParam.getLogo());
+        shop.setIntro(null);
         shop.setProvinceCode(shopParam.getAddress().getProvinceCode());
         shop.setCityCode(shopParam.getAddress().getCityCode()   );
         shop.setDistrictCode(shopParam.getAddress().getDistrictCode());

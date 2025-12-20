@@ -39,6 +39,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -207,6 +208,14 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public RPage<SysUserListVo> getByPage(FindUserParam findUserParam) {
+
+        List<String> status ;
+        if (ObjectUtil.isEmpty(findUserParam.getStatus())) {
+            status = List.of(UserStatus.active.name(),UserStatus.suspended.name());
+        } else {
+            status = List.of(findUserParam.getStatus().getName());
+        }
+
         QSysUser sysUser = QSysUser.sysUser;
         QSysDept qSysDept = QSysDept.sysDept;
         QSysDeptUser qSysDeptUser = QSysDeptUser.sysDeptUser;
@@ -230,7 +239,7 @@ public class SysUserServiceImpl implements SysUserService {
                         BoolBuilder.getInstance()
                                 .and(findUserParam.getUserName(), sysUser.userName::contains)
                                 .and(findUserParam.getPhone(), sysUser.phone::eq)
-                                .and(sysUser.status.eq(UserStatus.active.name()))
+                                .and(sysUser.status.in(status))
                                 .getWhere()
                 ).orderBy(sysUser.createAt.desc())
                 .offset(findUserParam.obtainOffset())

@@ -6,6 +6,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
+import com.yuansaas.core.context.AppContext;
+import com.yuansaas.core.context.AppContextHolder;
+import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.redis.RedisUtil;
@@ -88,7 +91,7 @@ public class DeptServiceImpl implements DeptService {
     public Boolean save(SaveDeptParam saveDeptParam) {
         SysDept sysDept = new SysDept();
         BeanUtils.copyProperties(saveDeptParam, sysDept);
-        sysDept.setCreateBy("admin");
+        sysDept.setCreateBy(AppContextUtil.getUserInfo());
         sysDept.setCreateAt(LocalDateTime.now());
         deptRepository.save(sysDept);
         // 清除缓存
@@ -105,7 +108,7 @@ public class DeptServiceImpl implements DeptService {
     public Boolean update(UpdateDeptParam updateDeptParam) {
         deptRepository.findById(updateDeptParam.getId()).ifPresentOrElse(dept ->{
             dept.setName(updateDeptParam.getName());
-            dept.setUpdateBy("admin");
+            dept.setUpdateBy(AppContextUtil.getUserInfo());
             dept.setUpdateAt(LocalDateTime.now());
             deptRepository.save(dept);
             // 清除缓存

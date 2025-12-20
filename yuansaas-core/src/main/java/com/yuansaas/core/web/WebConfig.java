@@ -1,6 +1,7 @@
 package com.yuansaas.core.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yuansaas.core.jackson.JacksonConfig;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,12 +22,12 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final ObjectMapper objectMapper;
+    private final JacksonConfig jacksonConfig;
 
     @Bean
     public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-        mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
+        mappingJackson2HttpMessageConverter.setObjectMapper(jacksonConfig.objectMapper());
         mappingJackson2HttpMessageConverter.setDefaultCharset(StandardCharsets.UTF_8);
         return mappingJackson2HttpMessageConverter;
     }

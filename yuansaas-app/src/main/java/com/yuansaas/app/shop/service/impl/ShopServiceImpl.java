@@ -20,6 +20,8 @@ import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
+import com.yuansaas.user.dept.params.SaveDeptParam;
+import com.yuansaas.user.dept.service.DeptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -39,6 +41,7 @@ public class ShopServiceImpl implements ShopService {
     private final ShopMapStruct shopMapStruct;
     private final ShopRepository shopRepository;
     private final JPAQueryFactory jpaQueryFactory;
+    private final DeptService deptService;
 
     /**
      * 添加商家
@@ -52,6 +55,12 @@ public class ShopServiceImpl implements ShopService {
         // 生成code
         saveShop.setCode(getCode(saveShopParam.getType()));
         shopRepository.save(saveShop);
+        // 生成默认部门id
+        SaveDeptParam saveDeptParam = new SaveDeptParam();
+        saveDeptParam.setName(saveShop.getName());
+        saveDeptParam.setPid(-1l);
+        saveDeptParam.setMerchantCode(saveShop.getCode());
+        deptService.save(saveDeptParam);
         return true;
     }
 

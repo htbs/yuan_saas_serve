@@ -1,6 +1,7 @@
 package com.yuansaas.user.system.param;
 
 import com.yuansaas.core.page.PageModel;
+import com.yuansaas.user.common.enums.UserStatus;
 import lombok.Data;
 
 /**
@@ -24,5 +25,9 @@ public class FindUserParam extends PageModel {
      * 部门ID
      */
     private Long deptId;
+    /**
+     * 状态
+     */
+    private UserStatus status;
 
 }

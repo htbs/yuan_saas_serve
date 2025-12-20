@@ -45,7 +45,7 @@ snowflake: # 雪花算法配置
 
 jwt:
   secret: "lCT3L7aw4cRIM57L4ljZO3esSAv1kUQvsOU1mBRRQCKTUoQuDOfKhfXhaegeMd9I5nxOseaTFCy0ubIfZAI29w=="
-  expiration: 1800000 # 30分钟
+  expiration: 180000000 # 30分钟
   refresh-expiration: 604800000 # 7天
 
 wx:

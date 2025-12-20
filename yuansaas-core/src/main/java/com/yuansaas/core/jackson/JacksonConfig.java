@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -80,6 +82,12 @@ public class JacksonConfig {
 
         // 空值处理策略
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+
+        // 全局配置所有 Long 类型序列化为字符串
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Long.class , ToStringSerializer.instance);
+        module.addSerializer(Long.TYPE, ToStringSerializer.instance);
+        mapper.registerModule(module);
     }
 
     /**

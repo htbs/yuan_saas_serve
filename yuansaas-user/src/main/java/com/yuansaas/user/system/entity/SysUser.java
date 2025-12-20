@@ -1,6 +1,5 @@
 package com.yuansaas.user.system.entity;
 
-import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.jpa.model.BaseEntity;
 import com.yuansaas.user.common.enums.UserStatus;
 import jakarta.persistence.Column;
@@ -10,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter

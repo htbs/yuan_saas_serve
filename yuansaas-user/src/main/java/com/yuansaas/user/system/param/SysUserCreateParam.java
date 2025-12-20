@@ -64,5 +64,4 @@ public class SysUserCreateParam {
      */
     @NotNull(message = "部门id不能为空")
     private Long deptId;
-
 }

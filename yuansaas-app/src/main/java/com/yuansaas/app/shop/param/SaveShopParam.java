@@ -76,4 +76,9 @@ public class SaveShopParam {
      */
     @NotBlank(message = "营业执照不能为空")
     private String businessLicense;
+
+    /**
+     * 商铺logo
+     */
+    private String logo;
 }
