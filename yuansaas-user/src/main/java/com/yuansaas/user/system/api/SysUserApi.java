@@ -1,25 +1,20 @@
 package com.yuansaas.user.system.api;
 
-import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
-import com.yuansaas.user.common.enums.UserType;
 import com.yuansaas.user.menu.vo.MenuListVo;
-import com.yuansaas.user.role.params.FindRoleParam;
-import com.yuansaas.user.role.vo.RoleListVo;
 import com.yuansaas.user.system.entity.SysUser;
 import com.yuansaas.user.system.param.FindUserParam;
 import com.yuansaas.user.system.param.SysUserCreateParam;
+import com.yuansaas.user.system.param.UpdateUserPwdParam;
 import com.yuansaas.user.system.param.UserUpdateParam;
 import com.yuansaas.user.system.service.SysUserService;
 import com.yuansaas.user.system.vo.SysUserListVo;
 import com.yuansaas.user.system.vo.SysUserVo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +66,29 @@ public class SysUserApi {
     public ResponseEntity<ResponseModel<Boolean>> updateUser(@RequestBody @Validated UserUpdateParam userUpdateParam) {
         return ResponseBuilder.okResponse( userService.updateUser(userUpdateParam));
     }
+
+    /**
+     * 修改密码
+     * @param updateUserPwd 用户修改请求
+     * @return 修改成功的用户信息
+     */
+    @PostMapping("/update/pwd")
+    @SecurityAuth()
+    public ResponseEntity<ResponseModel<Boolean>> updateUserPwd(@RequestBody @Validated UpdateUserPwdParam updateUserPwd) {
+        return ResponseBuilder.okResponse( userService.updateUserPwd(updateUserPwd));
+    }
+
+    /**
+     * 重置密码
+     * @param userUpdateParam 用户修改请求
+     * @return 修改成功的用户信息
+     */
+    @PutMapping("/reset/pwd/{id}")
+    @SecurityAuth()
+    public ResponseEntity<ResponseModel<Boolean>> resetUserResetPwd(@PathVariable Long id) {
+        return ResponseBuilder.okResponse( userService.resetUserResetPwd(id));
+    }
+
 
     /**
      * 冻结用户

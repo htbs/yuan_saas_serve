@@ -1,11 +1,14 @@
 package com.yuansaas.app.shop.service.mapstruct;
 
 import com.yuansaas.app.shop.entity.Shop;
+import com.yuansaas.app.shop.entity.ShopDataConfig;
 import com.yuansaas.app.shop.param.SaveShopParam;
+import com.yuansaas.app.shop.param.UpdateShopDataParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContext;
 import com.yuansaas.core.context.AppContextUtil;
+import com.yuansaas.core.jackson.JacksonUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -24,8 +27,6 @@ public class ShopMapStruct {
         Shop shop = new Shop();
         shop.setName(shopParam.getName());
         shop.setType(shopParam.getType().name());
-        shop.setLogo(shopParam.getLogo());
-        shop.setIntro(null);
         shop.setProvinceCode(shopParam.getAddress().getProvinceCode());
         shop.setCityCode(shopParam.getAddress().getCityCode()   );
         shop.setDistrictCode(shopParam.getAddress().getDistrictCode());
@@ -63,5 +64,22 @@ public class ShopMapStruct {
         shop.setDeleteStatus(AppConstants.N);
         shop.setCreateBy(AppContextUtil.getUserInfo());
         shop.setCreateAt(LocalDateTime.now());
+    }
+
+    public ShopDataConfig toShopDataConfig (UpdateShopDataParam shopDataParam, Shop shop) {
+        ShopDataConfig shopDataConfig = new ShopDataConfig();
+        shopDataConfig.setShopCode(shop.getCode());
+        shopDataConfig.setIntro(shopDataParam.getIntro());
+        shopDataConfig.setLabel(JacksonUtil.toJson(shopDataParam.getLabel()));
+        shopDataConfig.setPhone(shopDataParam.getPhone());
+        shopDataConfig.setSubjectColor(shopDataParam.getSubjectColor());
+        shopDataConfig.setLogo(shopDataParam.getLogo());
+        shopDataConfig.setCustomerServiceWechat(shopDataParam.getCustomerServiceWechat());
+        shopDataConfig.setOfficialAccounts(shopDataParam.getOfficialAccounts());
+        shopDataConfig.setCreateAt(LocalDateTime.now());
+        shopDataConfig.setCreateBy(AppContextUtil.getUserInfo());
+        shopDataConfig.setUpdateAt(LocalDateTime.now());
+        shopDataConfig.setUpdateBy(AppContextUtil.getUserInfo());
+        return shopDataConfig;
     }
 }

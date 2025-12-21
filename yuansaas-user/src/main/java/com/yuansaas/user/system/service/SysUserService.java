@@ -8,14 +8,13 @@ import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.system.entity.SysUser;
 import com.yuansaas.user.system.param.FindUserParam;
 import com.yuansaas.user.system.param.SysUserCreateParam;
+import com.yuansaas.user.system.param.UpdateUserPwdParam;
 import com.yuansaas.user.system.param.UserUpdateParam;
 import com.yuansaas.user.system.vo.SysUserListVo;
 import com.yuansaas.user.system.vo.SysUserVo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,6 +62,22 @@ public interface SysUserService {
      * @return 更新成功的用户信息 true/false
      */
     Boolean updateUser(UserUpdateParam userUpdateParam);
+
+
+    /**
+     * 修改密码
+     * @param updateUserPwd 用户修改请求
+     * @return 修改成功的用户信息
+     */
+    Boolean updateUserPwd(UpdateUserPwdParam updateUserPwd);
+
+    /**
+     * 重置密码
+     * @param id 用户修改请求
+     * @return 修改成功的用户信息
+     */
+    Boolean resetUserResetPwd(Long id);
+
     /**
      * 锁定用户
      * @param userId  用户id

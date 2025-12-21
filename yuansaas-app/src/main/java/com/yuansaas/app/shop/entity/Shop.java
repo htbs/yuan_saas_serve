@@ -42,6 +42,14 @@ public class Shop extends BaseEntity {
      */
     private String  intro;
     /**
+     * 手机号
+     */
+    private String  phone;
+    /**
+     * 主题色
+     */
+    private String subjectColor;
+    /**
      * '标签'
      */
     @Type(value = JsonStringType.class)

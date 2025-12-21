@@ -9,6 +9,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
+import com.yuansaas.core.exception.ex.AuthErrorCode;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
@@ -28,6 +29,7 @@ import com.yuansaas.user.system.entity.QSysUser;
 import com.yuansaas.user.system.entity.SysUser;
 import com.yuansaas.user.system.param.FindUserParam;
 import com.yuansaas.user.system.param.SysUserCreateParam;
+import com.yuansaas.user.system.param.UpdateUserPwdParam;
 import com.yuansaas.user.system.param.UserUpdateParam;
 import com.yuansaas.user.system.repository.SysUserRepository;
 import com.yuansaas.user.system.service.SysUserService;
@@ -134,6 +136,52 @@ public class SysUserServiceImpl implements SysUserService {
             throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
         });
         return true;
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param updateUserPwd 用户修改请求
+     * @return 修改成功的用户信息
+     */
+    @Override
+    public Boolean updateUserPwd(UpdateUserPwdParam updateUserPwd) {
+        sysUserRepository.findById(updateUserPwd.getUserId()).ifPresentOrElse(sysUser -> {
+                        // 加密密码：passwordEncoder.encode(request.getPassword())
+                        if (!passwordEncoder.matches(updateUserPwd.getOldPassword(), sysUser.getPassword())) {
+                            throw AuthErrorCode.AUTHENTICATION_FAILED.buildException("旧密码输入错误，请重新输入") ;
+                        }
+                        sysUser.setPassword(updateUserPwd.getNewPassword());
+                        sysUser.setUpdateAt(LocalDateTime.now());
+                        sysUser.setUpdateBy(AppContextUtil.getUserInfo());
+                        sysUserRepository.save(sysUser);
+                    }
+                    ,() ->{
+                        throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
+                    }
+        );
+        return null;
+    }
+
+    /**
+     * 重置密码
+     *
+     * @param id 用户修改请求
+     * @return 修改成功的用户信息
+     */
+    @Override
+    public Boolean resetUserResetPwd(Long id) {
+        sysUserRepository.findById(id).ifPresentOrElse(sysUser -> {
+                    sysUser.setPassword(AppConstants.PWD);
+                    sysUser.setUpdateAt(LocalDateTime.now());
+                    sysUser.setUpdateBy(AppContextUtil.getUserInfo());
+                    sysUserRepository.save(sysUser);
+                }
+                ,() ->{
+                    throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
+                }
+        );
+        return null;
     }
 
     @Override

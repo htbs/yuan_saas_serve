@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AppConstants {
 
+    public static final String PWD = "DC483E80A7A0BD9EF71D8CF973673924";
+
     public static final String UNKNOWN = "unknown";
     public static final String DEFAULT = "default";
     public static final String N_A = "N/A";
@@ -81,5 +83,4 @@ public final class AppConstants {
     public static final String COLON_CHAR = ":";
     public static final String DASH_CHAR = "-";
     public static final String DEFAULT_VALUE_SEPARATOR = ":-";
-
 }

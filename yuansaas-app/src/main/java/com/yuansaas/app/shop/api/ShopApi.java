@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  *
- * 商家 API
+ * 商家管理 API
  *
  * @author LXZ 2025/12/12 10:04
  */
