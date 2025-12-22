@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author LXZ 2025/12/12 10:04
  */
-@RequestMapping("/api/shop")
+@RequestMapping("/shop/data")
 @RestController
 @RequiredArgsConstructor
 public class ShopDataApi {

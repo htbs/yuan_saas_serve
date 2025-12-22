@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ShopDataConfigRepository extends JpaRepository<ShopDataConfig,Long> {
 
 
-    Integer countByCode(String code);
+    Integer countByShopCode(String code);
 
     ShopDataConfig findByShopCode(String code);
 }
