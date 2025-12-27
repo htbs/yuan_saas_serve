@@ -42,16 +42,16 @@ public class DictApi {
         return ResponseBuilder.okResponse(dictService.createDict(saveDictParam));
     }
 
-    /**
-     * 编辑字典项
-     * @param updateDictParam 编辑字典相关参数
-     * @author  lxz 2025/11/16 14:35
-     */
-    @RequestMapping(value = "/update",method = RequestMethod.POST)
-    @SecurityAuth
-    public ResponseEntity<ResponseModel<Boolean>> updateDict(@RequestBody @Validated UpdateDictParam updateDictParam) {
-        return ResponseBuilder.okResponse(dictService.updateDict(updateDictParam));
-    }
+//    /**
+//     * 编辑字典项
+//     * @param updateDictParam 编辑字典相关参数
+//     * @author  lxz 2025/11/16 14:35
+//     */
+//    @RequestMapping(value = "/update",method = RequestMethod.POST)
+//    @SecurityAuth
+//    public ResponseEntity<ResponseModel<Boolean>> updateDict(@RequestBody @Validated UpdateDictParam updateDictParam) {
+//        return ResponseBuilder.okResponse(dictService.updateDict(updateDictParam));
+//    }
 
 
     /**
@@ -60,7 +60,7 @@ public class DictApi {
      * @author  lxz 2025/11/16 14:35
      */
     @RequestMapping(value = "/update/order_num",method = RequestMethod.POST)
-    @SecurityAuth
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> updateOrderNum(@RequestBody @Validated UpdateSortParam updateSortParam) {
         return ResponseBuilder.okResponse(dictService.updateOrderNum(updateSortParam));
     }

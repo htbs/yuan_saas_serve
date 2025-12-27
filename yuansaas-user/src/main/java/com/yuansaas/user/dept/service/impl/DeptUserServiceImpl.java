@@ -2,6 +2,9 @@ package com.yuansaas.user.dept.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.yuansaas.common.constants.AppConstants;
+import com.yuansaas.core.context.AppContext;
+import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.entity.SysDeptUser;
 import com.yuansaas.user.dept.repository.DeptRepository;
@@ -31,18 +34,19 @@ public class DeptUserServiceImpl implements DeptUserService {
      * 保存或修改
      *
      * @param userId     用户ID
-     * @param deptId     部门ID
      */
     @Override
     @Transactional
-    public void saveOrUpdate(Long userId,Long deptId) {
-        // 先删除原有关系
-        if (ObjectUtil.isEmpty(deptId)) {
+    public void saveOrUpdate(Long userId) {
+        List<SysDept> byMerchantCodeAndPid = deptRepository.findByMerchantCodeAndPid(AppContextUtil.getMerchantCode(), AppConstants.ZERO_L);
+        if (ObjectUtil.isEmpty(byMerchantCodeAndPid)) {
             return;
         }
+        Long deptId = byMerchantCodeAndPid.get(0).getId();
+
         deptUserRepository.deleteByDeptIdAndUserId(deptId,userId);
         // 查询部门是否存在
-        SysDept sysDept = deptRepository.findById(deptId).orElse(null);
+        SysDept sysDept = byMerchantCodeAndPid.get(0);
         if(ObjectUtil.isEmpty(sysDept)){
             return ;
         }

@@ -46,8 +46,14 @@ public class DictServiceImpl implements DictService {
      */
     @Override
     public Boolean createDict(SaveDictParam saveDictParam) {
+
+        Integer count = dictRepository.countByDictType(saveDictParam.getDictType());
+        if (count >= 1) {
+            throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("字典类型已存在");
+        }
         SysDictType dict = new SysDictType();
         BeanUtils.copyProperties(saveDictParam, dict);
+        dict.setPlatform(saveDictParam.getPlatform().name());
         dict.setCreateBy(AppContextUtil.getUserInfo());
         dict.setCreateAt(LocalDateTime.now());
         dictRepository.save(dict);
@@ -68,10 +74,8 @@ public class DictServiceImpl implements DictService {
             throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("字典数据不存在");
         }
         // 更新字典数据
-        sysDictType = new SysDictType();
         sysDictType.setDictName(updateDictParam.getDictName());
         sysDictType.setDictType(updateDictParam.getDictType());
-        sysDictType.setPlatform(updateDictParam.getPlatform());
         sysDictType.setSort(updateDictParam.getSort());
         sysDictType.setUpdateBy(AppContextUtil.getUserInfo());
         sysDictType.setUpdateAt(LocalDateTime.now());
@@ -129,8 +133,8 @@ public class DictServiceImpl implements DictService {
                 )).from(qSysDictType)
                 .where(BoolBuilder.getInstance()
                         .and(findDictParam.getDictName(), qSysDictType.dictName::contains)
-                        .and(findDictParam.getPlatform(), qSysDictType.platform::eq)
                         .getWhere())
+                .orderBy(qSysDictType.sort.asc() , qSysDictType.createAt.desc())
                 .offset(findDictParam.obtainOffset())
                 .limit(findDictParam.getPageSize())
                 .fetchResults();

@@ -30,10 +30,6 @@ public class SysDictData extends BaseEntity {
      */
     private  String  dictValue;
     /**
-     * 平台类型
-     */
-    private PlatformTypeEnum platform;
-    /**
      * 字典排序
      */
     private  Integer sort;

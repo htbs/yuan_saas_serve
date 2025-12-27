@@ -16,7 +16,6 @@ import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.enums.DeptCacheEnum;
-import com.yuansaas.user.dept.model.DeptTreeModel;
 import com.yuansaas.user.dept.params.FindDeptParam;
 import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.params.UpdateDeptParam;
@@ -154,6 +153,18 @@ public class DeptServiceImpl implements DeptService {
             throw DataErrorCode.DATA_NOT_FOUND.buildException("部门不存在");
         }
         return BeanUtil.copyProperties(sysDept , DeptListVo.class);
+    }
+
+    /**
+     * 通过商家code和父部门id查询部门信息
+     *
+     * @param merchantCode 商家code
+     * @param pid          父部门id
+     * @author LXZ 2025/12/24  12:14
+     */
+    @Override
+    public List<SysDept> findByMerchantCodeAndPid(String merchantCode, Long pid) {
+        return deptRepository.findByMerchantCodeAndPid(merchantCode, pid);
     }
 
 

@@ -1,6 +1,8 @@
 package com.yuansaas.user.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yuansaas.core.context.AppContext;
+import com.yuansaas.core.context.AppContextHolder;
 import com.yuansaas.core.exception.AppException;
 import com.yuansaas.core.exception.ex.AuthErrorCode;
 import com.yuansaas.core.response.ResponseBuilder;
@@ -27,6 +29,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * JWT认证过滤器
@@ -68,6 +71,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     }
                     // 解析 JWT 访问令牌 并设置认证信息
                     CustomUserDetails userDetails = jwtManager.parseToken(token);
+
+                    // 设置用户信息到上下文
+                    initialize(userDetails);
 
                     // 验证用户状态
                     if (!userStatusCache.isUserActive(userDetails.getUserId(), userDetails.getUserType())) {
@@ -141,5 +147,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             responseModel = ResponseBuilder.error(AuthErrorCode.INVALID_TOKEN.getCode(), errorMessage);
         }
         globalMapper.writeValue(response.getWriter(), responseModel);
+    }
+
+    private void initialize(CustomUserDetails userDetails){
+        Optional<AppContext> context = AppContextHolder.getContext();
+        if (context.isPresent()) {
+            AppContext appContext = context.get();
+            appContext.setUserId(userDetails.getUserId());
+            appContext.setUserName(userDetails.getUsername());
+            appContext.setUserType(userDetails.getUserType().name());
+            appContext.setMerchantCode(userDetails.getMerchantCode());
+            AppContextHolder.setContext(appContext);
+        }
+
     }
 }

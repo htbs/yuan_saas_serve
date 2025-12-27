@@ -1,5 +1,6 @@
 package com.yuansaas.user.dept.params;
 
+import com.yuansaas.core.context.AppContextUtil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -15,8 +16,7 @@ public class SaveDeptParam {
     /**
      * 商户编号
      */
-    @NotNull(message = "商户编号不能为空")
-    private String merchantCode;
+    private String merchantCode = AppContextUtil.getMerchantCode();
     /**
      * 父部门ID
      */

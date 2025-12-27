@@ -23,6 +23,11 @@ public class SysUserVo {
     private String userName;
 
     /**
+     * 用户头像
+     */
+    private String headUrl;
+
+    /**
      * 邮箱
      */
     private String email;

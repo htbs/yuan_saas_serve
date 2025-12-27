@@ -31,7 +31,7 @@ public class UpdateDictParam {
     /**
      * 平台类型
      */
-    @EnumValidate(enumClass = PlatformTypeEnum.class)
+    @EnumValidate(enumClass = PlatformTypeEnum.class , message = "平台类型不正确")
     private PlatformTypeEnum platform;
     /**
      * 字典排序值

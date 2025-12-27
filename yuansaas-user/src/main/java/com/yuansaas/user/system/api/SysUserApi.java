@@ -80,12 +80,12 @@ public class SysUserApi {
 
     /**
      * 重置密码
-     * @param userUpdateParam 用户修改请求
+     * @param id 用户修改请求
      * @return 修改成功的用户信息
      */
     @PutMapping("/reset/pwd/{id}")
-    @SecurityAuth()
-    public ResponseEntity<ResponseModel<Boolean>> resetUserResetPwd(@PathVariable Long id) {
+    @SecurityAuth(authenticated = false)
+    public ResponseEntity<ResponseModel<Boolean>> resetUserResetPwd(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.resetUserResetPwd(id));
     }
 
@@ -97,7 +97,7 @@ public class SysUserApi {
      */
     @PutMapping("/lcok/{id}")
     @SecurityAuth()
-    public ResponseEntity<ResponseModel<Boolean>> lockUser(@PathVariable Long id) {
+    public ResponseEntity<ResponseModel<Boolean>> lockUser(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse(userService.lockUser(id));
     }
 
@@ -108,7 +108,7 @@ public class SysUserApi {
      */
     @PutMapping("/unlock/{id}")
     @SecurityAuth()
-    public ResponseEntity<ResponseModel<Boolean>> unlockUser(@PathVariable Long id) {
+    public ResponseEntity<ResponseModel<Boolean>> unlockUser(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.unlockUser(id));
     }
 
@@ -119,7 +119,7 @@ public class SysUserApi {
      */
     @DeleteMapping("/delete/{id}")
     @SecurityAuth()
-    public ResponseEntity<ResponseModel<Boolean>> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<ResponseModel<Boolean>> deleteUser(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.deleteUser(id));
     }
 
@@ -131,7 +131,7 @@ public class SysUserApi {
      */
     @GetMapping("/get/menu/list/{id}")
     @SecurityAuth()
-    public ResponseEntity<ResponseModel<List<MenuListVo>>> findMenuListByUserId(@PathVariable Long id) {
+    public ResponseEntity<ResponseModel<List<MenuListVo>>> findMenuListByUserId(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.findMenuListByUserId(id));
     }
 

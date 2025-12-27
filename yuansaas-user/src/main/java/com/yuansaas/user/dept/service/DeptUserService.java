@@ -12,9 +12,8 @@ public interface DeptUserService {
     /**
      * 保存或修改
      * @param userId      用户ID
-     * @param deptId      部门ID
      */
-    void saveOrUpdate(Long userId, Long deptId);
+    void saveOrUpdate(Long userId);
 
     /**
      * 根据部门ids，删除部门用户关系

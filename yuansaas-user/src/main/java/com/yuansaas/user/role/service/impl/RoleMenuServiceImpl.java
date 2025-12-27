@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
+import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.user.menu.entity.Menu;
@@ -56,7 +57,7 @@ public class RoleMenuServiceImpl implements RoleMenuService {
             roleMenu.setMenuId(menu.getId());
             roleMenu.setRoleId(roleId);
             roleMenu.setCreateAt(LocalDateTime.now());
-            roleMenu.setCreateBy("admin");
+            roleMenu.setCreateBy(AppContextUtil.getUserInfo());
             roleMenuList.add(roleMenu);
         });
         roleMenuRepository.saveAll(roleMenuList);

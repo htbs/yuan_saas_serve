@@ -3,15 +3,6 @@ package com.yuansaas.app.common.service;
 import com.yuansaas.app.common.params.*;
 import com.yuansaas.app.common.vo.SysDictTypeVo;
 import com.yuansaas.core.page.RPage;
-import com.yuansaas.core.response.ResponseBuilder;
-import com.yuansaas.core.response.ResponseModel;
-import com.yuansaas.user.auth.security.annotations.SecurityAuth;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  *
@@ -53,8 +44,9 @@ public interface DictItemService {
 
     /**
      * 查询字典项分页
-     * @param findDictParam 字典id
-     * @author  lxz 2025/11/16 14:35
+     *
+     * @param findDictItemParam 字典id
+     * @author lxz 2025/11/16 14:35
      */
-    ;RPage<SysDictTypeVo> findByPage(FindDictParam findDictParam);
+    RPage<SysDictTypeVo> findByPage(FindDictItemParam  findDictItemParam);
 }

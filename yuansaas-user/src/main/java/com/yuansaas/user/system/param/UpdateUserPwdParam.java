@@ -1,5 +1,6 @@
 package com.yuansaas.user.system.param;
 
+import com.yuansaas.core.context.AppContextUtil;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -16,8 +17,7 @@ public class UpdateUserPwdParam {
     /**
      * 用户id
      */
-    @NotNull(message = "用户id不能为空")
-    private Long userId;
+    private Long userId = AppContextUtil.requireUserId();
     /**
      * 旧密码
      */

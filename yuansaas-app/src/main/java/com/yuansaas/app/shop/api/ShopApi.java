@@ -6,6 +6,7 @@ import com.yuansaas.app.shop.param.SignedParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
 import com.yuansaas.app.shop.service.ShopService;
 import com.yuansaas.app.shop.vo.ShopListVo;
+import com.yuansaas.app.shop.vo.ShopVo;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
@@ -83,6 +84,19 @@ public class ShopApi {
     @SecurityAuth
     public ResponseEntity<ResponseModel<RPage<ShopListVo>>> getByPage( FindShopParam findShopParam) {
         return ResponseBuilder.okResponse(shopService.getByPage(findShopParam));
+    }
+
+
+    /**
+     * 查询商家详情
+     * @param id 商家id
+     * @return 商家详情
+     * @author  lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/get/{id}",method = RequestMethod.GET)
+    @SecurityAuth
+    public ResponseEntity<ResponseModel<ShopVo>> getById(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(shopService.getById(id));
     }
 
 

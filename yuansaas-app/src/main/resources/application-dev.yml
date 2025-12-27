@@ -57,6 +57,18 @@ wx:
     config-storage:
       type: RedisTemplate
 
+sms:
+  smsSendIntervalMin: 3 # 短信发送间隔 5分钟
+  sendSmsEnable: false # 是否开启短信发送功能
+  codeLength: 6 # 验证码长度
+  expireTime: 300 # 验证码过期时间 5分钟
+  show: true # 是否显示验证码
+
+#  aliyun:
+#    accessKeyId: xxxxxxxxxxxxxxxxxx
+#    accessKeySecret: xxxxxxxxxxxxxxxxxx
+#    endpoint: xxxxxxxxxxxxxxxxxx
+
 
 ys:
   app:

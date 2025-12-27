@@ -2,7 +2,6 @@ package com.yuansaas.core.context;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +54,10 @@ public class AppContext implements Serializable {
      * 会话ID
      */
     private String sessionId;
+    /**
+     * 商户编号
+     */
+    private String merchantCode;
 
     /**
      * 自定义属性
@@ -102,6 +105,7 @@ public class AppContext implements Serializable {
         copy.setTraceId(traceId);
         copy.setIpAddress(ipAddress);
         copy.setSessionId(sessionId);
+        copy.setMerchantCode(merchantCode);
         copy.setCustomAttributes(new HashMap<>(customAttributes));
         return copy;
     }

@@ -62,6 +62,11 @@ public class CustomUserDetails implements UserDetails {
     private UserStatus status;
 
     /**
+     * 商户编码
+     */
+    private final String merchantCode;
+
+    /**
      * 权限列表
      */
     private final Collection<? extends GrantedAuthority> authorities;
@@ -76,6 +81,7 @@ public class CustomUserDetails implements UserDetails {
          this.locked = UserStatus.active.matches(clientUser.getStatus());
          IBaseEnum.fromNameIgnoreCase(clientUser.getStatus() , UserStatus.class).ifPresent(userStatus -> this.status = userStatus);
          this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_".concat(userType.getName())));
+         this.merchantCode = null;
     }
 
     public CustomUserDetails(SysUser sysUser){
@@ -88,6 +94,7 @@ public class CustomUserDetails implements UserDetails {
         this.locked = UserStatus.active.matches(sysUser.getStatus());
         IBaseEnum.fromNameIgnoreCase(sysUser.getStatus() , UserStatus.class).ifPresent(userStatus -> this.status = userStatus);
         this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_".concat(userType.getName())));
+        this.merchantCode = sysUser.getMerchantCode();
     }
 
     @Override

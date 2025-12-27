@@ -38,7 +38,7 @@ public class ShopMapStruct {
         shop.setIdCardFront(shopParam.getIdCardFront());
         shop.setIdCardBack(shopParam.getIdCardBack());
         shop.setBusinessLicense(shopParam.getBusinessLicense());
-        shop.setSignedStatus(shopParam.getSignedStatus());
+        shop.setSignedStatus(shopParam.getSignedStatus().name());
         shop.setLockStatus(AppConstants.N);
         shop.setDeleteStatus(AppConstants.N);
         shop.setCreateBy(AppContextUtil.getUserInfo());

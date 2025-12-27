@@ -7,12 +7,15 @@ import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
+import com.yuansaas.core.context.AppContextUtil;
+import com.yuansaas.core.exception.ex.BizErrorCode;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.dept.entity.QSysDept;
+import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.service.DeptService;
 import com.yuansaas.user.dept.vo.DeptListVo;
 import com.yuansaas.user.menu.entity.Menu;
@@ -81,7 +84,10 @@ public class RoleServiceImpl implements RoleService {
                 ))
                 .from(role)
                 .leftJoin(dept).on(role.deptId.eq(dept.id))
-                .where(BoolBuilder.getInstance().getWhere())
+                .where(BoolBuilder.getInstance()
+                        .and(findRoleParam.getName() , role.name::contains)
+                        .and(findRoleParam.getMerchantCode() , role.merchantCode::eq)
+                        .getWhere())
                 .orderBy(role.id.desc())
                 .offset(findRoleParam.obtainOffset())
                 .limit(findRoleParam.getPageSize())
@@ -96,11 +102,12 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Boolean save(SaveRoleParam saveRoleParam) {
-        validated(saveRoleParam.getMerchantCode(),saveRoleParam.getDeptId());
+        Long deptId = validated(saveRoleParam.getMerchantCode());
         Role role = new Role();
         BeanUtil.copyProperties(saveRoleParam, role);
+        role.setDeptId(deptId);
         role.setCreateAt(LocalDateTime.now());
-        role.setCreateBy("admin");
+        role.setCreateBy(AppContextUtil.getUserInfo());
         roleRepository.save(role);
         return true;
     }
@@ -113,12 +120,11 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean update(UpdateRoleParam updateRoleParam) {
         roleRepository.findById(updateRoleParam.getId()).ifPresentOrElse(role ->{
-            validated(role.getMerchantCode(),updateRoleParam.getDeptId());
+            validated(role.getMerchantCode());
             role.setName(updateRoleParam.getName());
-            role.setDeptId(updateRoleParam.getDeptId());
             role.setDescription(updateRoleParam.getDescription());
             role.setUpdateAt(LocalDateTime.now());
-            role.setUpdateBy("admin");
+            role.setUpdateBy(AppContextUtil.getUserInfo());
             roleRepository.save(role);
         } , () ->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("角色不存在");
@@ -198,7 +204,13 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 校验 角色 相关信息
      */
-    public void validated ( String merchantCode , Long deptId ) {
-        deptService.getById(merchantCode, deptId);
+    public Long validated ( String merchantCode) {
+
+        List<SysDept> byMerchantCodeAndPid = deptService.findByMerchantCodeAndPid(merchantCode, AppConstants.ZERO_L);
+        if (ObjectUtil.isEmpty(byMerchantCodeAndPid)) {
+            throw BizErrorCode.BUSINESS_VALIDATION_FAILED.buildException("默认部门不存在");
+
+        }
+        return byMerchantCodeAndPid.get(0).getId();
     }
 }

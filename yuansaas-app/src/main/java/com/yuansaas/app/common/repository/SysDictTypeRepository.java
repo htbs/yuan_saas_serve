@@ -10,4 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface SysDictTypeRepository extends JpaRepository<SysDictType, Long> {
 
+    Integer countByDictType(String dictType);
 }

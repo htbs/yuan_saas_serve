@@ -16,21 +16,17 @@ public class SysDictTypeVo implements Serializable {
      */
     private Long id;
     /**
-     * 字典类型
+     * 字典标签
      */
-    private String dictType;
+    private String dictLabel;
     /**
      * 字典名称
      */
-    private String dictName;
-    /**
-     * 平台类型
-     */
-    private String platform;
+    private String dictValue;
     /**
      *  排序
      */
-    private String sort;
+    private Integer sort;
     /**
      * 操作人
      */

@@ -75,6 +75,15 @@ public class AppContextUtil {
         return AppContextHolder.getUserId().orElseThrow(() -> new SecurityException("User ID not available in context"));
     }
 
+
+    /**
+     * 获取当前用户类型
+     * @return 当前用户ID
+     */
+    public static String requireUserType() {
+        return AppContextHolder.getUserType().orElseThrow(() -> new SecurityException("User type not available in context"));
+    }
+
     /**
      * 获取当前TraceId
      * @return 当前TraceId
@@ -105,6 +114,10 @@ public class AppContextUtil {
      */
     public static String getUserInfo() {
         return AppContextHolder.getUserId().map(id -> id + ":" + AppContextHolder.getUserName().orElse("")).orElse("");
+    }
+
+    public static String getMerchantCode(){
+        return AppContextHolder.getMerchantCode().orElse("");
     }
 
     /**

@@ -2,7 +2,6 @@ package com.yuansaas.app.common.api;
 
 import com.yuansaas.app.common.params.*;
 import com.yuansaas.app.common.service.DictItemService;
-import com.yuansaas.app.common.service.DictService;
 import com.yuansaas.app.common.vo.SysDictTypeVo;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
@@ -73,13 +72,14 @@ public class DictItemApi {
 
     /**
      * 查询字典项分页
-     * @param findDictParam 字典id
-     * @author  lxz 2025/11/16 14:35
+     *
+     * @param findDictItemParam 字典id
+     * @author lxz 2025/11/16 14:35
      */
     @RequestMapping(value = "/page",method = RequestMethod.GET)
     @SecurityAuth
-    public ResponseEntity<ResponseModel<RPage<SysDictTypeVo>>> findByPage(FindDictParam findDictParam) {
-        return ResponseBuilder.okResponse(dictItemService.findByPage(findDictParam));
+    public ResponseEntity<ResponseModel<RPage<SysDictTypeVo>>> findByPage(FindDictItemParam findDictItemParam) {
+        return ResponseBuilder.okResponse(dictItemService.findByPage(findDictItemParam));
     }
 
 

@@ -102,7 +102,7 @@ public class MenuServiceImpl implements MenuService {
         BeanUtils.copyProperties(saveMenuParam, menuModel);
         Menu menu = validated(menuModel);
         // 获取菜单编码
-        String menuCode = getMenuCode(ObjectUtil.isEmpty(menu) ? "":menu.getMenuCode(),saveMenuParam.getMerchantCode());
+        String menuCode = getMenuCode(ObjectUtil.isEmpty(menu) ? "": menu.getMenuCode(), saveMenuParam.getMerchantCode());
 
         // 保存菜单
         Menu menuNew = new Menu();

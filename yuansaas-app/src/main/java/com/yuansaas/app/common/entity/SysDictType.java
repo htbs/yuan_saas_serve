@@ -28,7 +28,7 @@ public class SysDictType extends BaseEntity {
     /**
      * 平台类型
      */
-    private PlatformTypeEnum platform;
+    private String platform;
     /**
      * 排序
      */

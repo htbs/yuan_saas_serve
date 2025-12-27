@@ -1,6 +1,9 @@
 package com.yuansaas.user.system.param;
 
+import com.yuansaas.core.annotation.EnumValidate;
+import com.yuansaas.integration.sms.enums.SendTypeEnum;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -44,19 +47,25 @@ public class UserUpdateParam {
     /**
      * 手机号
      */
-    @NotBlank(message = "手机号不能为空")
     private String phone;
+    /**
+     * 验证码
+     */
+    private String verifyCode;
+    /**
+     * 序列号
+     */
+    private String serialNo;
+    /**
+     * 发送类型
+     */
+    private SendTypeEnum sendSceneType;
 
     /**
      * 角色类型
      */
     @NotNull(message = "角色类型不能为空")
-    private List<Long> roleList;
+    private List<Long> roleIds;
 
-    /**
-     * 部门id
-     */
-    @NotNull(message = "部门id不能为空")
-    private Long deptId;
 
 }

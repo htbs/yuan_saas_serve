@@ -5,6 +5,7 @@ import com.yuansaas.app.shop.param.SaveShopParam;
 import com.yuansaas.app.shop.param.SignedParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
 import com.yuansaas.app.shop.vo.ShopListVo;
+import com.yuansaas.app.shop.vo.ShopVo;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
@@ -57,6 +58,14 @@ public interface ShopService {
      * @author  lxz 2025/11/16 14:35
      */
     RPage<ShopListVo> getByPage(FindShopParam findShopParam);
+
+    /**
+     * 查询商家列表
+     * @param id 商家id
+     * @return 商家信息
+     * @author  lxz 2025/11/16 14:35
+     */
+    ShopVo getById(Long id);
     /**
      * 签约操作
      * @param signedParam 签约参数

@@ -1,11 +1,13 @@
 package com.yuansaas.app.shop.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.app.shop.entity.QShop;
 import com.yuansaas.app.shop.entity.Shop;
+import com.yuansaas.app.shop.enums.ShopSignedStatusEnum;
 import com.yuansaas.app.shop.enums.ShopTypeEnum;
 import com.yuansaas.app.shop.param.FindShopParam;
 import com.yuansaas.app.shop.param.SaveShopParam;
@@ -15,6 +17,7 @@ import com.yuansaas.app.shop.repository.ShopRepository;
 import com.yuansaas.app.shop.service.ShopService;
 import com.yuansaas.app.shop.service.mapstruct.ShopMapStruct;
 import com.yuansaas.app.shop.vo.ShopListVo;
+import com.yuansaas.app.shop.vo.ShopVo;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
@@ -58,7 +61,7 @@ public class ShopServiceImpl implements ShopService {
         // 生成默认部门id
         SaveDeptParam saveDeptParam = new SaveDeptParam();
         saveDeptParam.setName(saveShop.getName());
-        saveDeptParam.setPid(-1l);
+        saveDeptParam.setPid(0L);
         saveDeptParam.setMerchantCode(saveShop.getCode());
         deptService.save(saveDeptParam);
         return true;
@@ -82,7 +85,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     /**
-     * 禁用商家
+     * 禁用/启用 商家
      *
      * @param id 商家id
      * @author lxz 2025/11/16 14:35
@@ -158,6 +161,19 @@ public class ShopServiceImpl implements ShopService {
     }
 
     /**
+     * 查询商家列表
+     *
+     * @param id 商家id
+     * @return 商家信息
+     * @author lxz 2025/11/16 14:35
+     */
+    @Override
+    public ShopVo getById(Long id) {
+        Shop shop = shopRepository.findById(id).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("商家不存在"));
+        return BeanUtil.copyProperties(shop, ShopVo.class);
+    }
+
+    /**
      * 签约操作
      *
      * @param signedParam 签约参数
@@ -169,7 +185,7 @@ public class ShopServiceImpl implements ShopService {
         if (ObjectUtils.isEmpty(shop)) {
             throw DataErrorCode.DATA_NOT_FOUND.buildException();
         }
-        shop.setSignedStatus(AppConstants.Y);
+        shop.setSignedStatus(ShopSignedStatusEnum.SIGNED.name());
         shop.setSignedUserId(0L);
         shop.setSignedUserName(signedParam.getName());
         shop.setSignedStartAt(signedParam.getSigneTime());

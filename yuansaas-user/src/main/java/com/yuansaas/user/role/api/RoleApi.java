@@ -68,7 +68,7 @@ public class RoleApi {
      * @param id 角色ID
      * @return true/false
      */
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.delete(id));
@@ -79,7 +79,7 @@ public class RoleApi {
      * @return roleVo
      */
     @GetMapping("/{id}")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<RoleVo>> getById(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.getById(id));
     }
@@ -89,7 +89,7 @@ public class RoleApi {
      * @return true/false
      */
     @PostMapping("/authorize")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> authorize(@RequestBody @Validated AuthorizeMenuParam authorizeMenuParam) {
         return ResponseBuilder.okResponse(roleService.authorize(authorizeMenuParam));
     }
@@ -99,9 +99,9 @@ public class RoleApi {
      * @param roleId 角色ID
      * @return MenuListVo
      */
-    @GetMapping("/authorize/menu/list")
-    @SecurityAuth(authenticated = false)
-    public ResponseEntity<ResponseModel<List<MenuListVo>>> getAuthorizeMenuListByRoleId(@RequestParam("roleId") Long roleId) {
+    @GetMapping("/authorize/menu/list/{roleId}")
+    @SecurityAuth()
+    public ResponseEntity<ResponseModel<List<MenuListVo>>> getAuthorizeMenuListByRoleId(@PathVariable("roleId") Long roleId) {
         return ResponseBuilder.okResponse(roleService.getAuthorizeMenuListByRoleId(roleId));
     }
 
