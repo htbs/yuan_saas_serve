@@ -27,7 +27,7 @@ spring:
 
   data:
     redis:
-      host: 120.48.98.242
+      host: 120.48.98.242    # Redis服务器地址
       port: 6379
       password: "yuanshi" # 如果有密码填上
       database: 0
