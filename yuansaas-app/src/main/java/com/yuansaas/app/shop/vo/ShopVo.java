@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * 商家信息VO
  *
@@ -35,9 +37,10 @@ public class ShopVo {
     private AddressModel address;
     /**
      * 签约状态
-     * @see ShopSignedStatusEnum
+     * @see ShopSignedStatusEnum  /Users/liuxuzhao/Desktop/劉皛旭/私用/yuan_saas_serve/yuansaas-app/target/yuansaas-app-0.0.1-SNAPSHOT.jar
      */
-    private ShopSignedStatusEnum signedStatus;
+    private String signedStatus;
+
     /**
      * 统一社会信用代码
      */
@@ -70,4 +73,25 @@ public class ShopVo {
      * 营业执照
      */
     private String businessLicense;
+    /**
+     * '签约人Id'
+     */
+    private Long  signedUserId;
+    /**
+     * '签约人'
+     */
+    private String  signedUserName;
+    /**
+     * '签约开始时间'
+     */
+    private LocalDateTime signedStartAt;
+    /**
+     * '签约结束时间'
+     */
+    private LocalDateTime  signedEndAt;
+    /**
+     * '签约金额（分）'
+     */
+    private Integer  signedAmount;
+
 }

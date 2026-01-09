@@ -34,40 +34,6 @@ public class Shop extends BaseEntity {
      */
     private String  code;
     /**
-     * '店铺logo'
-     */
-    private String  logo;
-    /**
-     * '店铺简介'
-     */
-    private String  intro;
-    /**
-     * 手机号
-     */
-    private String  phone;
-    /**
-     * 主题色
-     */
-    private String subjectColor;
-    /**
-     * '标签'
-     */
-    @Type(value = JsonStringType.class)
-    @Column(columnDefinition = "json")
-    private String  label;
-    /**
-     * '所属行业'
-     */
-    private String  industry;
-    /**
-     * '营业开始时间'
-     */
-    private Date weekdayStartHours;
-    /**
-     * '营业结束时间'
-     */
-    private Date  weekdayEndHours;
-    /**
      * '省编码'
      */
     private String  provinceCode;
