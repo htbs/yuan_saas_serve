@@ -80,13 +80,13 @@ ys:
         body:
           enable: true # 打印请求体 默认 false
           max-size: 10240 # 日志最大长度 10KB
-          include-patterns: "/**" # 匹配的请求路径 多路径用逗号隔开，支持api/**， api/user/info
+          include-patterns: "/**" # 匹配的请求路径 多路径用逗号隔开，支持api/**， api/user/init
       response:
         enable: true # 打印响应日志 默认 false
         body:
           enable: true # 打印响应体 默认 false
           max-size: 10240 # 日志最大长度 10KB
-          include-patterns: "/**" # 匹配的请求路径 多路径用逗号隔开，支持api/**， api/user/info
+          include-patterns: "/**" # 匹配的请求路径 多路径用逗号隔开，支持api/**， api/user/init
       sensitive:
         fields: "password,password_confirmation" # 敏感字段不打印日志
       slow:

@@ -4,6 +4,7 @@ import com.yuansaas.app.shop.param.FindShopParam;
 import com.yuansaas.app.shop.param.SaveShopParam;
 import com.yuansaas.app.shop.param.SignedParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
+import com.yuansaas.app.shop.service.ShopDataService;
 import com.yuansaas.app.shop.service.ShopService;
 import com.yuansaas.app.shop.vo.ShopListVo;
 import com.yuansaas.app.shop.vo.ShopVo;
@@ -101,7 +102,7 @@ public class ShopApi {
 
 
     /**
-     * 签约操作
+     * 签约操作 (签约成功后，商家的状态会变为已签约, 并生成店铺的基本数据信息)
      * @param signedParam 签约参数
      * @author  lxz 2025/11/16 14:35
      */

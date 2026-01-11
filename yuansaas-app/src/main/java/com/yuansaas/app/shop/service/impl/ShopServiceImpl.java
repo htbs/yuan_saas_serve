@@ -9,11 +9,9 @@ import com.yuansaas.app.shop.entity.QShop;
 import com.yuansaas.app.shop.entity.Shop;
 import com.yuansaas.app.shop.enums.ShopSignedStatusEnum;
 import com.yuansaas.app.shop.enums.ShopTypeEnum;
-import com.yuansaas.app.shop.param.FindShopParam;
-import com.yuansaas.app.shop.param.SaveShopParam;
-import com.yuansaas.app.shop.param.SignedParam;
-import com.yuansaas.app.shop.param.UpdateShopParam;
+import com.yuansaas.app.shop.param.*;
 import com.yuansaas.app.shop.repository.ShopRepository;
+import com.yuansaas.app.shop.service.ShopDataService;
 import com.yuansaas.app.shop.service.ShopService;
 import com.yuansaas.app.shop.service.mapstruct.ShopMapStruct;
 import com.yuansaas.app.shop.vo.ShopListVo;
@@ -45,6 +43,8 @@ public class ShopServiceImpl implements ShopService {
     private final ShopRepository shopRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final DeptService deptService;
+    private final ShopDataService shopDataService;
+
 
     /**
      * 添加商家
@@ -193,6 +193,8 @@ public class ShopServiceImpl implements ShopService {
         shop.setUpdateAt(LocalDateTime.now());
         shop.setUpdateBy(AppContextUtil.getUserInfo());
         shopRepository.save(shop);
+        // 签约成功后默认激活店铺
+        shopDataService.init(shop.getCode());
         return true;
     }
 

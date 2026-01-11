@@ -67,7 +67,7 @@ public interface ShopService {
      */
     ShopVo getById(Long id);
     /**
-     * 签约操作
+     * 签约操作 (签约成功后，商家的状态会变为已签约, 并生成店铺的基本数据信息)
      * @param signedParam 签约参数
      * @author  lxz 2025/11/16 14:35
      */

@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -22,7 +23,7 @@ import java.util.Date;
 @Table(name = "shop_data_config")
 public class ShopDataConfig extends BaseEntity {
     /**
-     * '店铺名字'
+     * '店铺code'
      */
     private String  shopCode;
     /**
@@ -55,10 +56,14 @@ public class ShopDataConfig extends BaseEntity {
     @Type(value = JsonStringType.class)
     @Column(columnDefinition = "json")
     private String  label;
+
+//    privateis_unified BOOLEAN DEFAULT false, -- 是否开启统一设置
     /**
-     * '营业时间规则'
+     * 统一开始时间，如 09:00
      */
-    @Type(value = JsonStringType.class)
-    @Column(columnDefinition = "json")
-    private Object weekdayHours;
+    private Time startTime;
+    /**
+     * 统一结束时间，如 18:00
+     */
+    private Time endTime ;
 }
