@@ -21,7 +21,6 @@ import com.yuansaas.user.client.entity.ClientUser;
 import com.yuansaas.user.client.service.ClientUserService;
 import com.yuansaas.user.common.entity.UserWechatBinding;
 import com.yuansaas.user.common.enums.UserStatus;
-import com.yuansaas.user.common.enums.UserBaseRole;
 import com.yuansaas.user.common.enums.UserWxAuthClient;
 import com.yuansaas.user.common.model.WechatUserInfoModel;
 import com.yuansaas.user.common.service.UserLoginLogService;
@@ -41,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.yuansaas.user.common.enums.UserBaseRole.*;
 
 /**
  * 统一认证
@@ -195,14 +193,14 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
 //            if (loginParam.getUserType().mismatches(binding.getUserType())) {
 //                throw new AuthenticationServiceException("微信账号已绑定其他类型用户");
 //            }
-            Optional<UserBaseRole> userTypeOptional = IBaseEnum.fromName(binding.getUserType(), UserBaseRole.class);
-            UserBaseRole bindUserType = userTypeOptional.orElseThrow(() -> AuthErrorCode.ACCESS_DENIED.buildException("未知的绑定用户"));
+            Optional<UserTypeEnum> userTypeOptional = IBaseEnum.fromName(binding.getUserType(), UserTypeEnum.class);
+            UserTypeEnum bindUserType = userTypeOptional.orElseThrow(() -> AuthErrorCode.ACCESS_DENIED.buildException("未知的绑定用户"));
             return switch (bindUserType) {
-                case ADMIN -> new CustomUserDetails(
+                case YUAN_SHI_USER -> new CustomUserDetails(
                         sysUserService.findById(binding.getUserId())
                                 .orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("系统用户不存在"))
                 );
-                case USER -> new CustomUserDetails(
+                case CLIENT_USER -> new CustomUserDetails(
                         clientUserService.findById(binding.getUserId())
                                 .orElseThrow(() ->  DataErrorCode.DATA_NOT_FOUND.buildException("客户端用户不存在") )
                 );
