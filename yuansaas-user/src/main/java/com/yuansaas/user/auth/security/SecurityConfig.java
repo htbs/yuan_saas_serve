@@ -78,54 +78,6 @@ public class SecurityConfig {
         return AuthorizationManagerBeforeMethodInterceptor.preAuthorize(manager);
     }
 
-//    // CORS 配置 Bean
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//
-//        // 允许的源（根据需求修改）
-//        configuration.setAllowedOrigins(Arrays.asList(
-//                "http://localhost:*",    // 开发环境
-//                "http://127.0.0.1:*",    // 开发环境
-//                "http://192.168.*.*:*", // 本地测试环境
-//                "https://sm-web.soolay.cn"     // 开发环境
-//
-//        ));
-//
-//        // 允许的 HTTP 方法
-//        configuration.setAllowedMethods(Arrays.asList(
-//                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
-//        ));
-//
-//        // 允许的请求头
-//        configuration.setAllowedHeaders(Arrays.asList(
-//                "Authorization",
-//                "Content-Type",
-//                "X-Requested-With",
-//                "Accept",
-//                "Origin",
-//                "Access-Control-Request-Method",
-//                "Access-Control-Request-Headers"
-//        ));
-//
-//        // 暴露的响应头
-//        configuration.setExposedHeaders(Arrays.asList(
-//                "Access-Control-Allow-Origin",
-//                "Access-Control-Allow-Credentials"
-//        ));
-//
-//        // 是否允许发送认证信息（如 cookies）
-//        configuration.setAllowCredentials(true);
-//
-//        // 预检请求的有效期（秒）
-//        configuration.setMaxAge(3600L);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//
-//        return source;
-//    }
-
     /**
      * 这个过滤器会清除所有现有的 CORS 头，然后重新设置正确的头
      * 要放在 CorsFilter 之前执行
