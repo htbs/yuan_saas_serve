@@ -1,6 +1,6 @@
 package com.yuansaas.user.auth.security.annotations;
 
-import com.yuansaas.user.common.enums.UserType;
+import com.yuansaas.common.enums.UserTypeEnum;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.lang.annotation.ElementType;
@@ -21,7 +21,7 @@ public @interface SecurityAuth {
     /**
      * 允许的用户类型
      */
-    UserType[] userTypes() default {};
+    UserTypeEnum[] userTypes() default {};
 
     /**
      * 允许的角色

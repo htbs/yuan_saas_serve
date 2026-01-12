@@ -1,9 +1,8 @@
 package com.yuansaas.app.common.params;
 
 
-import com.yuansaas.app.common.enums.PlatformTypeEnum;
+import com.yuansaas.app.common.enums.DictPlatformTypeEnum;
 import com.yuansaas.core.annotation.EnumValidate;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -27,8 +26,8 @@ public class SaveDictParam {
     /**
      * 平台类型
      */
-    @EnumValidate(enumClass = PlatformTypeEnum.class)
-    private PlatformTypeEnum platform;
+    @EnumValidate(enumClass = DictPlatformTypeEnum.class)
+    private DictPlatformTypeEnum platform;
     /**
      * 字典排序值
      */

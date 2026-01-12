@@ -1,7 +1,7 @@
 package com.yuansaas.app.user.common.service;
 
 import com.yuansaas.app.user.common.vo.WxMpQrCodeTicketVo;
-import com.yuansaas.user.common.enums.UserType;
+import com.yuansaas.common.enums.UserTypeEnum;
 
 /**
  * 授权登录
@@ -15,6 +15,6 @@ public interface AuthService {
      * @param userType 用户类型
      * @return 临时二维码ticket
      */
-    WxMpQrCodeTicketVo getTempQrCodeTicket(UserType userType);
+    WxMpQrCodeTicketVo getTempQrCodeTicket(UserTypeEnum userType);
 
 }

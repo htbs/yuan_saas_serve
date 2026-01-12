@@ -19,4 +19,7 @@ public interface GenericHeaderCons {
 
     String USER_AGENT = "User-Agent";
 
+    // 终端类型
+    String X_TERMINAL_TYPE = "X-Terminal-Type";
+
 }

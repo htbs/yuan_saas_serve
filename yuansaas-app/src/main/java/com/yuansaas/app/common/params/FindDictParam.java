@@ -1,6 +1,6 @@
 package com.yuansaas.app.common.params;
 
-import com.yuansaas.app.common.enums.PlatformTypeEnum;
+import com.yuansaas.app.common.enums.DictPlatformTypeEnum;
 import com.yuansaas.core.page.PageModel;
 import lombok.Data;
 
@@ -19,5 +19,5 @@ public class FindDictParam  extends PageModel {
     /**
      * 平台类型
      */
-    private PlatformTypeEnum platform;
+    private DictPlatformTypeEnum platform;
 }

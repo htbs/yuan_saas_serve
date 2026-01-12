@@ -27,6 +27,9 @@ public enum AuthErrorCode implements IErrorCodeEnum<AuthErrorCode> {
     PASSWORD_EXPIRED("AUTH_0011", "密码已过期"),
     PASSWORD_RESET_REQUIRED("AUTH_0012", "需要重置密码"),
     AUTH_PARAM_ERROR("AUTH_0013", "认证参数错误"),
+    AUTH_USER_NOT_FOUND("AUTH_0014", "用户不存在"),
+    TERMINAL_NOT_FOUND("AUTH_0015", "终端不存在"),
+    INVALID_USER("AUTH_0016" , "无效用户"),
     ;
 
     private final String code;

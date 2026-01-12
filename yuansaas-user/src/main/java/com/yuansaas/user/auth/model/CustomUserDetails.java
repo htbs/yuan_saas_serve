@@ -1,9 +1,10 @@
 package com.yuansaas.user.auth.model;
 
 import com.yuansaas.common.enums.IBaseEnum;
+import com.yuansaas.common.enums.UserBaseRoleEnum;
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.user.client.entity.ClientUser;
 import com.yuansaas.user.common.enums.UserStatus;
-import com.yuansaas.user.common.enums.UserType;
 import com.yuansaas.user.system.entity.SysUser;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,9 +28,19 @@ public class CustomUserDetails implements UserDetails {
     private final Long userId;
 
     /**
+     * 用户基础角色
+     */
+    private final UserBaseRoleEnum userBaseRole;
+
+    /**
+     * 用户角色
+     */
+//    private final String userRole;
+
+    /**
      * 用户类型
      */
-    private final UserType userType;
+    private final UserTypeEnum userType;
 
     /**
      * 用户名
@@ -68,26 +79,29 @@ public class CustomUserDetails implements UserDetails {
 
     public CustomUserDetails(ClientUser clientUser){
          this.userId = clientUser.getId();
-         this.userType = UserType.CLIENT_USER;
+         this.userBaseRole = UserBaseRoleEnum.LOGIN_USER;
          this.username = clientUser.getUserName();
          this.avatar = clientUser.getAvatarUrl();
          this.password = clientUser.getPasswordHash() ;
+         this.userType = UserTypeEnum.CLIENT_USER;
          this.enabled = UserStatus.active.matches(clientUser.getStatus());
          this.locked = UserStatus.active.matches(clientUser.getStatus());
          IBaseEnum.fromNameIgnoreCase(clientUser.getStatus() , UserStatus.class).ifPresent(userStatus -> this.status = userStatus);
-         this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_".concat(userType.getName())));
+         this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_".concat(userBaseRole.getName())));
     }
 
     public CustomUserDetails(SysUser sysUser){
         this.userId = sysUser.getId();
-        this.userType = UserType.SYSTEM_USER;
+        this.userBaseRole = UserBaseRoleEnum.LOGIN_USER;
         this.username = sysUser.getUserName();
         this.avatar = null;
+//        this.userRole= null;
+        this.userType = UserTypeEnum.YUAN_SHI_USER;
         this.enabled = UserStatus.active.matches(sysUser.getStatus());
         this.password = sysUser.getPassword() ;
         this.locked = UserStatus.active.matches(sysUser.getStatus());
         IBaseEnum.fromNameIgnoreCase(sysUser.getStatus() , UserStatus.class).ifPresent(userStatus -> this.status = userStatus);
-        this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_".concat(userType.getName())));
+        this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_".concat(userBaseRole.getName())));
     }
 
     @Override

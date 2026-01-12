@@ -1,6 +1,6 @@
 package com.yuansaas.app.user.client.param;
 
-import com.yuansaas.user.common.enums.UserType;
+import com.yuansaas.user.common.enums.UserBaseRole;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -34,7 +34,7 @@ public class TestModel {
     /**
      *  用户类型
      */
-    private UserType userType;
+    private UserBaseRole userType;
     /**
      *  创建时间
      */

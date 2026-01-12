@@ -1,19 +1,18 @@
 package com.yuansaas.user.auth.security;
 
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.core.exception.AppException;
+import com.yuansaas.core.exception.ex.AuthErrorCode;
 import com.yuansaas.user.auth.model.CustomUserDetails;
 import com.yuansaas.user.auth.properties.JwtProperties;
 import com.yuansaas.user.client.entity.ClientUser;
 import com.yuansaas.user.client.service.ClientUserService;
-import com.yuansaas.user.common.enums.UserType;
 import com.yuansaas.user.common.service.UserStatusCache;
 import com.yuansaas.user.config.ServiceManager;
 import com.yuansaas.user.system.entity.SysUser;
-import com.yuansaas.user.system.service.SysUserService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -65,6 +64,7 @@ public class JwtManager {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("userId",userDetails.getUserId())
+                .claim("userBaseRole",userDetails.getUserBaseRole().name())
                 .claim("userType",userDetails.getUserType().name())
                 .claim("tokenType",tokenType)
                 .setIssuedAt(new Date())
@@ -111,22 +111,27 @@ public class JwtManager {
     public CustomUserDetails parseToken(String token) {
         Claims claims = jwtTokenParser.extractAllClaims(token);
         Long userId = claims.get("userId", Long.class);
-        UserType userType = UserType.valueOf(claims.get("userType", String.class));
+        UserTypeEnum userType = UserTypeEnum.getByCode(claims.get("userType", String.class));
         String username = claims.getSubject();
 
         // 根据用户类型加载用户详情
         return loadUserDetails(userType, userId, username);
     }
 
-    private CustomUserDetails loadUserDetails(UserType userType, Long userId, String username) {
-        if (userType == UserType.SYSTEM_USER) {
+    private CustomUserDetails loadUserDetails(UserTypeEnum userType, Long userId, String username) {
+        if (userType == UserTypeEnum.YUAN_SHI_USER) {
             SysUser user = ServiceManager.sysUserService.findById(userId)
                     .orElseThrow(() -> new UsernameNotFoundException("系统用户不存在"));
             return new CustomUserDetails(user);
-        } else {
+        } if (userType == UserTypeEnum.CLIENT_USER){
             ClientUser user = clientUserService.findById(userId)
                     .orElseThrow(() -> new UsernameNotFoundException("客户端用户不存在"));
             return new CustomUserDetails(user);
+        } if (userType == UserTypeEnum.MERCHANT_USER){
+            // TODO 商户用户
+            return null;
+        }else {
+            throw AuthErrorCode.AUTH_USER_NOT_FOUND.buildException();
         }
     }
 

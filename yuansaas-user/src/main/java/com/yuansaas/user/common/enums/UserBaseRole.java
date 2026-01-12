@@ -10,11 +10,11 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum UserType implements IBaseEnum<UserType> {
+public enum UserBaseRole implements IBaseEnum<UserBaseRole> {
 
-    SYSTEM_USER("管理员"),
-    CLIENT_USER("普通用户"),
-    GUEST_USER("访客");
+    ADMIN("管理员"),
+    USER("普通用户"),
+    GUEST("访客");
 
     private final String description;
 

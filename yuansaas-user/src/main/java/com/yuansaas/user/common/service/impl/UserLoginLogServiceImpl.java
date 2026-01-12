@@ -1,11 +1,11 @@
 package com.yuansaas.user.common.service.impl;
 
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.utils.IpUtil;
 import com.yuansaas.user.auth.enums.LoginType;
 import com.yuansaas.user.auth.model.CustomUserDetails;
 import com.yuansaas.user.common.entity.UserLoginLog;
-import com.yuansaas.user.common.enums.UserType;
 import com.yuansaas.user.common.repository.UserLoginLogRepository;
 import com.yuansaas.user.common.service.UserLoginLogService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +32,7 @@ public class UserLoginLogServiceImpl implements UserLoginLogService {
         log.setUserType(userDetails.getUserType().name());
         log.setUserName(userDetails.getUsername());
         log.setLoginType(loginType.name());
-        log.setTerminal(AppContextUtil.requireClientType());
+        log.setTerminal(AppContextUtil.getTerminalType());
         log.setCreateAt(LocalDateTime.now());
         buildRequestIfo(request, log);
         log.setSuccess(success);
@@ -41,10 +41,11 @@ public class UserLoginLogServiceImpl implements UserLoginLogService {
     }
 
     @Override
-    public void logLoginFailure(String username, UserType userType, LoginType loginType, HttpServletRequest request, String failureReason) {
+    public void logLoginFailure(String username, UserTypeEnum userType, LoginType loginType, HttpServletRequest request, String failureReason) {
         UserLoginLog log = new UserLoginLog();
         log.setUserName(username);
         log.setUserType(userType.name());
+        log.setTerminal(AppContextUtil.getTerminalType());
         log.setLoginType(loginType.name());
         log.setCreateAt(LocalDateTime.now());
         buildRequestIfo(request, log);

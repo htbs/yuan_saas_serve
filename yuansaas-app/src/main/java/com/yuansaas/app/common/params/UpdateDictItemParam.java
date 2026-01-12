@@ -1,8 +1,6 @@
 package com.yuansaas.app.common.params;
 
 
-import com.yuansaas.app.common.enums.PlatformTypeEnum;
-import com.yuansaas.core.annotation.EnumValidate;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

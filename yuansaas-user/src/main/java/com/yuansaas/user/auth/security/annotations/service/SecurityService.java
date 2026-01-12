@@ -1,9 +1,9 @@
 package com.yuansaas.user.auth.security.annotations.service;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.user.auth.model.CustomUserDetails;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
-import com.yuansaas.user.common.enums.UserType;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,7 +27,7 @@ public class SecurityService {
      */
     public boolean checkCombinedAuth(Authentication authentication, SecurityAuth annotation) {
         // 获取注解属性
-        UserType[] userTypes = annotation.userTypes();
+        UserTypeEnum[] userTypes = annotation.userTypes();
         String[] roles = annotation.roles();
         String[] permissions = annotation.permissions();
 
@@ -64,8 +64,8 @@ public class SecurityService {
         return true;
     }
 
-    private boolean checkUserTypes(Authentication authentication, UserType[] requiredTypes) {
-        UserType currentUserType = extractUserType(authentication);
+    private boolean checkUserTypes(Authentication authentication, UserTypeEnum[] requiredTypes) {
+        UserTypeEnum currentUserType = extractUserType(authentication);
         return Arrays.stream(requiredTypes).anyMatch(t -> t == currentUserType);
     }
 
@@ -82,10 +82,10 @@ public class SecurityService {
         return true;
     }
 
-    private UserType extractUserType(Authentication authentication) {
+    private UserTypeEnum extractUserType(Authentication authentication) {
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             return ((CustomUserDetails) authentication.getPrincipal()).getUserType();
         }
-        return UserType.GUEST_USER;
+        return UserTypeEnum.UNKNOWN;
     }
 }

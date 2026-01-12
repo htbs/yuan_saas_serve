@@ -1,5 +1,6 @@
 package com.yuansaas.user.auth.api;
 
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.param.RefreshTokenParam;
@@ -7,7 +8,6 @@ import com.yuansaas.user.auth.param.UnifiedLoginParam;
 import com.yuansaas.user.auth.service.UnifiedAuthService;
 import com.yuansaas.user.auth.vo.AuthVo;
 import com.yuansaas.user.auth.vo.TokenRefreshVo;
-import com.yuansaas.user.common.enums.UserType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +76,7 @@ public class UnifiedAuthApi {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel<Void>> lockUser(
             @PathVariable Long userId,
-            @PathVariable UserType userType) {
+            @PathVariable UserTypeEnum userType) {
 
         authService.lockUser(userId, userType);
         return ResponseBuilder.okResponse();
@@ -92,8 +92,7 @@ public class UnifiedAuthApi {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel<Void>> unlockUser(
             @PathVariable Long userId,
-            @PathVariable UserType userType) {
-
+            @PathVariable UserTypeEnum userType) {
         authService.unlockUser(userId, userType);
         return ResponseBuilder.okResponse();
     }

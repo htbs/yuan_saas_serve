@@ -1,7 +1,7 @@
 package com.yuansaas.user.common.service;
 
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.user.common.entity.UserWechatBinding;
-import com.yuansaas.user.common.enums.UserType;
 import com.yuansaas.user.common.model.WechatUserInfoModel;
 
 /**
@@ -31,5 +31,5 @@ public interface WechatBindingService {
      * @param userType 用户类型
      * @param wechatUser 微信用户信息
      */
-    void bindWechat(Long userId, UserType userType, WechatUserInfoModel wechatUser);
+    void bindWechat(Long userId, UserTypeEnum userType, WechatUserInfoModel wechatUser);
 }
