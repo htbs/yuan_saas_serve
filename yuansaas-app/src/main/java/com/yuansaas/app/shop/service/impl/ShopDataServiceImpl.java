@@ -1,11 +1,13 @@
 package com.yuansaas.app.shop.service.impl;
 
 import ch.qos.logback.core.CoreConstants;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.yuansaas.app.shop.entity.ShopDataConfig;
 import com.yuansaas.app.shop.entity.ShopRegularHours;
 import com.yuansaas.app.shop.entity.ShopSpecialHours;
+import com.yuansaas.app.shop.model.BusinessDataModel;
 import com.yuansaas.app.shop.model.RegularHoursModel;
 import com.yuansaas.app.shop.model.SpecialHoursModel;
 import com.yuansaas.app.shop.model.TimeSlotsModel;
@@ -31,6 +33,7 @@ import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -142,6 +145,48 @@ public class ShopDataServiceImpl implements ShopDataService {
         return shopBusinessHoursVo;
     }
 
+    /**
+     * 查询商家营业时间
+     *
+     * @param date 时间
+     * @author lxz 2025/11/16 14:35
+     */
+    @Override
+    public BusinessDataModel getBusinessHoursByShopCode(Date date , String shopCode) {
+        // 查询商家日常营业时间
+        List<RegularHoursModel> regularHoursByShopCode = getRegularHoursByShopCode(shopCode);
+        // 查询商家特殊营业时间
+        List<SpecialHoursModel> specialHoursByShopCode = getSpecialHoursByShopCode(shopCode);
+        BusinessDataModel businessDataModel = null;
+        if (ObjectUtil.isNotEmpty(specialHoursByShopCode)) {
+            businessDataModel =  specialHoursByShopCode.stream()
+                    .filter(f -> AppConstants.Y.equals(f.getIsOpen()))
+                    .filter(f -> DateUtil.isIn(date, DateUtil.beginOfDay(f.getStartDate()), DateUtil.endOfDay(f.getEndDate())))
+                    .findFirst()
+                    .map( f ->{
+                        BusinessDataModel businessData = new BusinessDataModel();
+                        businessData.setIsBusiness(AppConstants.Y);
+                        businessData.setStartTime(f.getTimeSlots().getStartTime());
+                        businessData.setEndTime(f.getTimeSlots().getStartTime());
+                        return businessData;
+                    }).orElse(null);
+        }
+        if (ObjectUtil.isNotEmpty(regularHoursByShopCode)) {
+            businessDataModel =  regularHoursByShopCode.stream()
+                    .filter(f -> AppConstants.Y.equals(f.getIsOpen()))
+                    .filter(f -> f.getDayOfWeek() == DateUtil.dayOfWeek(date))
+                    .findFirst()
+                    .map( f ->{
+                        BusinessDataModel businessData = new BusinessDataModel();
+                        businessData.setIsBusiness(AppConstants.Y);
+                        businessData.setStartTime(f.getTimeSlots().getStartTime());
+                        businessData.setEndTime(f.getTimeSlots().getStartTime());
+                        return businessData;
+                    }).orElse(null);
+        }
+        return ObjectUtil.isEmpty(businessDataModel) ? new BusinessDataModel() : businessDataModel;
+    }
+
 
     /**
      * 保存或更新商家特殊营业时间的配置
@@ -163,6 +208,7 @@ public class ShopDataServiceImpl implements ShopDataService {
             shopSpecialHoursList.add(shopSpecialHours);
         });
         shopSpecialHoursRepository.saveAll(shopSpecialHoursList);
+        // todo 保存到redis缓存
     }
     /**
      * 保存或更新商家日常营业时间的配置
@@ -182,6 +228,7 @@ public class ShopDataServiceImpl implements ShopDataService {
             shopRegularHoursList.add(shopRegularHours);
         });
         shopRegularHoursRepository.saveAll(shopRegularHoursList);
+        // todo 保存到redis缓存
     }
 
     /**
@@ -199,6 +246,9 @@ public class ShopDataServiceImpl implements ShopDataService {
      * 获取商家日常营业时间配置
      */
     private List<RegularHoursModel> getRegularHoursByShopCode(String shopCode) {
+        // todo 保存到redis缓存
+
+        // 从数据库获取
         List<ShopRegularHours> shopRegularHoursList = shopRegularHoursRepository.findByShopCode(shopCode);
         if (ObjectUtil.isEmpty(shopRegularHoursList)) {
             return null;
@@ -219,6 +269,9 @@ public class ShopDataServiceImpl implements ShopDataService {
      * 获取商家特殊营业时间配置
      */
     private List<SpecialHoursModel> getSpecialHoursByShopCode(String shopCode) {
+        // todo 保存到redis缓存
+
+        // 从数据库获取
         List<ShopSpecialHours> shopSpecialHoursList = shopSpecialHoursRepository.findByShopCode(shopCode);
         if (ObjectUtil.isEmpty(shopSpecialHoursList)) {
             return null;
@@ -247,6 +300,7 @@ public class ShopDataServiceImpl implements ShopDataService {
         shopDataConfig.setSubjectColor("#FAFAFA");
         // 可以默认标签
 //        shopDataConfig.setLabel();
+        shopDataConfig.setIsUnified(AppConstants.Y);
         shopDataConfig.setStartTime(LocalTime.parse("09:00:00"));
         shopDataConfig.setEndTime(LocalTime.parse("18:00:00"));
         shopDataConfig.setCreateBy(AppContextUtil.getUserInfo());
@@ -270,6 +324,7 @@ public class ShopDataServiceImpl implements ShopDataService {
             shopRegularHoursList.add(shopRegularHours);
         }
         shopRegularHoursRepository.saveAll(shopRegularHoursList);
+        // todo 保存到redis缓存
     }
 
 

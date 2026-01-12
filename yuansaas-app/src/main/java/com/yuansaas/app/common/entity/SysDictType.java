@@ -18,6 +18,10 @@ import lombok.Data;
 public class SysDictType extends BaseEntity {
 
     /**
+     * 字典编码
+     */
+    private String dictCode;
+    /**
      * 字典类型
      */
     private String dictType;
@@ -33,4 +37,12 @@ public class SysDictType extends BaseEntity {
      * 排序
      */
     private Integer sort;
+    /**
+     * '锁定状态(Y锁定|N不锁定)'
+     */
+    private String  lockStatus;
+    /**
+     * '删除状态(Y删除|N未删除)'
+     */
+    private String  deleteStatus;
 }

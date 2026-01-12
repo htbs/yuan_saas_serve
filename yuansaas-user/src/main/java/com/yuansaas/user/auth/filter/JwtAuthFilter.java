@@ -156,7 +156,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             appContext.setUserId(userDetails.getUserId());
             appContext.setUserName(userDetails.getUsername());
             appContext.setUserType(userDetails.getUserType().name());
-            appContext.setMerchantCode(userDetails.getMerchantCode());
+//            appContext.setMerchantCode(userDetails.getMerchantCode());
             AppContextHolder.setContext(appContext);
         }
 

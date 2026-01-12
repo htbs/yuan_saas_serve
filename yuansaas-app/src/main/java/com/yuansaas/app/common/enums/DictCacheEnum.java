@@ -15,11 +15,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum DictCacheEnum implements IBaseEnum<DictCacheEnum> {
 
-    DICT_ITEM_CACHE("dict_item_cache", "字典项缓存"),
+    DICT("DICT:VALUE", "字典缓存"),
 
     ;
 
-    private final String code;
+    private final String key;
     private final String desc;
 
     @Override

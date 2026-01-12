@@ -25,12 +25,12 @@ public class SpecialHoursModel {
     /**
      * 开始时间
      */
-    @JsonFormat(pattern = "MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date startDate;
     /**
      * 结束时间
      */
-    @JsonFormat(pattern = "MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date endDate;
     /**
      * 时间配置 [{"start":"09:00","end":"18:00"}, ...]

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 系统字典类型VO
+ * 系统字典VO
  *
  * @author LXZ 2025/11/19 17:31
  */
@@ -16,13 +16,21 @@ public class SysDictTypeVo implements Serializable {
      */
     private Long id;
     /**
-     * 字典标签
+     * 字典类型
      */
-    private String dictLabel;
+    private String dictType;
     /**
      * 字典名称
      */
-    private String dictValue;
+    private String dictName;
+    /**
+     * 字典编码
+     */
+    private String dictCode;
+    /**
+     * 字典禁用状态
+     */
+    private String lockStatus;
     /**
      *  排序
      */
@@ -31,4 +39,8 @@ public class SysDictTypeVo implements Serializable {
      * 操作人
      */
     private String updateBy;
+    /**
+     * 操作人
+     */
+    private String updateAt;
 }

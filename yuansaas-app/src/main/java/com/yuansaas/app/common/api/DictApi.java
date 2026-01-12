@@ -1,6 +1,5 @@
 package com.yuansaas.app.common.api;
 
-import com.google.common.collect.Lists;
 import com.yuansaas.app.common.params.FindDictParam;
 import com.yuansaas.app.common.params.SaveDictParam;
 import com.yuansaas.app.common.params.UpdateDictParam;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 /**
  *
@@ -32,7 +30,7 @@ public class DictApi {
     private final DictService dictService;
 
     /**
-     * 创建字典项
+     * 创建字典
      * @param saveDictParam 创建字典相关参数
      * @author  lxz 2025/11/16 14:35
      */
@@ -42,17 +40,16 @@ public class DictApi {
         return ResponseBuilder.okResponse(dictService.createDict(saveDictParam));
     }
 
-//    /**
-//     * 编辑字典项
-//     * @param updateDictParam 编辑字典相关参数
-//     * @author  lxz 2025/11/16 14:35
-//     */
-//    @RequestMapping(value = "/update",method = RequestMethod.POST)
-//    @SecurityAuth
-//    public ResponseEntity<ResponseModel<Boolean>> updateDict(@RequestBody @Validated UpdateDictParam updateDictParam) {
-//        return ResponseBuilder.okResponse(dictService.updateDict(updateDictParam));
-//    }
-
+    /**
+     * 修改字典
+     * @param updateDictParam 修改字典排序
+     * @author  lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/update",method = RequestMethod.PUT)
+    @SecurityAuth()
+    public ResponseEntity<ResponseModel<Boolean>> updateDict(@RequestBody @Validated UpdateDictParam updateDictParam) {
+        return ResponseBuilder.okResponse(dictService.updateDict(updateDictParam));
+    }
 
     /**
      * 修改字典项排序
@@ -81,7 +78,7 @@ public class DictApi {
      * @param findDictParam 字典id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/page",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/page",method = RequestMethod.GET)
     @SecurityAuth
     public ResponseEntity<ResponseModel<RPage<SysDictTypeVo>>> findByPage(FindDictParam findDictParam) {
         return ResponseBuilder.okResponse(dictService.getDictListByPage(findDictParam));

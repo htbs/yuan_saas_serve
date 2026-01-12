@@ -1,7 +1,10 @@
 package com.yuansaas.app.shop.service;
 
+import com.yuansaas.app.shop.model.BusinessDataModel;
 import com.yuansaas.app.shop.param.*;
 import com.yuansaas.app.shop.vo.ShopBusinessHoursVo;
+
+import java.util.Date;
 
 /**
  *
@@ -39,5 +42,13 @@ public interface ShopDataService {
      * @author  lxz 2025/11/16 14:35
      */
     ShopBusinessHoursVo getBusinessHoursByShopCode(String shopCode);
+
+    /**
+     * 查询商家营业时间
+     * @param date 时间
+     * @param shopCode 店铺编码
+     * @author  lxz 2025/11/16 14:35
+     */
+    BusinessDataModel getBusinessHoursByShopCode(Date date , String shopCode);
 
 }

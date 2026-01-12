@@ -12,7 +12,7 @@ import lombok.Data;
 public class RegularHoursModel {
 
     /**
-     * 1-7: 周一到周日
+     * 1-7: 周一到周日  1表示周日，2表示周一
      */
     private Integer dayOfWeek;
     /**

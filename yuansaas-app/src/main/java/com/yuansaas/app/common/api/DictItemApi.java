@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  *
- * 字典配置
+ * 字典项配置
  *
  * @author LXZ 2025/11/17 16:00
  */

@@ -2,6 +2,7 @@ package com.yuansaas.app.shop.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.common.model.AddressModel;
 import com.yuansaas.core.jpa.model.BaseEntity;
 import jakarta.persistence.Column;
@@ -59,7 +60,10 @@ public class ShopDataConfig extends BaseEntity {
     @Column(columnDefinition = "json")
     private String  label;
 
-//    privateis_unified BOOLEAN DEFAULT false, -- 是否开启统一设置
+    /**
+     * 是否开启统一设置 (N 关闭| Y 开启)
+     */
+    private String isUnified= AppConstants.N;
     /**
      * 统一开始时间，如 09:00
      */
@@ -70,4 +74,5 @@ public class ShopDataConfig extends BaseEntity {
      */
     @JsonFormat(pattern = "HH:mm:ss" )
     private LocalTime endTime ;
+
 }
