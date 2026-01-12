@@ -1,6 +1,8 @@
 package com.yuansaas.app.shop.service.impl;
 
+import ch.qos.logback.core.CoreConstants;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.yuansaas.app.shop.entity.ShopDataConfig;
 import com.yuansaas.app.shop.entity.ShopRegularHours;
 import com.yuansaas.app.shop.entity.ShopSpecialHours;
@@ -17,6 +19,7 @@ import com.yuansaas.app.shop.repository.ShopSpecialHoursRepository;
 import com.yuansaas.app.shop.service.ShopDataService;
 import com.yuansaas.app.shop.service.mapstruct.ShopMapStruct;
 import com.yuansaas.app.shop.vo.ShopBusinessHoursVo;
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jackson.JacksonUtil;
@@ -26,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -204,7 +208,7 @@ public class ShopDataServiceImpl implements ShopDataService {
             RegularHoursModel regularHoursModel = new RegularHoursModel();
             regularHoursModel.setIsOpen(r.getIsOpen());
             regularHoursModel.setDayOfWeek(r.getDayOfWeek());
-            regularHoursModel.setTimeSlots(JacksonUtil.convert(r.getTimeSlots(), TimeSlotsModel.class));
+            regularHoursModel.setTimeSlots(JacksonUtil.convert(JSONUtil.parseObj(r.getTimeSlots()), TimeSlotsModel.class ));
             regularHoursModel.setRemark(r.getRemark());
             regularHoursModels.add(regularHoursModel);
         });
@@ -226,7 +230,7 @@ public class ShopDataServiceImpl implements ShopDataService {
             specialHoursModel.setStartDate(s.getStartDate());
             specialHoursModel.setEndDate(s.getEndDate());
             specialHoursModel.setIsOpen(s.getIsOpen());
-            specialHoursModel.setTimeSlots(JacksonUtil.convert(s.getTimeSlots(), TimeSlotsModel.class));
+            specialHoursModel.setTimeSlots(JacksonUtil.convert(JSONUtil.parseObj(s.getTimeSlots()), TimeSlotsModel.class ));
             specialHoursModel.setRemark(s.getRemark());
             specialHoursModels.add(specialHoursModel);
         });
@@ -240,11 +244,11 @@ public class ShopDataServiceImpl implements ShopDataService {
         // 更新商家信息
         ShopDataConfig shopDataConfig = new ShopDataConfig();
         shopDataConfig.setShopCode(saveShopDataParam.getShopCode());
-        shopDataConfig.setSubjectColor(saveShopDataParam.getSubjectColor());
+        shopDataConfig.setSubjectColor("#FAFAFA");
         // 可以默认标签
 //        shopDataConfig.setLabel();
-        shopDataConfig.setStartTime(Time.valueOf("09:00"));
-        shopDataConfig.setEndTime(Time.valueOf("18:00"));
+        shopDataConfig.setStartTime(LocalTime.parse("09:00:00"));
+        shopDataConfig.setEndTime(LocalTime.parse("18:00:00"));
         shopDataConfig.setCreateBy(AppContextUtil.getUserInfo());
         shopDataConfig.setCreateAt(LocalDateTime.now());
         shopDataConfigRepository.save(shopDataConfig);
@@ -259,7 +263,7 @@ public class ShopDataServiceImpl implements ShopDataService {
         for (int i = 1; i <= 7; i++) {
             ShopRegularHours shopRegularHours = new ShopRegularHours();
             shopRegularHours.setShopCode(shopCode);
-            shopRegularHours.setIsOpen(false);
+            shopRegularHours.setIsOpen(AppConstants.N);
             shopRegularHours.setDayOfWeek(i);
             shopRegularHours.setCreateAt(LocalDateTime.now());
             shopRegularHours.setCreateBy(AppContextUtil.getUserInfo());

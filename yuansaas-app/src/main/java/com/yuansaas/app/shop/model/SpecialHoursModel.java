@@ -15,9 +15,9 @@ import java.util.Date;
 public class SpecialHoursModel {
 
     /**
-     * 开关
+     * 开关 (N 关闭 | Y 打开)
      */
-    private Boolean isOpen;
+    private String isOpen;
     /**
      * 标题 如：春节、店庆
      */

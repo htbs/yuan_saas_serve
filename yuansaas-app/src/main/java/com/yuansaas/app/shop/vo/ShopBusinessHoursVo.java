@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -19,11 +20,11 @@ public class ShopBusinessHoursVo {
     /**
      *  开始时间 (格式：HH:mm)
      */
-    private Time startTime;
+    private LocalTime startTime;
     /**
      *  结束时间 (格式：HH:mm)
      */
-    private Time endTime;
+    private LocalTime endTime;
     /**
      * 日常时间配置
      */

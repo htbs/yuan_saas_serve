@@ -1,5 +1,6 @@
 package com.yuansaas.app.shop.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import com.yuansaas.common.model.AddressModel;
 import com.yuansaas.core.jpa.model.BaseEntity;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.Type;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
 /**
@@ -61,9 +63,11 @@ public class ShopDataConfig extends BaseEntity {
     /**
      * 统一开始时间，如 09:00
      */
-    private Time startTime;
+    @JsonFormat(pattern = "HH:mm:ss" )
+    private LocalTime startTime;
     /**
      * 统一结束时间，如 18:00
      */
-    private Time endTime ;
+    @JsonFormat(pattern = "HH:mm:ss" )
+    private LocalTime endTime ;
 }

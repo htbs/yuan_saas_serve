@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Data
 @Entity
-@Table(name = "shop_regular_hours")
+@Table(name = "shop_special_hours")
 public class ShopSpecialHours extends BaseEntity {
 
     /**
@@ -25,7 +25,7 @@ public class ShopSpecialHours extends BaseEntity {
     /**
      * 开关
      */
-    private Boolean isOpen;
+    private String isOpen;
     /**
      * 标题 如：春节、店庆
      */

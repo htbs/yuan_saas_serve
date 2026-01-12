@@ -18,7 +18,7 @@ public class RegularHoursModel {
     /**
      * 开关
      */
-    private Boolean isOpen;
+    private String isOpen;
     /**
      * 时间配置 [{"start":"09:00","end":"18:00"}, ...]
      */

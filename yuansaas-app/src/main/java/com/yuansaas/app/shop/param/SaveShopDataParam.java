@@ -45,7 +45,7 @@ public class SaveShopDataParam {
      */
     private String subjectColor;
     /**
-     * '标签'
+     * 标签
      */
     private List<String> label;
     /**

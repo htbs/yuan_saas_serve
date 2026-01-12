@@ -1,8 +1,10 @@
 package com.yuansaas.app.shop.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.sql.Time;
+import java.time.LocalTime;
 
 /**
  *
@@ -16,11 +18,13 @@ public class TimeSlotsModel {
     /**
      * 开始时间
      */
-    private Time startTime;
+    @JsonFormat(pattern = "HH:mm:ss" )
+    private LocalTime startTime;
     /**
      * 结束时间
      */
-    private Time endTime;
+    @JsonFormat(pattern = "HH:mm:ss")
+    private LocalTime endTime;
     /**
      *  备注
      */

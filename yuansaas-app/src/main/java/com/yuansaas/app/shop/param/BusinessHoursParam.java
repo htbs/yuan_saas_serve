@@ -1,5 +1,6 @@
 package com.yuansaas.app.shop.param;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yuansaas.app.shop.model.RegularHoursModel;
 import com.yuansaas.app.shop.model.SpecialHoursModel;
 import jakarta.validation.constraints.NotBlank;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -26,11 +28,13 @@ public class BusinessHoursParam {
     /**
      *  开始时间 (格式：HH:mm)
      */
-    private Time startTime;
+    @JsonFormat(pattern = "HH:mm:ss" )
+    private LocalTime startTime;
     /**
      *  结束时间 (格式：HH:mm)
      */
-    private Time endTime;
+    @JsonFormat(pattern = "HH:mm:ss" )
+    private LocalTime endTime;
     /**
      * 日常时间配置
      */
