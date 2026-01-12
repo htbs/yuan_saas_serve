@@ -1,9 +1,7 @@
 package com.yuansaas.app.common.params;
 
-import com.yuansaas.app.common.enums.PlatformTypeEnum;
-import com.yuansaas.core.annotation.EnumValidate;
+import com.yuansaas.app.common.enums.DictPlatformTypeEnum;
 import com.yuansaas.core.page.PageModel;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -18,4 +16,8 @@ public class FindDictParam  extends PageModel {
      * 字典类型名称
      */
     private String dictName;
+    /**
+     * 平台类型
+     */
+    private DictPlatformTypeEnum platform;
 }

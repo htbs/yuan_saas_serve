@@ -1,5 +1,8 @@
 package com.yuansaas.core.context;
 
+import com.yuansaas.common.enums.TerminalEnum;
+import com.yuansaas.common.enums.UserBaseRoleEnum;
+import com.yuansaas.common.enums.UserTypeEnum;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -93,11 +96,19 @@ public class AppContextUtil {
     }
 
     /**
-     * 获取当前ClientType
-     * @return 当前ClientType
+     * 获取当前TerminalType
+     * @return 当前TerminalType
      */
-    public static String requireClientType(){
-        return AppContextHolder.getClientType().orElse("");
+    public static TerminalEnum requireTerminalType(){
+        return  TerminalEnum.getByCode(AppContextHolder.getTerminalType().orElse(null));
+    }
+
+    /**
+     * 获取当前TerminalType
+     * @return 当前TerminalType
+     */
+    public static String getTerminalType(){
+        return  AppContextHolder.getTerminalType().orElse(null);
     }
 
     /**
@@ -118,6 +129,20 @@ public class AppContextUtil {
 
     public static String getMerchantCode(){
         return AppContextHolder.getMerchantCode().orElse("");
+    }
+
+    /**
+     * 获取当前用户类型
+     */
+    public static UserTypeEnum getUserType() {
+        return UserTypeEnum.getByCode(AppContextHolder.getUserType().orElse(null));
+    }
+
+    /**
+     * 获取当前用户基础角色
+     */
+    public static UserBaseRoleEnum getUserBaseRole() {
+        return UserBaseRoleEnum.getByCode(AppContextHolder.getUserBaseRole().orElse(null));
     }
 
     /**

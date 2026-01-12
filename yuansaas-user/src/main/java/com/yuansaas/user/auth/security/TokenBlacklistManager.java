@@ -1,7 +1,8 @@
 package com.yuansaas.user.auth.security;
 
+import com.yuansaas.common.enums.UserTypeEnum;
+import com.yuansaas.core.context.AppContextHolder;
 import com.yuansaas.core.redis.RedisUtil;
-import com.yuansaas.user.common.enums.UserType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -57,7 +58,7 @@ public class TokenBlacklistManager {
     }
 
     // 黑名单用户的所有令牌
-    public void blacklistUserTokens(Long userId, UserType userType) {
+    public void blacklistUserTokens(Long userId, UserTypeEnum userType) {
         if (userId == null || userType == null) {
             return;
         }
@@ -76,7 +77,7 @@ public class TokenBlacklistManager {
     }
 
     // 解除用户黑名单状态
-    public void unBlackListUser(Long userId, UserType userType) {
+    public void unBlackListUser(Long userId, UserTypeEnum userType) {
         if (userId == null || userType == null) {
             return;
         }
@@ -106,7 +107,7 @@ public class TokenBlacklistManager {
     }
 
     // 检查用户是否在黑名单中
-    public boolean isUserBlacklisted(Long userId, UserType userType) {
+    public boolean isUserBlacklisted(Long userId, UserTypeEnum userType) {
         if (userId == null || userType == null) {
             return false;
         }
@@ -115,18 +116,18 @@ public class TokenBlacklistManager {
             String userKey = buildUserKey(userId, userType);
             return Boolean.TRUE.equals(RedisUtil.hasKey(userKey));
         } catch (Exception e) {
-            log.error("检查用户黑名单失败: userId={}, userType={}", userId, userType, e);
+            log.error("检查用户黑名单失败: userId={}, userType={} , terminal={}", userId, userType, AppContextHolder.getTerminalType(),e);
             return false;
         }
     }
 
     // 构建令牌黑名单键
     private String buildTokenKey(String token) {
-        return RedisUtil.genKey("blacklist", "token", token);
+        return RedisUtil.genKey("blacklist", "token", AppContextHolder.getTerminalType() ,token);
     }
 
     // 构建用户黑名单键
-    private String buildUserKey(Long userId, UserType userType) {
+    private String buildUserKey(Long userId, UserTypeEnum userType) {
         return RedisUtil.genKey("blacklist", "user", userType.name(), userId);
     }
 

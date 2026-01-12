@@ -2,9 +2,9 @@ package com.yuansaas.app.user.client.api;
 
 import com.yuansaas.app.user.common.service.AuthService;
 import com.yuansaas.app.user.common.vo.WxMpQrCodeTicketVo;
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
-import com.yuansaas.user.common.enums.UserType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class ClientAuthApi {
      */
     @RequestMapping("/get/temp/qc/code/ticket")
     public ResponseEntity<ResponseModel<WxMpQrCodeTicketVo>> getTempQcCodeTicket(){
-        return ResponseBuilder.okResponse(authService.getTempQrCodeTicket(UserType.CLIENT_USER));
+        return ResponseBuilder.okResponse(authService.getTempQrCodeTicket(UserTypeEnum.CLIENT_USER));
     }
 
 

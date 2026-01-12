@@ -1,9 +1,9 @@
 package com.yuansaas.user.auth.service;
 
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.user.auth.param.UnifiedLoginParam;
 import com.yuansaas.user.auth.vo.AuthVo;
 import com.yuansaas.user.auth.vo.TokenRefreshVo;
-import com.yuansaas.user.common.enums.UserType;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -40,27 +40,27 @@ public interface UnifiedAuthService {
      * @param userId 用户id
      * @param userType 用户类型
      */
-    void lockUser(Long userId , UserType userType);
+    void lockUser(Long userId , UserTypeEnum userType);
 
     /**
      * 解锁用户
      * @param userId 用户id
      * @param userType 用户类型
      */
-    void unlockUser(Long userId , UserType userType);
+    void unlockUser(Long userId , UserTypeEnum userType);
 
     /**
      * 禁用用户
      * @param userId 用户id
      * @param userType 用户类型
      */
-    void disableUser(Long userId , UserType userType);
+    void disableUser(Long userId , UserTypeEnum userType);
 
     /**
      * 启用用户
      * @param userId 用户id
      * @param userType 用户类型
      */
-    void enableUser(Long userId , UserType userType);
+    void enableUser(Long userId , UserTypeEnum userType);
 
 }

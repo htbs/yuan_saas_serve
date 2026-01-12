@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
 import com.yuansaas.app.common.service.ThirdPartyMessageParamsService;
 import com.yuansaas.app.user.common.service.AuthService;
 import com.yuansaas.app.user.common.vo.WxMpQrCodeTicketVo;
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.integration.wx.mp.service.WxMpAuthService;
-import com.yuansaas.user.common.enums.UserType;
 import lombok.RequiredArgsConstructor;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.jspecify.annotations.Nullable;
@@ -26,7 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final WxMpAuthService wxMpAuthService;
 
     @Override
-    public WxMpQrCodeTicketVo getTempQrCodeTicket(UserType userType) {
+    public WxMpQrCodeTicketVo getTempQrCodeTicket(UserTypeEnum userType) {
         HashMap<@Nullable String, @Nullable Object> dataMap = Maps.newHashMap();
         dataMap.put("userType" , userType.getName());
         String numberConfigKey = thirdPartyMessageParamsService.createNumberConfigKey("wx_temp_qrcode_ticket", dataMap);

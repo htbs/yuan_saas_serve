@@ -1,5 +1,7 @@
 package com.yuansaas.core.context.filter;
 
+import com.yuansaas.common.enums.TerminalEnum;
+import com.yuansaas.core.exception.ex.AuthErrorCode;
 import com.yuansaas.core.jackson.JacksonUtil;
 import com.yuansaas.core.context.constans.GenericHeaderCons;
 import com.yuansaas.core.context.AppContext;
@@ -132,7 +134,9 @@ public class AppContextFilter extends OncePerRequestFilter {
 
         try {
             // 请求日志记录
-             printLogRequest(requestWrapper);
+            printLogRequest(requestWrapper);
+             // 验证终端类型
+            validTerminalType(requestWrapper);
             // 继续处理请求
             filterChain.doFilter(requestWrapper, responseWrapper);
         } finally {
@@ -153,7 +157,7 @@ public class AppContextFilter extends OncePerRequestFilter {
 
     private AppContext createAppContext(HttpServletRequest request) {
         return AppContext.create()
-                .setClientType(request.getHeader(GenericHeaderCons.CLIENT_TYPE))
+                .setTerminalType(request.getHeader(GenericHeaderCons.X_TERMINAL_TYPE))
                 .setIpAddress(request.getRemoteAddr())
                 .setSessionId(request.getSession(false) != null ? request.getSession(false).getId() : null);
     }
@@ -182,6 +186,7 @@ public class AppContextFilter extends OncePerRequestFilter {
         try {
             Map<String , Object> logMap = new HashMap<>();
             logMap.put("logType" , "request");
+            logMap.put("terminal", request.getHeader(GenericHeaderCons.X_TERMINAL_TYPE));
             logMap.put("method", request.getMethod());
             logMap.put("uri", request.getRequestURI());
             logMap.put("query", formatQueryString(request.getQueryString()));
@@ -566,5 +571,19 @@ public class AppContextFilter extends OncePerRequestFilter {
 
         // 回退到URI
         return request.getRequestURI();
+    }
+
+    /**
+     * 验证Terminal Type是否合法
+     */
+    private void validTerminalType(RequestWrapper requestWrapper) {
+        // 预检接口不需要验证
+        if(requestWrapper.getMethod().equals("OPTIONS")){
+            return;
+        }
+        String terminalType = requestWrapper.getHeader(GenericHeaderCons.X_TERMINAL_TYPE);
+        if(terminalType == null || terminalType.isEmpty() || TerminalEnum.getByCode(terminalType) == null){
+            throw AuthErrorCode.TERMINAL_NOT_FOUND.buildException();
+        }
     }
 }

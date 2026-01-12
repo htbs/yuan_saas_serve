@@ -81,8 +81,12 @@ public final class AppContextHolder {
         return getContext().map(AppContext::getUserType);
     }
 
-    public static Optional<String> getClientType() {
-        return getContext().map(AppContext::getClientType);
+    public static Optional<String> getTerminalType() {
+        return getContext().map(AppContext::getTerminalType);
+    }
+
+    public static Optional<String> getUserBaseRole() {
+        return getContext().map(AppContext::getUserBaseRole);
     }
 
     public static Optional<String> getTraceId() {

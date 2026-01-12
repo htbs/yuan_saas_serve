@@ -1,6 +1,6 @@
 package com.yuansaas.user.auth.vo;
 
-import com.yuansaas.user.common.enums.UserType;
+import com.yuansaas.common.enums.UserTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +30,7 @@ public class AuthVo {
     /**
      * 用户类型
      */
-    private UserType userType;
+    private UserTypeEnum userType;
 
     /**
      * 用户ID

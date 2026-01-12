@@ -1,6 +1,6 @@
 package com.yuansaas.user.auth.model;
 
-import com.yuansaas.user.common.enums.UserType;
+import com.yuansaas.common.enums.UserTypeEnum;
 import lombok.Data;
 
 /**
@@ -19,9 +19,10 @@ public class UserLockEvent {
     /**
      * 用户类型
      */
-    private UserType userType;
+    private UserTypeEnum userType;
 
-    public UserLockEvent(Long userId, UserType userType) {
+
+    public UserLockEvent(Long userId, UserTypeEnum userType) {
         this.userId = userId;
         this.userType = userType;
     }

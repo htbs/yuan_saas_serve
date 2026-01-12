@@ -1,7 +1,7 @@
 package com.yuansaas.app.common.params;
 
 
-import com.yuansaas.app.common.enums.PlatformTypeEnum;
+import com.yuansaas.app.common.enums.DictPlatformTypeEnum;
 import com.yuansaas.core.annotation.EnumValidate;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -31,8 +31,8 @@ public class UpdateDictParam {
     /**
      * 平台类型
      */
-    @EnumValidate(enumClass = PlatformTypeEnum.class , message = "平台类型不正确")
-    private PlatformTypeEnum platform;
+    @EnumValidate(enumClass = DictPlatformTypeEnum.class)
+    private DictPlatformTypeEnum platform;
     /**
      * 字典排序值
      */

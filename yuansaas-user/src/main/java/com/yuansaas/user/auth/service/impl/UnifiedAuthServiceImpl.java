@@ -2,6 +2,7 @@ package com.yuansaas.user.auth.service.impl;
 
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.common.enums.IBaseEnum;
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.core.exception.ex.AuthErrorCode;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.redis.RedisUtil;
@@ -20,7 +21,6 @@ import com.yuansaas.user.client.entity.ClientUser;
 import com.yuansaas.user.client.service.ClientUserService;
 import com.yuansaas.user.common.entity.UserWechatBinding;
 import com.yuansaas.user.common.enums.UserStatus;
-import com.yuansaas.user.common.enums.UserType;
 import com.yuansaas.user.common.enums.UserWxAuthClient;
 import com.yuansaas.user.common.model.WechatUserInfoModel;
 import com.yuansaas.user.common.service.UserLoginLogService;
@@ -40,8 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.yuansaas.user.common.enums.UserType.CLIENT_USER;
-import static com.yuansaas.user.common.enums.UserType.SYSTEM_USER;
 
 /**
  * 统一认证
@@ -109,7 +107,7 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
         // 5. 将旧刷新令牌加入黑名单
         tokenBlacklistManager.blackListToken(refreshToken);
 
-        log.info("用户 username: {}、userType:{} 刷新令牌成功", userDetails.getUsername(),userDetails.getUserType());
+        log.info("用户 username: {}、userType:{} 刷新令牌成功", userDetails.getUsername(),userDetails.getUserBaseRole());
 
         return TokenRefreshVo.builder()
                 .accessToken(newAccessToken)
@@ -129,7 +127,8 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
     }
 
     private CustomUserDetails authenticateByPassword(UnifiedLoginParam loginParam) {
-        if (loginParam.getUserType() == SYSTEM_USER) {
+        if (loginParam.getUserType() == UserTypeEnum.YUAN_SHI_USER) {
+            // 元识
              SysUser user = sysUserService.findByUsername(loginParam.getUsername())
                     .orElseThrow(() -> AuthErrorCode.AUTHENTICATION_FAILED.buildException("用户名或密码错误"));
 
@@ -139,7 +138,8 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
             }
 
             return new CustomUserDetails(user);
-        } else {
+        } if(loginParam.getUserType() == UserTypeEnum.CLIENT_USER)  {
+            // 客户端
             ClientUser user = clientUserService.findByUsername(loginParam.getUsername())
                     .orElseThrow(() -> new BadCredentialsException("用户名或密码错误"));
 
@@ -148,7 +148,11 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
             }
 
             return new CustomUserDetails(user);
+        }if(loginParam.getUserType() == UserTypeEnum.MERCHANT_USER){
+            // 商家
+            // todo
         }
+        throw AuthErrorCode.INVALID_USER.buildException() ;
     }
 
     /***
@@ -189,10 +193,10 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
 //            if (loginParam.getUserType().mismatches(binding.getUserType())) {
 //                throw new AuthenticationServiceException("微信账号已绑定其他类型用户");
 //            }
-            Optional<UserType> userTypeOptional = IBaseEnum.fromName(binding.getUserType(), UserType.class);
-            UserType bindUserType = userTypeOptional.orElseThrow(() -> AuthErrorCode.ACCESS_DENIED.buildException("未知的绑定用户"));
+            Optional<UserTypeEnum> userTypeOptional = IBaseEnum.fromName(binding.getUserType(), UserTypeEnum.class);
+            UserTypeEnum bindUserType = userTypeOptional.orElseThrow(() -> AuthErrorCode.ACCESS_DENIED.buildException("未知的绑定用户"));
             return switch (bindUserType) {
-                case SYSTEM_USER -> new CustomUserDetails(
+                case YUAN_SHI_USER -> new CustomUserDetails(
                         sysUserService.findById(binding.getUserId())
                                 .orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("系统用户不存在"))
                 );
@@ -229,10 +233,10 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
 //        }
 //    }
 
-    private CustomUserDetails registerNewUserFromWechat(UserType userType, WechatUserInfoModel wechatUser) {
-        if (userType == SYSTEM_USER) {
+    private CustomUserDetails registerNewUserFromWechat(UserTypeEnum userType, WechatUserInfoModel wechatUser) {
+        if (userType == UserTypeEnum.YUAN_SHI_USER ||userType == UserTypeEnum.MERCHANT_USER) {
             // 系统用户不允许自动注册
-            throw AuthErrorCode.UNAUTHORIZED.buildException("系统用户需要管理员创建");
+            throw AuthErrorCode.UNAUTHORIZED.buildException("该用户不允许自动注册");
         }
 
         // 创建新客户端用户
@@ -246,7 +250,7 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
         ClientUser savedUser = clientUserService.save(newUser);
 
         // 绑定微信
-        wechatAuthService.bindWechat(savedUser.getId(), CLIENT_USER, wechatUser);
+        wechatAuthService.bindWechat(savedUser.getId(), UserTypeEnum.CLIENT_USER, wechatUser);
 
         return new CustomUserDetails(savedUser);
     }
@@ -272,10 +276,10 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
 
     @Transactional
     @Override
-    public void lockUser(Long userId, UserType userType) {
-        if (userType == SYSTEM_USER) {
+    public void lockUser(Long userId, UserTypeEnum userType) {
+        if (userType == UserTypeEnum.YUAN_SHI_USER) {
             sysUserService.lockUser(userId);
-        }else if (userType == CLIENT_USER) {
+        }else if (userType == UserTypeEnum.CLIENT_USER) {
             clientUserService.lockUser(userId);
         }
         // 发布用户锁定事件
@@ -284,10 +288,10 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
 
     @Transactional
     @Override
-    public void unlockUser(Long userId, UserType userType) {
-        if (userType == SYSTEM_USER) {
+    public void unlockUser(Long userId, UserTypeEnum userType) {
+        if (userType == UserTypeEnum.YUAN_SHI_USER) {
             sysUserService.unlockUser(userId);
-        }else if (userType == CLIENT_USER) {
+        }else if (userType == UserTypeEnum.CLIENT_USER) {
             clientUserService.unlockUser(userId);
         }
         // 发布用户解锁事件
@@ -295,12 +299,12 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
     }
 
     @Override
-    public void disableUser(Long userId, UserType userType) {
+    public void disableUser(Long userId, UserTypeEnum userType) {
 
     }
 
     @Override
-    public void enableUser(Long userId, UserType userType) {
+    public void enableUser(Long userId, UserTypeEnum userType) {
 
     }
 }

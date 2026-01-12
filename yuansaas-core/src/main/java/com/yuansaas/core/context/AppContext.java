@@ -36,9 +36,14 @@ public class AppContext implements Serializable {
     private String userType;
 
     /**
-     * 客户端类型
+     * 用户基础角色
      */
-    private String clientType;
+    private String userBaseRole;
+
+    /**
+     * 终端类型
+     */
+    private String terminalType;
 
     /**
      * 链路ID
@@ -101,7 +106,7 @@ public class AppContext implements Serializable {
         copy.setUserName(userName);
         copy.setUserNo(userNo);
         copy.setUserType(userType);
-        copy.setClientType(clientType);
+        copy.setTerminalType(terminalType);
         copy.setTraceId(traceId);
         copy.setIpAddress(ipAddress);
         copy.setSessionId(sessionId);

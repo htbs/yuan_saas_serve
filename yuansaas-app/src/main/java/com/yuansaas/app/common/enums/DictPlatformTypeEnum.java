@@ -12,16 +12,30 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum PlatformTypeEnum implements IBaseEnum<PlatformTypeEnum> {
+public enum DictPlatformTypeEnum implements IBaseEnum<DictPlatformTypeEnum> {
 
     /**
-     * 公共
+     * 全平台共用
      */
-    PUBLIC("公共", "-1"),
+    COMMON("公共" ),
+
+     /**
+     * 总平台端
+     */
+    PLATFORM("平台" ),
+
+     /**
+     * 商家端
+     */
+     SHOP("商家" ),
+
+    /**
+     * 用户端
+     */
+      USER("用户"),
     ;
 
     private final String name;
-    private final String value;
 
     @Override
     public String getName() {

@@ -1,8 +1,8 @@
 package com.yuansaas.user.common.service;
 
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.user.auth.enums.LoginType;
 import com.yuansaas.user.auth.model.CustomUserDetails;
-import com.yuansaas.user.common.enums.UserType;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -30,7 +30,7 @@ public interface UserLoginLogService {
      * @param request HTTP请求
      * @param failureReason 登录失败原因
      */
-    void logLoginFailure(String username, UserType userType, LoginType loginType,
+    void logLoginFailure(String username, UserTypeEnum userType, LoginType loginType,
                          HttpServletRequest request, String failureReason);
 
 

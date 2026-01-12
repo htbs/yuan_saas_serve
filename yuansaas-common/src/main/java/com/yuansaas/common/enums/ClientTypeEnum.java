@@ -15,20 +15,20 @@ import java.util.stream.Collectors;
 @Getter
 public enum ClientTypeEnum implements IBaseEnum<ClientTypeEnum> {
 
-    WEB("web", "Web浏览器"),
-    H5("h5" , "H5浏览器"),
-    MOBILE_WEB("mobile_web", "移动端浏览器"),
-    ANDROID("android", "Android应用"),
-    IOS("ios", "iOS应用"),
-    WINDOWS("windows", "Windows应用"),
-    MAC("mac", "Mac应用"),
-    LINUX("linux", "Linux应用"),
-    WEIXIN_MINI_PROGRAM("weixin_mini", "微信小程序"),
-    ALIPAY_MINI_PROGRAM("alipay_mini", "支付宝小程序"),
-    DOUYIN_MINI_PROGRAM("douyin_mini", "抖音小程序"),
-    HARMONYOS("harmonyos", "鸿蒙应用"),
-    OTHER("other", "其他客户端"),
-    UNKNOWN("unknown", "未知客户端");
+    WEB("WEB", "Web浏览器"),
+    H5("H5" , "H5浏览器"),
+    MOBILE_WEB("MOBILE_WEB", "移动端浏览器"),
+    ANDROID("ANDROID", "Android应用"),
+    IOS("IOS", "iOS应用"),
+    WINDOWS("WINDOWS", "Windows应用"),
+    MAC("MAC", "Mac应用"),
+    LINUX("LINUX", "Linux应用"),
+    WEIXIN_MINI_PROGRAM("WEIXIN_MINI", "微信小程序"),
+    ALIPAY_MINI_PROGRAM("ALIPAY_MINI", "支付宝小程序"),
+    DOUYIN_MINI_PROGRAM("DOUYIN_MINI", "抖音小程序"),
+    HARMONYOS("HARMONYOS", "鸿蒙应用"),
+    OTHER("OTHER", "其他客户端"),
+    UNKNOWN("UNKNOWN", "未知客户端");
 
     private final String value;
     private final String description;

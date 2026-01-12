@@ -1,7 +1,7 @@
 package com.yuansaas.user.auth.param;
 
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.user.auth.enums.LoginType;
-import com.yuansaas.user.common.enums.UserType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -17,7 +17,7 @@ public class UnifiedLoginParam {
      * 用户类型
      */
     @NotNull(message = "用户类型不能为空")
-    private UserType userType;
+    private UserTypeEnum userType;
 
     /**
      * 用户名

@@ -1,6 +1,6 @@
 package com.yuansaas.app.common.entity;
 
-import com.yuansaas.app.common.enums.PlatformTypeEnum;
+import com.yuansaas.app.common.enums.DictPlatformTypeEnum;
 import com.yuansaas.core.jpa.model.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -28,7 +28,7 @@ public class SysDictType extends BaseEntity {
     /**
      * 平台类型
      */
-    private String platform;
+    private DictPlatformTypeEnum platform;
     /**
      * 排序
      */

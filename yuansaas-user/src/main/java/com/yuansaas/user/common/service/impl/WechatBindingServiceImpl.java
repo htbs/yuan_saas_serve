@@ -1,8 +1,8 @@
 package com.yuansaas.user.common.service.impl;
 
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.user.common.entity.UserWechatBinding;
-import com.yuansaas.user.common.enums.UserType;
 import com.yuansaas.user.common.model.WechatUserInfoModel;
 import com.yuansaas.user.common.repository.UserWechatBindingRepository;
 import com.yuansaas.user.common.service.WechatBindingService;
@@ -31,7 +31,7 @@ public class WechatBindingServiceImpl implements WechatBindingService {
     }
 
     @Override
-    public void bindWechat(Long userId, UserType userType, WechatUserInfoModel wechatUser) {
+    public void bindWechat(Long userId, UserTypeEnum userType, WechatUserInfoModel wechatUser) {
         if(ObjectUtils.isEmpty(userId)
                 || ObjectUtils.isEmpty(userType)
                 || ObjectUtils.isEmpty(wechatUser)
