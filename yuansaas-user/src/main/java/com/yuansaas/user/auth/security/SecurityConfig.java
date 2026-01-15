@@ -93,26 +93,19 @@ public class SecurityConfig {
                     throws ServletException, IOException {
 
                 // 获取请求的Origin
-                String origin = request.getHeader("Origin");
                 if(!EnvironmentUtil.isProd() ){
                     // 如果是开发环境，允许所有源
                     response.setHeader("Access-Control-Allow-Origin", "*");
-                }else{
-                    // 如果是生产环境，只允许指定源 Nginx 处理
-                    response.setHeader("Access-Control-Allow-Origin", origin);
+                    response.setHeader("Access-Control-Allow-Methods",
+                            "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+                    response.setHeader("Access-Control-Allow-Headers",
+                            "Authorization, Content-Type, X-Requested-With, Accept, Origin, X-Terminal-Type");
+                    response.setHeader("Access-Control-Expose-Headers",
+                            "Authorization, Content-Disposition, X-Terminal-Type");
+                    response.setHeader("Access-Control-Allow-Credentials", "true");
+                    response.setHeader("Access-Control-Max-Age", "3600");
+                    response.setHeader("Vary", "Origin");
                 }
-
-                response.setHeader("Access-Control-Allow-Methods",
-                        "GET, POST, PUT, DELETE, OPTIONS, PATCH");
-                response.setHeader("Access-Control-Allow-Headers",
-                        "Authorization, Content-Type, X-Requested-With, Accept, Origin, "
-                                + "X-Terminal-Type, Terminal-Type");
-                response.setHeader("Access-Control-Expose-Headers",
-                        "Authorization, Content-Disposition, X-Terminal-Type");
-                response.setHeader("Access-Control-Allow-Credentials", "true");
-                response.setHeader("Access-Control-Max-Age", "3600");
-                response.setHeader("Vary", "Origin");
-
                 // 如果是OPTIONS预检请求，直接返回200
                 if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
                     response.setStatus(HttpServletResponse.SC_OK);
