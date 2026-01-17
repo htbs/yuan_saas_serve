@@ -3,6 +3,7 @@ package com.yuansaas.app.common.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 系统字典VO
@@ -42,5 +43,5 @@ public class SysDictTypeVo implements Serializable {
     /**
      * 操作人
      */
-    private String updateAt;
+    private LocalDateTime updateAt;
 }
