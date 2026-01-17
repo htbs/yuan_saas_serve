@@ -1,7 +1,7 @@
 package com.yuansaas.app.common.service;
 
 import com.yuansaas.app.common.params.*;
-import com.yuansaas.app.common.vo.SysDictTypeVo;
+import com.yuansaas.app.common.vo.SysDictDataVo;
 import com.yuansaas.core.page.RPage;
 
 /**
@@ -48,5 +48,14 @@ public interface DictItemService {
      * @param findDictItemParam 字典id
      * @author lxz 2025/11/16 14:35
      */
-    RPage<SysDictTypeVo> findByPage(FindDictItemParam  findDictItemParam);
+    RPage<SysDictDataVo> findByPage(FindDictItemParam  findDictItemParam);
+
+    /**
+     * 查询字典项数据
+     *
+     * @param dictCode 字典code
+     * @param dictLabel  字典keu
+     * @author lxz 2025/11/16 14:35
+     */
+    SysDictDataVo findByDictCodeAndDictLabel(String dictCode , String dictLabel);
 }

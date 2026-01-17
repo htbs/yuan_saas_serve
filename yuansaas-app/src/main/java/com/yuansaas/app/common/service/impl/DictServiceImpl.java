@@ -62,6 +62,7 @@ public class DictServiceImpl implements DictService {
         dict.setPlatform(saveDictParam.getPlatform().name());
         dict.setLockStatus(AppConstants.N);
         dict.setDeleteStatus(AppConstants.N);
+        dict.setSysDefault(AppConstants.N);
         dict.setCreateBy(AppContextUtil.getUserInfo());
         dict.setCreateAt(LocalDateTime.now());
         dict.setUpdateBy(AppContextUtil.getUserInfo());
@@ -89,7 +90,6 @@ public class DictServiceImpl implements DictService {
         // 更新字典数据
         sysDictType.setDictName(updateDictParam.getDictName());
         sysDictType.setDictType(updateDictParam.getDictType());
-        sysDictType.setSort(updateDictParam.getSort());
         sysDictType.setUpdateBy(AppContextUtil.getUserInfo());
         sysDictType.setUpdateAt(LocalDateTime.now());
         dictRepository.save(sysDictType);
@@ -143,6 +143,7 @@ public class DictServiceImpl implements DictService {
                         qSysDictType.dictType,
                         qSysDictType.dictCode,
                         qSysDictType.platform,
+                        qSysDictType.sysDefault,
                         qSysDictType.sort,
                         qSysDictType.updateBy,
                         qSysDictType.updateAt

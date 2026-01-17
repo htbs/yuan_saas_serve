@@ -10,5 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface SysDictDataRepository extends JpaRepository<SysDictData , Long> {
 
-    SysDictData findByDictLabelAndDictTypeId(String dictLabel , Long dictTypeId);
+    SysDictData findByDictLabelAndDictCode(String dictLabel , String dictCode);
 }

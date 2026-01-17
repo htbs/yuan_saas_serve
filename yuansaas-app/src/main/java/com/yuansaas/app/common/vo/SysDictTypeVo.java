@@ -33,7 +33,7 @@ public class SysDictTypeVo implements Serializable {
      */
     private String dictCode;
     /**
-     * 字典禁用状态
+     * 字典禁用状态 （Y 禁用 | N 不禁用）
      */
     private String lockStatus;
     /**
@@ -48,4 +48,8 @@ public class SysDictTypeVo implements Serializable {
      * 操作人
      */
     private LocalDateTime updateAt;
+    /**
+     * 系统默认 （Y 默认 | N 不默认）
+     */
+    private String sysDefault;
 }

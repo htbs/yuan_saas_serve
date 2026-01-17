@@ -2,7 +2,7 @@ package com.yuansaas.app.common.api;
 
 import com.yuansaas.app.common.params.*;
 import com.yuansaas.app.common.service.DictItemService;
-import com.yuansaas.app.common.vo.SysDictTypeVo;
+import com.yuansaas.app.common.vo.SysDictDataVo;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
@@ -26,7 +26,7 @@ public class DictItemApi {
     private final DictItemService dictItemService;
 
     /**
-     * 创建字典数据
+     * 创建字典项数据
      * @param saveDictItemParam 创建字典相关参数
      * @author  lxz 2025/11/16 14:35
      */
@@ -37,30 +37,30 @@ public class DictItemApi {
     }
 
     /**
-     * 编辑字典
+     * 编辑字典项数据
      * @param updateDictItemParam 编辑字典相关参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    @RequestMapping(value = "/update",method = RequestMethod.PUT)
     @SecurityAuth
     public ResponseEntity<ResponseModel<Boolean>> updateDict(@RequestBody @Validated UpdateDictItemParam updateDictItemParam) {
         return ResponseBuilder.okResponse(dictItemService.updateDict(updateDictItemParam));
     }
 
 
-    /**
-     * 修改字典排序
-     * @param updateSortParam 修改字典排序
-     * @author  lxz 2025/11/16 14:35
-     */
-    @RequestMapping(value = "/update/order_num",method = RequestMethod.POST)
-    @SecurityAuth
-    public ResponseEntity<ResponseModel<Boolean>> updateOrderNum(@RequestBody @Validated UpdateSortParam updateSortParam) {
-        return ResponseBuilder.okResponse(dictItemService.updateOrderNum(updateSortParam));
-    }
+//    /**
+//     * 修改字典项排序 (弃用 我感觉没有)
+//     * @param updateSortParam 修改字典排序
+//     * @author  lxz 2025/11/16 14:35
+//     */
+//    @RequestMapping(value = "/update/order_num",method = RequestMethod.PUT)
+//    @SecurityAuth
+//    public ResponseEntity<ResponseModel<Boolean>> updateOrderNum(@RequestBody @Validated UpdateSortParam updateSortParam) {
+//        return ResponseBuilder.okResponse(dictItemService.updateOrderNum(updateSortParam));
+//    }
 
     /**
-     * 根据字典id删除字典数据
+     * 根据字典项id删除字典数据
      * @param id 字典id
      * @author  lxz 2025/11/16 14:35
      */
@@ -78,9 +78,23 @@ public class DictItemApi {
      */
     @RequestMapping(value = "/page",method = RequestMethod.GET)
     @SecurityAuth
-    public ResponseEntity<ResponseModel<RPage<SysDictTypeVo>>> findByPage(FindDictItemParam findDictItemParam) {
+    public ResponseEntity<ResponseModel<RPage<SysDictDataVo>>> findByPage(FindDictItemParam findDictItemParam) {
         return ResponseBuilder.okResponse(dictItemService.findByPage(findDictItemParam));
     }
 
+
+    /**
+     * 查询字典项
+     *
+     * @param dictCode 字典code
+     * @param dictLabel  字典key
+     * @author lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/get",method = RequestMethod.GET)
+    @SecurityAuth
+    public ResponseEntity<ResponseModel<SysDictDataVo>> findByDictCodeAndDictLabel(@RequestParam(value = "dictCode") String dictCode ,
+                                                               @RequestParam(value = "dictLabel") String dictLabel) {
+        return ResponseBuilder.okResponse(dictItemService.findByDictCodeAndDictLabel(dictCode ,dictLabel));
+    }
 
 }

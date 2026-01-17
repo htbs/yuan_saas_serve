@@ -1,20 +1,25 @@
 package com.yuansaas.app.common.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.app.common.entity.QSysDictData;
 import com.yuansaas.app.common.entity.SysDictData;
+import com.yuansaas.app.common.entity.SysDictType;
+import com.yuansaas.app.common.enums.DictCacheEnum;
 import com.yuansaas.app.common.params.*;
 import com.yuansaas.app.common.repository.SysDictDataRepository;
 import com.yuansaas.app.common.repository.SysDictTypeRepository;
 import com.yuansaas.app.common.service.DictItemService;
+import com.yuansaas.app.common.vo.SysDictDataVo;
 import com.yuansaas.app.common.vo.SysDictTypeVo;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
+import com.yuansaas.core.redis.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -45,9 +50,12 @@ public class DictItemServiceImpl implements DictItemService {
      */
     @Override
     public Boolean createDict(SaveDictItemParam saveDictItemParam) {
-        sysDictTypeRepository.findById(saveDictItemParam.getDictTypeId()).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("字典类型不存在"));
+        SysDictType byDictCode = sysDictTypeRepository.findByDictCode(saveDictItemParam.getDictCode());
+        if (ObjectUtil.isEmpty(byDictCode)) {
+            throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("字典数据不存在！");
+        }
         // 验证字典标签是否存在
-        validateDictLabel(null,saveDictItemParam.getDictTypeId(), saveDictItemParam.getDictLabel());
+        validateDictLabel(null,saveDictItemParam.getDictCode(), saveDictItemParam.getDictLabel());
         SysDictData sysDictData = new SysDictData();
         BeanUtils.copyProperties(saveDictItemParam, sysDictData);
         sysDictData.setCreateAt(LocalDateTime.now());
@@ -66,12 +74,14 @@ public class DictItemServiceImpl implements DictItemService {
     public Boolean updateDict(UpdateDictItemParam updateDictItemParam) {
         SysDictData sysDictData = sysDictDataRepository.findById(updateDictItemParam.getId()).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("字典数据不存在"));
         // 验证字典标签是否存在
-        validateDictLabel(sysDictData.getId(),sysDictData.getDictTypeId(), updateDictItemParam.getDictLabel());
+        validateDictLabel(sysDictData.getId(),sysDictData.getDictCode(), updateDictItemParam.getDictLabel());
         sysDictData.setDictValue(updateDictItemParam.getDictValue());
         sysDictData.setDictLabel(updateDictItemParam.getDictLabel());
+        sysDictData.setSort(updateDictItemParam.getSort());
         sysDictData.setUpdateAt(LocalDateTime.now());
         sysDictData.setUpdateBy(AppContextUtil.getUserInfo());
         sysDictDataRepository.save(sysDictData);
+        setCache(sysDictData);
         return true;
     }
 
@@ -88,6 +98,7 @@ public class DictItemServiceImpl implements DictItemService {
         sysDictData.setUpdateAt(LocalDateTime.now());
         sysDictData.setUpdateBy(AppContextUtil.getUserInfo());
         sysDictDataRepository.save(sysDictData);
+        setCache(sysDictData);
         return true;
     }
 
@@ -98,29 +109,33 @@ public class DictItemServiceImpl implements DictItemService {
      * @author lxz 2025/11/16 14:35
      */
     @Override
-    @Transactional
     public Boolean deleteDict(Long id) {
+        SysDictData sysDictData = sysDictDataRepository.findById(id).orElseThrow(DataErrorCode.DATA_NOT_FOUND::buildException);
         sysDictDataRepository.deleteById(id);
+        deleteCache(sysDictData);
         return true;
     }
 
     @Override
-    public RPage<SysDictTypeVo> findByPage(FindDictItemParam findDictItemParam) {
+    public RPage<SysDictDataVo> findByPage(FindDictItemParam findDictItemParam) {
         QSysDictData qSysDictData = QSysDictData.sysDictData;
 
-        QueryResults<SysDictTypeVo> queryResults = jpaQueryFactory.select(Projections.bean(SysDictTypeVo.class,
+        QueryResults<SysDictDataVo> queryResults = jpaQueryFactory.select(Projections.bean(SysDictDataVo.class,
                         qSysDictData.id,
+                        qSysDictData.dictCode,
                         qSysDictData.dictLabel,
                         qSysDictData.dictValue,
                         qSysDictData.sort,
+                        qSysDictData.createBy,
+                        qSysDictData.createAt,
                         qSysDictData.updateAt,
-                        qSysDictData.updateAt
+                        qSysDictData.updateBy
                 )).from(qSysDictData)
                 .where(BoolBuilder.getInstance()
-                        .and(findDictItemParam.getDictTypeId()  , qSysDictData.dictTypeId::eq)
+                        .and(findDictItemParam.getDictCode()  , qSysDictData.dictCode::eq)
                         .and(findDictItemParam.getDictValue() , qSysDictData.dictValue::contains)
                         .getWhere())
-                .orderBy(qSysDictData.sort.desc(), qSysDictData.updateAt.desc())
+                .orderBy(qSysDictData.sort.asc(), qSysDictData.updateAt.desc())
                 .limit(findDictItemParam.getPageSize())
                 .offset(findDictItemParam.obtainOffset())
                 .fetchResults();
@@ -128,16 +143,66 @@ public class DictItemServiceImpl implements DictItemService {
     }
 
     /**
+     * 查询字典项数据
+     *
+     * @param dictCode  字典code
+     * @param dictLabel 字典keu
+     * @author lxz 2025/11/16 14:35
+     */
+    @Override
+    public SysDictDataVo findByDictCodeAndDictLabel(String dictCode, String dictLabel) {
+        SysDictDataVo sysDictDataVo = new SysDictDataVo();
+        BeanUtils.copyProperties(getCache(dictCode , dictLabel) , sysDictDataVo);
+        return  sysDictDataVo;
+    }
+
+    /**
      * 验证字典标签是否存在
-     * @param dictTypeId 字典类型id
+     * @param dictCode 字典code
      * @param dictLabel 字典标签
      */
-    private void validateDictLabel(Long dictItemId,Long dictTypeId , String dictLabel) {
-        SysDictData dictData = sysDictDataRepository.findByDictLabelAndDictTypeId(dictLabel, dictTypeId);
+    private void validateDictLabel(Long dictItemId,String dictCode , String dictLabel) {
+        SysDictData dictData = sysDictDataRepository.findByDictLabelAndDictCode(dictLabel, dictCode);
         if (ObjectUtil.isNotEmpty(dictData)) {
             if (!ObjectUtil.equals(dictData.getId(), dictItemId)) {
                 throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("字典标签已存在");
             }
         }
+    }
+
+    /**
+     * 从缓存中获取
+     */
+    private SysDictData getCache(String dictCode , String  dictLabel){
+        String key =  RedisUtil.genKey(DictCacheEnum.DICT.getKey(), dictCode, dictLabel);
+        return RedisUtil.getOrLoad(key, new TypeReference<SysDictData>() {},
+                () -> {
+                    SysDictData byDictLabelAndDictCode = sysDictDataRepository.findByDictLabelAndDictCode(dictLabel, dictCode);
+                    if (ObjectUtil.isEmpty(byDictLabelAndDictCode)) {
+                        throw DataErrorCode.DATA_NOT_FOUND.buildException();
+                    }
+                    return byDictLabelAndDictCode;
+                }
+        );
+    }
+
+    /**
+     * 保存字段项数据到缓存中
+     */
+    private void setCache(SysDictData sysDictData){
+        String key =RedisUtil.genKey(DictCacheEnum.DICT.getKey(), sysDictData.getDictCode(),sysDictData.getDictLabel());
+        // 删除key
+        RedisUtil.delete(key);
+        // 保存数据
+        RedisUtil.set(key , sysDictData);
+    }
+
+    /**
+     * 保存字段项数据到缓存中
+     */
+    private void deleteCache(SysDictData sysDictData){
+        String key =RedisUtil.genKey(DictCacheEnum.DICT.getKey(), sysDictData.getDictCode(),sysDictData.getDictLabel());
+        // 删除key
+        RedisUtil.delete(key);
     }
 }

@@ -38,6 +38,10 @@ public class SysDictType extends BaseEntity {
      */
     private Integer sort;
     /**
+     * 系统默认
+     */
+    private String sysDefault;
+    /**
      * '锁定状态(Y锁定|N不锁定)'
      */
     private String  lockStatus;

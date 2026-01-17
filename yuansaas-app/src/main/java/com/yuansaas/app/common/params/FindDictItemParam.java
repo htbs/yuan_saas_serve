@@ -16,7 +16,7 @@ public class FindDictItemParam extends PageModel {
      */
     private String dictValue;
     /**
-     * 字典类型ID
+     * 字典code
      */
-    private Long dictTypeId;
+    private String dictCode;
 }

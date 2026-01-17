@@ -19,6 +19,10 @@ public interface SysDictTypeRepository extends JpaRepository<SysDictType, Long> 
      * 根据字典类型查询字典类型
      */
     SysDictType findByDictType(String dictType);
+    /**
+     * 通过code查询
+     */
+    SysDictType findByDictCode(String dictCode);
 
     /**
      * 根据字典编码查询字典数量

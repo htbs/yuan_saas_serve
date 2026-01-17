@@ -18,9 +18,9 @@ import lombok.Data;
 public class SysDictData extends BaseEntity {
 
     /**
-     * 字典类型ID
+     * 字典code
      */
-    private  Long  dictTypeId;
+    private  String  dictCode;
     /**
      * 字典标签
      */
@@ -29,10 +29,6 @@ public class SysDictData extends BaseEntity {
      * 字典键值
      */
     private  String  dictValue;
-    /**
-     * 平台类型
-     */
-    private DictPlatformTypeEnum platform;
     /**
      * 字典排序
      */
