@@ -126,6 +126,7 @@ public class DictItemServiceImpl implements DictItemService {
                         qSysDictData.dictLabel,
                         qSysDictData.dictValue,
                         qSysDictData.sort,
+                        qSysDictData.isSysDefault,
                         qSysDictData.createBy,
                         qSysDictData.createAt,
                         qSysDictData.updateAt,

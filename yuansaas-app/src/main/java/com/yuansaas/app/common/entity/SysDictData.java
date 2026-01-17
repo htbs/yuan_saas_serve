@@ -33,4 +33,8 @@ public class SysDictData extends BaseEntity {
      * 字典排序
      */
     private  Integer sort;
+    /**
+     * 是否系统默认 （Y 是|N 否）
+     */
+    private String isSysDefault = "N";
 }

@@ -33,6 +33,10 @@ public class SysDictDataVo implements Serializable {
      */
     private Integer sort;
     /**
+     * 是否系统默认 （Y 是 |N 否）
+     */
+    private String isSysDefault;
+    /**
      * 创建人
      */
     private String createBy;
@@ -43,7 +47,7 @@ public class SysDictDataVo implements Serializable {
     /**
      * 修改时间
      */
-    private String updateAt;
+    private LocalDateTime updateAt;
     /**
      * 修改人
      */
