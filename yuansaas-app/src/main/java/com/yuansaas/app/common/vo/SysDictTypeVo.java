@@ -25,6 +25,10 @@ public class SysDictTypeVo implements Serializable {
      */
     private String dictName;
     /**
+     * 平台类型
+     */
+    private String platform;
+    /**
      * 字典编码
      */
     private String dictCode;

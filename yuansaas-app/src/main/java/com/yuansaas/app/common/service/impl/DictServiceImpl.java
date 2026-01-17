@@ -59,7 +59,9 @@ public class DictServiceImpl implements DictService {
         SysDictType dict = new SysDictType();
         BeanUtils.copyProperties(saveDictParam, dict);
         dict.setDictCode(getCode(saveDictParam.getPlatform()));
-        dict.setPlatform(saveDictParam.getPlatform());
+        dict.setPlatform(saveDictParam.getPlatform().name());
+        dict.setLockStatus(AppConstants.N);
+        dict.setDeleteStatus(AppConstants.N);
         dict.setCreateBy(AppContextUtil.getUserInfo());
         dict.setCreateAt(LocalDateTime.now());
         dict.setUpdateBy(AppContextUtil.getUserInfo());
@@ -140,12 +142,15 @@ public class DictServiceImpl implements DictService {
                         qSysDictType.dictName,
                         qSysDictType.dictType,
                         qSysDictType.dictCode,
+                        qSysDictType.platform,
                         qSysDictType.sort,
                         qSysDictType.updateBy,
                         qSysDictType.updateAt
                 )).from(qSysDictType)
                 .where(BoolBuilder.getInstance()
                         .and(findDictParam.getDictName(), qSysDictType.dictName::contains)
+                        .and(ObjectUtil.isNotEmpty(findDictParam.getPlatform()) ? findDictParam.getPlatform().name() : null, qSysDictType.platform::eq)
+                        .and(AppConstants.N  , qSysDictType.deleteStatus::eq)
                         .getWhere())
                 .orderBy(qSysDictType.sort.asc() , qSysDictType.createAt.desc())
                 .offset(findDictParam.obtainOffset())

@@ -32,7 +32,7 @@ public class SysDictType extends BaseEntity {
     /**
      * 平台类型
      */
-    private DictPlatformTypeEnum platform;
+    private String platform;
     /**
      * 排序
      */

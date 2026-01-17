@@ -29,11 +29,6 @@ public class UpdateDictParam {
     @NotNull(message = "字典类型不能为空")
     private String dictType;
     /**
-     * 平台类型
-     */
-    @EnumValidate(enumClass = DictPlatformTypeEnum.class)
-    private DictPlatformTypeEnum platform;
-    /**
      * 字典排序值
      */
     private Integer sort;
