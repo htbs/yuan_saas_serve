@@ -18,7 +18,7 @@ public class OrderPageListVo {
     /**
      * 订单号
      */
-    private String orderNo;
+    private Long orderNo;
     /**
      * 订单类型
      */

@@ -16,7 +16,7 @@ public class OrderItemDataVo {
     /**
      * 订单号
      */
-    private String orderNo;
+    private Long orderNo;
     /**
      * 商品类型
      */
@@ -28,7 +28,7 @@ public class OrderItemDataVo {
     /**
      * 单价
      */
-    private String merchandiseAmount;
+    private Integer merchandiseAmount;
 
     /**
      * 扩展字段
