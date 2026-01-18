@@ -16,7 +16,7 @@ public class SaveDeptParam {
     /**
      * 商户编号
      */
-    private String merchantCode = AppContextUtil.getMerchantCode();
+    private String shopCode = AppContextUtil.getMerchantCode();
     /**
      * 父部门ID
      */

@@ -5,6 +5,12 @@ import cn.hutool.core.util.RandomUtil;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yuansaas.app.order.platform.enums.OrderItemTypeEnum;
+import com.yuansaas.app.order.platform.enums.OrderTypeEnum;
+import com.yuansaas.app.order.platform.model.FunctionTemplateModel;
+import com.yuansaas.app.order.platform.model.OrderItemModel;
+import com.yuansaas.app.order.platform.params.SubmitOrderParam;
+import com.yuansaas.app.order.platform.service.processor.ActionProcessor;
 import com.yuansaas.app.shop.entity.QShop;
 import com.yuansaas.app.shop.entity.Shop;
 import com.yuansaas.app.shop.enums.ShopSignedStatusEnum;
@@ -23,11 +29,16 @@ import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.service.DeptService;
+import com.yuansaas.user.menu.entity.Menu;
+import com.yuansaas.user.menu.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -44,6 +55,8 @@ public class ShopServiceImpl implements ShopService {
     private final JPAQueryFactory jpaQueryFactory;
     private final DeptService deptService;
     private final ShopDataService shopDataService;
+    private final MenuService menuService;
+
 
 
     /**
@@ -53,17 +66,12 @@ public class ShopServiceImpl implements ShopService {
      * @author lxz 2025/11/16 14:35
      */
     @Override
+    @Transactional
     public Boolean add(SaveShopParam saveShopParam) {
-        Shop saveShop = shopMapStruct.toSaveShop(saveShopParam);
-        // 生成code
-        saveShop.setCode(getCode(saveShopParam.getType()));
-        shopRepository.save(saveShop);
-        // 生成默认部门id
-        SaveDeptParam saveDeptParam = new SaveDeptParam();
-        saveDeptParam.setName(saveShop.getName());
-        saveDeptParam.setPid(0L);
-        saveDeptParam.setMerchantCode(saveShop.getCode());
-        deptService.save(saveDeptParam);
+        // 保存商家并创建部门
+        Shop shop = saveShop(saveShopParam);
+        // 生成订单
+        addOrder(shop);
         return true;
     }
 
@@ -212,6 +220,54 @@ public class ShopServiceImpl implements ShopService {
         }
         return code;
 
+    }
+
+    /**
+     * 保存商家
+     */
+    private Shop saveShop(SaveShopParam saveShopParam){
+        Shop saveShop = shopMapStruct.toSaveShop(saveShopParam);
+        // 生成code
+        saveShop.setCode(getCode(saveShopParam.getType()));
+        shopRepository.save(saveShop);
+        // 生成默认部门id
+        SaveDeptParam saveDeptParam = new SaveDeptParam();
+        saveDeptParam.setName(saveShop.getName());
+        saveDeptParam.setPid(0L);
+        saveDeptParam.setShopCode(saveShop.getCode());
+        deptService.save(saveDeptParam);
+        return saveShop;
+    }
+    /**
+     * 生成功能订单
+     */
+    private void addOrder(Shop shop){
+        // 获取初始化的功能
+        List<Menu> wcu3 = menuService.findByMenuCode("WCU3", 0);
+        if (ObjectUtils.isEmpty(wcu3)) {
+            return;
+        }
+        List<OrderItemModel> orderItemModelList = new ArrayList<>();
+        wcu3.forEach(f ->{
+            OrderItemModel orderItemModel = new OrderItemModel();
+            orderItemModel.setType(OrderItemTypeEnum.FUNCTION_TEMPLATE);
+            orderItemModel.setMerchandiseName(f.getName());
+            // todo 每个菜单应该有对应的价格
+            orderItemModel.setMerchandiseAmount(1);
+            FunctionTemplateModel functionTemplateModel = new FunctionTemplateModel();
+            functionTemplateModel.setFunctionCode(f.getMenuCode());
+            // todo 在签约后给菜单设值开始和结束时间
+            orderItemModel.setMerchantOrderExtModel(functionTemplateModel);
+            orderItemModelList.add(orderItemModel);
+        });
+
+        // 创建功能订单
+        SubmitOrderParam submitOrderParam = new SubmitOrderParam();
+        submitOrderParam.setShopCode(shop.getCode());
+        submitOrderParam.setOrderType(OrderTypeEnum.INIT_TEMPLATE.getName());
+        submitOrderParam.setMerchandiseName("初始化功能上线");
+        submitOrderParam.setOrderItemModelList(orderItemModelList);
+        ActionProcessor.submit(submitOrderParam);
     }
 
 }

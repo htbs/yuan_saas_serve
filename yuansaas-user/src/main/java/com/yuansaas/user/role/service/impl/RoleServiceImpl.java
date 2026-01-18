@@ -17,19 +17,16 @@ import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.service.DeptService;
-import com.yuansaas.user.dept.vo.DeptListVo;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.role.entity.QRole;
 import com.yuansaas.user.role.entity.Role;
-import com.yuansaas.user.role.entity.RoleMenu;
 import com.yuansaas.user.role.params.AuthorizeMenuParam;
 import com.yuansaas.user.role.params.FindRoleParam;
 import com.yuansaas.user.role.params.SaveRoleParam;
 import com.yuansaas.user.role.params.UpdateRoleParam;
-import com.yuansaas.user.role.repository.RoleMenuRepository;
 import com.yuansaas.user.role.repository.RoleRepository;
 import com.yuansaas.user.role.service.RoleMenuService;
 import com.yuansaas.user.role.service.RoleService;
@@ -41,8 +38,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -86,7 +81,7 @@ public class RoleServiceImpl implements RoleService {
                 .leftJoin(dept).on(role.deptId.eq(dept.id))
                 .where(BoolBuilder.getInstance()
                         .and(findRoleParam.getName() , role.name::contains)
-                        .and(findRoleParam.getMerchantCode() , role.merchantCode::eq)
+                        .and(findRoleParam.getMerchantCode() , role.shopCode::eq)
                         .getWhere())
                 .orderBy(role.id.desc())
                 .offset(findRoleParam.obtainOffset())
@@ -102,7 +97,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Boolean save(SaveRoleParam saveRoleParam) {
-        Long deptId = validated(saveRoleParam.getMerchantCode());
+        Long deptId = validated(saveRoleParam.getShopCode());
         Role role = new Role();
         BeanUtil.copyProperties(saveRoleParam, role);
         role.setDeptId(deptId);
@@ -120,7 +115,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean update(UpdateRoleParam updateRoleParam) {
         roleRepository.findById(updateRoleParam.getId()).ifPresentOrElse(role ->{
-            validated(role.getMerchantCode());
+            validated(role.getShopCode());
             role.setName(updateRoleParam.getName());
             role.setDescription(updateRoleParam.getDescription());
             role.setUpdateAt(LocalDateTime.now());
@@ -204,9 +199,9 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 校验 角色 相关信息
      */
-    public Long validated ( String merchantCode) {
+    public Long validated ( String shopCode) {
 
-        List<SysDept> byMerchantCodeAndPid = deptService.findByMerchantCodeAndPid(merchantCode, AppConstants.ZERO_L);
+        List<SysDept> byMerchantCodeAndPid = deptService.findByShopCodeAndPid(shopCode, AppConstants.ZERO_L);
         if (ObjectUtil.isEmpty(byMerchantCodeAndPid)) {
             throw BizErrorCode.BUSINESS_VALIDATION_FAILED.buildException("默认部门不存在");
 

@@ -49,10 +49,10 @@ public interface DeptService {
     /**
      * 通过商家code和父部门id查询部门信息
      *
-     * @param merchantCode 商家code
+     * @param shopCode 商家code
      * @param pid          父部门id
      * @author LXZ 2025/12/24  12:14
      */
-    List<SysDept> findByMerchantCodeAndPid(String merchantCode, Long pid);
+    List<SysDept> findByShopCodeAndPid(String shopCode, Long pid);
 
 }

@@ -50,6 +50,15 @@ public interface MenuService {
     MenuVo getById(Long id);
     /**
      * 批量获取菜单 (原始信息)
+     * @param ids  id
+     * @param lockStatus 禁用状态
      */
     List<Menu> getByList(List<Long> ids , String lockStatus);
+
+    /**
+     * 通过菜单code和菜单类型查询菜单
+     * @param menuCode  菜单code
+     * @param menuType  菜单类型（0 ： 菜单 | 1 ：按钮）
+     */
+    List<Menu> findByMenuCode(String menuCode  , Integer menuType);
 }

@@ -38,7 +38,7 @@ public class DeptUserServiceImpl implements DeptUserService {
     @Override
     @Transactional
     public void saveOrUpdate(Long userId) {
-        List<SysDept> byMerchantCodeAndPid = deptRepository.findByMerchantCodeAndPid(AppContextUtil.getMerchantCode(), AppConstants.ZERO_L);
+        List<SysDept> byMerchantCodeAndPid = deptRepository.findByShopCodeAndPid(AppContextUtil.getMerchantCode(), AppConstants.ZERO_L);
         if (ObjectUtil.isEmpty(byMerchantCodeAndPid)) {
             return;
         }

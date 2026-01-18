@@ -26,5 +26,5 @@ public class SaveRoleParam {
     /**
      * 商家编码
      */
-    private String merchantCode = AppContextUtil.getMerchantCode();
+    private String shopCode = AppContextUtil.getMerchantCode();
 }

@@ -212,6 +212,24 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /**
+     * 通过菜单code和菜单类型查询菜单
+     *
+     * @param menuCode 菜单code
+     * @param menuType 菜单类型（0 ： 菜单 | 1 ：按钮）
+     */
+    @Override
+    public List<Menu> findByMenuCode(String menuCode, Integer menuType) {
+        QMenu menu = QMenu.menu;
+        return jpaQueryFactory.select(menu)
+                .from(menu)
+                .where(BoolBuilder.getInstance()
+                        .and(menuCode, menu.menuCode::contains)
+                        .and(menuType, menu.menuType::eq)
+                        .getWhere()
+                ).fetch();
+    }
+
+    /**
      * 验证父级菜单是否存在
      * @param menuModel 校验model
      */

@@ -19,7 +19,7 @@ public class Role extends BaseEntity {
     /**
      * 商家编码
      */
-    private String merchantCode;
+    private String shopCode;
     /**
      * '部门ID
      */
