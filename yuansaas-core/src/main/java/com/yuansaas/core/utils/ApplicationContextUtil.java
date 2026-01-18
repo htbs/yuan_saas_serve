@@ -3,6 +3,7 @@ package com.yuansaas.core.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class ApplicationContextUtil {
+public class ApplicationContextUtil implements ApplicationContextAware {
 
     /**
      * 上下文对象实例
@@ -22,7 +23,8 @@ public class ApplicationContextUtil {
     private static ApplicationContext applicationContext;
 
 
-    public static void setApplicationContext(ApplicationContext applicationContext) {
+    @Override
+    public  void setApplicationContext(ApplicationContext applicationContext) throws BootstrapMethodError {
         ApplicationContextUtil.applicationContext = applicationContext;
     }
 
@@ -34,6 +36,7 @@ public class ApplicationContextUtil {
      * @return
      */
     public static <T> T getBean(Class<T> clazz) {
+        checkApplicationContext();
         return applicationContext.getBean(clazz);
     }
 
@@ -45,6 +48,7 @@ public class ApplicationContextUtil {
      * @return
      */
     public static <T> T getBean(String name) {
+        checkApplicationContext();
         return (T) applicationContext.getBean(name);
     }
 
@@ -57,6 +61,7 @@ public class ApplicationContextUtil {
      * @return
      */
     public static <T> T getBean(String name, Class<T> clazz) {
+        checkApplicationContext();
         return applicationContext.getBean(name, clazz);
     }
 
@@ -69,6 +74,7 @@ public class ApplicationContextUtil {
      * @return
      */
     public static <T> boolean registerBean(String beanName, T bean) {
+        checkApplicationContext();
         ConfigurableApplicationContext context = (ConfigurableApplicationContext) applicationContext;
         context.getBeanFactory().registerSingleton(beanName, bean);
         log.debug("【SpringContextUtil】注册实例“{}”到spring容器：{}", beanName, bean);
@@ -84,7 +90,22 @@ public class ApplicationContextUtil {
      * @return
      */
     public static <T> T getBeanByGenericType(Class<T> type, Class<?>... generics) {
+        checkApplicationContext();
         ObjectProvider<T> beanProvider = applicationContext.getBeanProvider(ResolvableType.forClassWithGenerics(type, generics));
         return beanProvider.getObject();
+    }
+
+    /**
+     * 检查 ApplicationContext 是否已初始化
+     */
+    private static void checkApplicationContext() {
+        if (applicationContext == null) {
+            throw new IllegalStateException(
+                    "ApplicationContext 未初始化，可能原因：\n" +
+                            "1. ApplicationContextUtil 没有被 Spring 扫描到\n" +
+                            "2. 在 Spring 初始化完成前调用了 getBean 方法\n" +
+                            "3. ApplicationContextUtil 没有实现 ApplicationContextAware 接口"
+            );
+        }
     }
 }
