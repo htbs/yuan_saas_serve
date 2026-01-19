@@ -1,5 +1,6 @@
 package com.yuansaas.app.shop.param;
 
+import com.yuansaas.app.order.enums.PayChannelEnum;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -39,5 +40,14 @@ public class SignedParam {
      * 合同编号
      */
     private String contractNo;
+    /**
+     * 支付金额
+     */
+    private Long payAmount;
+    /**
+     * 支付渠道
+     * @see PayChannelEnum
+     */
+    private PayChannelEnum payChannel;
 
 }

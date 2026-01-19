@@ -33,22 +33,26 @@ public class SubmitOrderProcessor extends ActionProcessor {
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public Boolean process(SubmitOrderParam submitRpOrderParam) {
-        OrderTypeEnum orderType =OrderTypeEnum.valueOf(submitRpOrderParam.getOrderType());
+    public <T>Boolean process(T t) {
+        SubmitOrderParam submitOrderParam = null;
+        if (t instanceof  SubmitOrderParam) {
+            submitOrderParam =(SubmitOrderParam) t;
+        }
+        OrderTypeEnum orderType =OrderTypeEnum.valueOf(submitOrderParam.getOrderType());
         switch (orderType){
             case FUNCTION_AUTH,
                  INIT_TEMPLATE,
                  RENEW_UPGRADE -> {
-                verifyFunction(submitRpOrderParam.getOrderItemModelList());
+                verifyFunction(submitOrderParam.getOrderItemModelList());
             }
             case SMS_RECHARGE -> { }
         }
         // 组装订单数据
-        Order order = orderMapstruct.toSave(submitRpOrderParam);
+        Order order = orderMapstruct.toSave(submitOrderParam);
         // 组装子订单数据
-        List<OrderItem> orderItems = assembleFunctionData(submitRpOrderParam, order.getOrderNo());
+        List<OrderItem> orderItems = assembleFunctionData(submitOrderParam, order.getOrderNo());
         if (ObjectUtil.isNotEmpty(orderItems)) {
-            Integer amount = orderItems.stream().mapToInt(OrderItem::getMerchandiseAmount).sum();
+            Long amount = orderItems.stream().mapToLong(OrderItem::getMerchandiseAmount).sum();
             order.setMerchandiseAmount(amount);
         }
         //保存

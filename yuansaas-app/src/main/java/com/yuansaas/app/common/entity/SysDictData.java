@@ -37,4 +37,12 @@ public class SysDictData extends BaseEntity {
      * 是否系统默认 （Y 是|N 否）
      */
     private String isSysDefault = "N";
+    /**
+     * '锁定状态(Y锁定|N不锁定)'
+     */
+    private String  lockStatus ;
+    /**
+     * '删除状态(Y删除|N未删除)'
+     */
+    private String  deleteStatus;
 }

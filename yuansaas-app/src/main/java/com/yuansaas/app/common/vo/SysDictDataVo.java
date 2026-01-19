@@ -37,6 +37,10 @@ public class SysDictDataVo implements Serializable {
      */
     private String isSysDefault;
     /**
+     * 操作状态 （Y 禁用|N 启用）
+     */
+    private String lockStatus;
+    /**
      * 创建人
      */
     private String createBy;
@@ -52,5 +56,9 @@ public class SysDictDataVo implements Serializable {
      * 修改人
      */
     private String updateBy;
+    /**
+     * 备注
+     */
+    private String remark;
 
 }
