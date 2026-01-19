@@ -28,7 +28,7 @@ public class OrderMapstruct {
         order.setOrderType(submitOrderParam.getOrderType());
         order.setOrderStatus(OrderStatusEnum.WAIT_PAY.getName());
         order.setMerchandiseNames(submitOrderParam.getMerchandiseName());
-        order.setDiscountAmount(0);
+        order.setDiscountAmount(0L);
         order.setCreateBy(AppContextUtil.getUserInfo());
         order.setCreateAt(LocalDateTime.now());
         return order;

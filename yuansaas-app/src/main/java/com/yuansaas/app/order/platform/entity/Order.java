@@ -32,10 +32,12 @@ public class Order extends BaseEntity {
     private  String tradeNo;
     /**
      * 订单类型
+     * @see com.yuansaas.app.order.platform.enums.OrderTypeEnum
      */
     private  String orderType;
     /**
      * 订单状态
+     * @see com.yuansaas.app.order.platform.enums.OrderStatusEnum
      */
     private  String orderStatus;
     /**
@@ -45,17 +47,19 @@ public class Order extends BaseEntity {
     /**
      * 商品金额
      */
-    private  Integer merchandiseAmount;
+    private  Long merchandiseAmount;
     /**
      * '优惠后金额'
      */
-    private  Integer discountAmount;
+    private  Long discountAmount;
     /**
      * '支付方式'
+     * @see com.yuansaas.app.order.enums.PayChannelEnum
      */
     private  String payMethod;
     /**
      * '支付状态'
+     * @see com.yuansaas.app.order.platform.enums.PayStatusEnum
      */
     private  String payStatus;
     /**
@@ -65,5 +69,5 @@ public class Order extends BaseEntity {
     /**
      * 支付金额
      */
-    private  Integer payAmount;
+    private  Long payAmount;
 }

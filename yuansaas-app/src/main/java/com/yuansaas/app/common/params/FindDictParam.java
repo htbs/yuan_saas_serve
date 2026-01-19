@@ -20,4 +20,8 @@ public class FindDictParam  extends PageModel {
      * 平台类型
      */
     private DictPlatformTypeEnum platform;
+    /**
+     * 操作状态
+     */
+    private String lockStatus;
 }
