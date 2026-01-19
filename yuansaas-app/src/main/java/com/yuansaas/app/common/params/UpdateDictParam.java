@@ -24,11 +24,6 @@ public class UpdateDictParam {
     @NotNull(message = "字典名称不能为空")
     private String dictName;
     /**
-     * 字典类型
-     */
-    @NotNull(message = "字典类型不能为空")
-    private String dictType;
-    /**
      * 字典排序值
      */
     private Integer sort;
