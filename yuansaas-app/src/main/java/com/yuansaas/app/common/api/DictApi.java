@@ -52,7 +52,7 @@ public class DictApi {
     }
 
     /**
-     * 修改字典项排序
+     * 修改字典排序
      * @param updateSortParam 修改字典排序
      * @author  lxz 2025/11/16 14:35
      */
@@ -63,7 +63,7 @@ public class DictApi {
     }
 
     /**
-     * 根据字典id删除字典项
+     * 根据字典id删除字典
      * @param id 字典id
      * @author  lxz 2025/11/16 14:35
      */
@@ -74,7 +74,29 @@ public class DictApi {
     }
 
     /**
-     * 查询字典项分页
+     * 禁用字典
+     * @param id 字典id
+     * @author  lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/disable/{id}",method = RequestMethod.PUT)
+    @SecurityAuth
+    public ResponseEntity<ResponseModel<Boolean>> disable(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(dictService.lock(id));
+    }
+
+    /**
+     * 启用字典
+     * @param id 字典id
+     * @author  lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/enable/{id}",method = RequestMethod.PUT)
+    @SecurityAuth
+    public ResponseEntity<ResponseModel<Boolean>> enable(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(dictService.lock(id));
+    }
+
+    /**
+     * 查询字典分页
      * @param findDictParam 字典id
      * @author  lxz 2025/11/16 14:35
      */

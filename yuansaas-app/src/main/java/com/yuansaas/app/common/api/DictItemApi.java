@@ -47,18 +47,6 @@ public class DictItemApi {
         return ResponseBuilder.okResponse(dictItemService.updateDict(updateDictItemParam));
     }
 
-
-//    /**
-//     * 修改字典项排序 (弃用 我感觉没有)
-//     * @param updateSortParam 修改字典排序
-//     * @author  lxz 2025/11/16 14:35
-//     */
-//    @RequestMapping(value = "/update/order_num",method = RequestMethod.PUT)
-//    @SecurityAuth
-//    public ResponseEntity<ResponseModel<Boolean>> updateOrderNum(@RequestBody @Validated UpdateSortParam updateSortParam) {
-//        return ResponseBuilder.okResponse(dictItemService.updateOrderNum(updateSortParam));
-//    }
-
     /**
      * 根据字典项id删除字典数据
      * @param id 字典id
@@ -95,6 +83,29 @@ public class DictItemApi {
     public ResponseEntity<ResponseModel<SysDictDataVo>> findByDictCodeAndDictLabel(@RequestParam(value = "dictCode") String dictCode ,
                                                                @RequestParam(value = "dictLabel") String dictLabel) {
         return ResponseBuilder.okResponse(dictItemService.findByDictCodeAndDictLabel(dictCode ,dictLabel));
+    }
+
+
+    /**
+     * 禁用字典项
+     * @param id 字典id
+     * @author  lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/disable/{id}",method = RequestMethod.PUT)
+    @SecurityAuth
+    public ResponseEntity<ResponseModel<Boolean>> disable(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(dictItemService.lock(id));
+    }
+
+    /**
+     * 启用字典项
+     * @param id 字典id
+     * @author  lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/enable/{id}",method = RequestMethod.PUT)
+    @SecurityAuth
+    public ResponseEntity<ResponseModel<Boolean>> enable(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(dictItemService.lock(id));
     }
 
 }

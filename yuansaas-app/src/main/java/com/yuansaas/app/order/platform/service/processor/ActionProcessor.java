@@ -1,11 +1,10 @@
 package com.yuansaas.app.order.platform.service.processor;
 
 import com.yuansaas.app.order.platform.enums.OrderAction;
+import com.yuansaas.app.order.platform.model.OrderPayParam;
 import com.yuansaas.app.order.platform.params.SubmitOrderParam;
 import com.yuansaas.core.utils.ApplicationContextUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.ApplicationContext;
 
 /**
  *
@@ -23,9 +22,17 @@ public abstract class ActionProcessor {
      */
     public static Boolean submit(SubmitOrderParam submitOrderParam) {
         return getProcessor(OrderAction.submit).process(submitOrderParam);
-
     }
-    public Boolean process(SubmitOrderParam rpOrderParam) {return true;}
+
+    /**
+     * 支付订单
+     */
+    public static Boolean pay(OrderPayParam orderPayParam) {
+        return getProcessor(OrderAction.pay).process(orderPayParam);
+    }
+
+
+    public <T>Boolean process(T t) {return true;}
 
 
     private static ActionProcessor getProcessor(OrderAction action) {
