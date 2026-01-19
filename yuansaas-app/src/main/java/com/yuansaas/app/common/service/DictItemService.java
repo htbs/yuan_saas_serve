@@ -27,13 +27,13 @@ public interface DictItemService {
 
     Boolean updateDict(UpdateDictItemParam updateDictItemParam);
 
-
-    /**
-     * 修改字典排序
-     * @param updateSortParam 修改字典排序
-     * @author  lxz 2025/11/16 14:35
-     */
-    Boolean updateOrderNum(UpdateSortParam updateSortParam);
+//
+//    /**
+//     * 修改字典排序
+//     * @param updateSortParam 修改字典排序
+//     * @author  lxz 2025/11/16 14:35
+//     */
+//    Boolean updateOrderNum(UpdateSortParam updateSortParam);
 
     /**
      * 根据字典id删除字典数据
@@ -41,6 +41,13 @@ public interface DictItemService {
      * @author  lxz 2025/11/16 14:35
      */
     Boolean deleteDict(Long id);
+
+    /**
+     * 操作字典项的禁用和启用状态
+     * @param id 字典id
+     * @author  lxz 2025/11/16 14:35
+     */
+    Boolean lock(Long id);
 
     /**
      * 查询字典项分页

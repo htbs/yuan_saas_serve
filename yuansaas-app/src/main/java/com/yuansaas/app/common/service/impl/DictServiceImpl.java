@@ -52,16 +52,13 @@ public class DictServiceImpl implements DictService {
      */
     @Override
     public Boolean createDict(SaveDictParam saveDictParam) {
-        Integer count = dictRepository.countByDictType(saveDictParam.getDictType());
-        if (count >= 1) {
-            throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("字典类型已存在，不能重复添加");
-        }
         SysDictType dict = new SysDictType();
         BeanUtils.copyProperties(saveDictParam, dict);
         dict.setDictCode(getCode(saveDictParam.getPlatform()));
         dict.setPlatform(saveDictParam.getPlatform().name());
         dict.setLockStatus(AppConstants.N);
         dict.setDeleteStatus(AppConstants.N);
+        dict.setIsSysDefault(AppConstants.N);
         dict.setCreateBy(AppContextUtil.getUserInfo());
         dict.setCreateAt(LocalDateTime.now());
         dict.setUpdateBy(AppContextUtil.getUserInfo());
@@ -79,16 +76,9 @@ public class DictServiceImpl implements DictService {
     @Override
     public Boolean updateDict( UpdateDictParam updateDictParam) {
         // 查询字典数据
-        SysDictType sysDictType = dictRepository.findByDictType(updateDictParam.getDictType());
-        if (ObjectUtil.isNotEmpty(sysDictType) && !Objects.equals(sysDictType.getId(), updateDictParam.getId())) {
-            throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("字典类型已存在，不能重复添加");
-        }
-        if (ObjectUtil.isEmpty(sysDictType)) {
-            sysDictType =getDictType(updateDictParam.getId());
-        }
+        SysDictType sysDictType = getDictType(updateDictParam.getId());
         // 更新字典数据
         sysDictType.setDictName(updateDictParam.getDictName());
-        sysDictType.setDictType(updateDictParam.getDictType());
         sysDictType.setUpdateBy(AppContextUtil.getUserInfo());
         sysDictType.setUpdateAt(LocalDateTime.now());
         dictRepository.save(sysDictType);
@@ -128,6 +118,22 @@ public class DictServiceImpl implements DictService {
     }
 
     /**
+     * 操作禁用/启用字典
+     *
+     * @param id 字典id
+     * @author lxz 2025/11/16 14:35
+     */
+    @Override
+    public Boolean lock(Long id) {
+        SysDictType dictType = getDictType(id);
+        dictType.setLockStatus(AppConstants.N.equals(dictType.getLockStatus()) ? AppConstants.Y : AppConstants.N);
+        dictType.setUpdateAt(LocalDateTime.now());
+        dictType.setUpdateBy(AppContextUtil.getUserInfo());
+        dictRepository.save(dictType);
+        return true;
+    }
+
+    /**
      * 根据查询条件返回字典列表
      * @param findDictParam 查询条件参数
      * @author lxz 2025/11/16 14:35
@@ -139,7 +145,8 @@ public class DictServiceImpl implements DictService {
         QueryResults<SysDictTypeVo> pageDict = jpaQueryFactory.select(Projections.bean(SysDictTypeVo.class,
                         qSysDictType.id,
                         qSysDictType.dictName,
-                        qSysDictType.dictType,
+                        qSysDictType.isSysDefault,
+                        qSysDictType.lockStatus,
                         qSysDictType.dictCode,
                         qSysDictType.platform,
                         qSysDictType.sort,
@@ -150,6 +157,7 @@ public class DictServiceImpl implements DictService {
                         .and(findDictParam.getDictName(), qSysDictType.dictName::contains)
                         .and(ObjectUtil.isNotEmpty(findDictParam.getPlatform()) ? findDictParam.getPlatform().name() : null, qSysDictType.platform::eq)
                         .and(AppConstants.N  , qSysDictType.deleteStatus::eq)
+                        .and(findDictParam.getLockStatus() , qSysDictType.lockStatus::eq)
                         .getWhere())
                 .orderBy(qSysDictType.sort.asc() , qSysDictType.createAt.desc())
                 .offset(findDictParam.obtainOffset())

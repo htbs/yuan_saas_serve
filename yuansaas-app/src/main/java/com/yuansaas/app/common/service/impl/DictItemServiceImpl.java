@@ -15,6 +15,7 @@ import com.yuansaas.app.common.repository.SysDictTypeRepository;
 import com.yuansaas.app.common.service.DictItemService;
 import com.yuansaas.app.common.vo.SysDictDataVo;
 import com.yuansaas.app.common.vo.SysDictTypeVo;
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
@@ -58,6 +59,8 @@ public class DictItemServiceImpl implements DictItemService {
         validateDictLabel(null,saveDictItemParam.getDictCode(), saveDictItemParam.getDictLabel());
         SysDictData sysDictData = new SysDictData();
         BeanUtils.copyProperties(saveDictItemParam, sysDictData);
+        sysDictData.setLockStatus(AppConstants.N);
+        sysDictData.setDeleteStatus(AppConstants.N);
         sysDictData.setCreateAt(LocalDateTime.now());
         sysDictData.setCreateBy(AppContextUtil.getUserInfo());
         sysDictDataRepository.save(sysDictData);
@@ -85,22 +88,22 @@ public class DictItemServiceImpl implements DictItemService {
         return true;
     }
 
-    /**
-     * 修改字典排序
-     *
-     * @param updateSortParam 修改字典排序
-     * @author lxz 2025/11/16 14:35
-     */
-    @Override
-    public Boolean updateOrderNum(UpdateSortParam updateSortParam) {
-        SysDictData sysDictData = sysDictDataRepository.findById(updateSortParam.getId()).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("字典数据不存在"));
-        sysDictData.setSort(updateSortParam.getSort());
-        sysDictData.setUpdateAt(LocalDateTime.now());
-        sysDictData.setUpdateBy(AppContextUtil.getUserInfo());
-        sysDictDataRepository.save(sysDictData);
-        setCache(sysDictData);
-        return true;
-    }
+//    /**
+//     * 修改字典排序
+//     *
+//     * @param updateSortParam 修改字典排序
+//     * @author lxz 2025/11/16 14:35
+//     */
+//    @Override
+//    public Boolean updateOrderNum(UpdateSortParam updateSortParam) {
+//        SysDictData sysDictData = sysDictDataRepository.findById(updateSortParam.getId()).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("字典数据不存在"));
+//        sysDictData.setSort(updateSortParam.getSort());
+//        sysDictData.setUpdateAt(LocalDateTime.now());
+//        sysDictData.setUpdateBy(AppContextUtil.getUserInfo());
+//        sysDictDataRepository.save(sysDictData);
+//        setCache(sysDictData);
+//        return true;
+//    }
 
     /**
      * 根据字典id删除字典数据
@@ -111,8 +114,28 @@ public class DictItemServiceImpl implements DictItemService {
     @Override
     public Boolean deleteDict(Long id) {
         SysDictData sysDictData = sysDictDataRepository.findById(id).orElseThrow(DataErrorCode.DATA_NOT_FOUND::buildException);
-        sysDictDataRepository.deleteById(id);
+        sysDictData.setDeleteStatus(AppConstants.Y);
+        sysDictData.setUpdateAt(LocalDateTime.now());
+        sysDictData.setUpdateBy(AppContextUtil.getUserInfo());
+        sysDictDataRepository.save(sysDictData);
         deleteCache(sysDictData);
+        return true;
+    }
+
+    /**
+     * 操作字典项的禁用和启用状态
+     *
+     * @param id 字典id
+     * @author lxz 2025/11/16 14:35
+     */
+    @Override
+    public Boolean lock(Long id) {
+        SysDictData sysDictData = sysDictDataRepository.findById(id).orElseThrow(DataErrorCode.DATA_NOT_FOUND::buildException);
+        sysDictData.setLockStatus(AppConstants.N.equals(sysDictData.getLockStatus()) ? AppConstants.Y : AppConstants.N);
+        sysDictData.setUpdateAt(LocalDateTime.now());
+        sysDictData.setUpdateBy(AppContextUtil.getUserInfo());
+        sysDictDataRepository.save(sysDictData);
+        setCache(sysDictData);
         return true;
     }
 
@@ -127,14 +150,17 @@ public class DictItemServiceImpl implements DictItemService {
                         qSysDictData.dictValue,
                         qSysDictData.sort,
                         qSysDictData.isSysDefault,
+                        qSysDictData.lockStatus,
                         qSysDictData.createBy,
                         qSysDictData.createAt,
                         qSysDictData.updateAt,
-                        qSysDictData.updateBy
+                        qSysDictData.updateBy,
+                        qSysDictData.remark
                 )).from(qSysDictData)
                 .where(BoolBuilder.getInstance()
                         .and(findDictItemParam.getDictCode()  , qSysDictData.dictCode::eq)
                         .and(findDictItemParam.getDictValue() , qSysDictData.dictValue::contains)
+                        .and(AppConstants.N , qSysDictData.deleteStatus::eq)
                         .getWhere())
                 .orderBy(qSysDictData.sort.asc(), qSysDictData.updateAt.desc())
                 .limit(findDictItemParam.getPageSize())
