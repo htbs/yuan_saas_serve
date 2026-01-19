@@ -4,13 +4,16 @@ import cn.hutool.core.util.ObjectUtil;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yuansaas.app.order.platform.entity.Order;
 import com.yuansaas.app.order.platform.entity.QOrder;
 import com.yuansaas.app.order.platform.entity.QOrderItem;
 import com.yuansaas.app.order.platform.params.FindOrderPageParam;
+import com.yuansaas.app.order.platform.repository.OrderRepository;
 import com.yuansaas.app.order.platform.service.OrderService;
 import com.yuansaas.app.order.platform.vo.OrderItemDataVo;
 import com.yuansaas.app.order.platform.vo.OrderPageListVo;
 import com.yuansaas.app.shop.entity.QShop;
+import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     private final JPAQueryFactory jpaQueryFactory;
+    private final OrderRepository orderRepository;
 
 
     /**
@@ -72,6 +76,21 @@ public class OrderServiceImpl implements OrderService {
      * 查询订单详情信息
      *
      * @param orderNo 订单号
+     * @return OrderVo
+     */
+    @Override
+    public Order findOrderByOrderNo(Long orderNo) {
+        Order byOrderNo = orderRepository.findByOrderNo(orderNo);
+        if (ObjectUtil.isEmpty(byOrderNo)) {
+            throw DataErrorCode.DATA_NOT_FOUND.buildException();
+        }
+        return byOrderNo;
+    }
+
+    /**
+     * 查询子订单详情信息
+     *
+     * @param orderNo 订单号
      * @return OrderItemDataVo
      */
     @Override
@@ -93,5 +112,17 @@ public class OrderServiceImpl implements OrderService {
             return null;
         }
         return orderItemDataVos;
+    }
+
+    /**
+     * 通过店铺的订单数据
+     *
+     * @param shopCode    店铺code
+     * @param orderType   订单类型
+     * @param orderStatus 订单类型
+     */
+    @Override
+    public List<Order> findShopCodeAndOrderType(String shopCode, String orderType, String orderStatus) {
+        return orderRepository.findByShopCodeAndOrderTypeAndOrderStatus(shopCode, orderType, orderStatus);
     }
 }
