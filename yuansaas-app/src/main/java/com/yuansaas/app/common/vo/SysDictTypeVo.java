@@ -17,10 +17,6 @@ public class SysDictTypeVo implements Serializable {
      */
     private Long id;
     /**
-     * 字典类型
-     */
-    private String dictType;
-    /**
      * 字典名称
      */
     private String dictName;
@@ -51,5 +47,5 @@ public class SysDictTypeVo implements Serializable {
     /**
      * 系统默认 （Y 默认 | N 不默认）
      */
-    private String sysDefault;
+    private String isSysDefault;
 }
