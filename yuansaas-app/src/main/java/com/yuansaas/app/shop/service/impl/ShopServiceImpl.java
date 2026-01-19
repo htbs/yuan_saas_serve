@@ -5,11 +5,15 @@ import cn.hutool.core.util.RandomUtil;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yuansaas.app.order.platform.entity.Order;
 import com.yuansaas.app.order.platform.enums.OrderItemTypeEnum;
+import com.yuansaas.app.order.platform.enums.OrderStatusEnum;
 import com.yuansaas.app.order.platform.enums.OrderTypeEnum;
 import com.yuansaas.app.order.platform.model.FunctionTemplateModel;
 import com.yuansaas.app.order.platform.model.OrderItemModel;
+import com.yuansaas.app.order.platform.model.OrderPayParam;
 import com.yuansaas.app.order.platform.params.SubmitOrderParam;
+import com.yuansaas.app.order.platform.service.OrderService;
 import com.yuansaas.app.order.platform.service.processor.ActionProcessor;
 import com.yuansaas.app.shop.entity.QShop;
 import com.yuansaas.app.shop.entity.Shop;
@@ -27,6 +31,7 @@ import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
+import com.yuansaas.core.utils.id.SnowflakeIdGenerator;
 import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.service.DeptService;
 import com.yuansaas.user.menu.entity.Menu;
@@ -56,6 +61,8 @@ public class ShopServiceImpl implements ShopService {
     private final DeptService deptService;
     private final ShopDataService shopDataService;
     private final MenuService menuService;
+    private final OrderService orderService;
+    private final SnowflakeIdGenerator idGenerator;
 
 
 
@@ -189,10 +196,7 @@ public class ShopServiceImpl implements ShopService {
      */
     @Override
     public Boolean signed(SignedParam signedParam) {
-        Shop shop = shopRepository.findById(signedParam.getId()).orElse(null);
-        if (ObjectUtils.isEmpty(shop)) {
-            throw DataErrorCode.DATA_NOT_FOUND.buildException();
-        }
+        Shop shop = shopRepository.findById(signedParam.getId()).orElseThrow(DataErrorCode.DATA_NOT_FOUND::buildException);
         shop.setSignedStatus(ShopSignedStatusEnum.SIGNED.name());
         shop.setSignedUserId(0L);
         shop.setSignedUserName(signedParam.getName());
@@ -201,8 +205,11 @@ public class ShopServiceImpl implements ShopService {
         shop.setUpdateAt(LocalDateTime.now());
         shop.setUpdateBy(AppContextUtil.getUserInfo());
         shopRepository.save(shop);
-        // 签约成功后默认激活店铺
+        // 签约成功后
+        // 默认激活店铺
         shopDataService.init(shop.getCode());
+        // 修改功能订单状态
+        updateOrder(shop ,signedParam);
         return true;
     }
 
@@ -261,13 +268,30 @@ public class ShopServiceImpl implements ShopService {
             orderItemModelList.add(orderItemModel);
         });
 
-        // 创建功能订单
+        // todo  创建功能订单
         SubmitOrderParam submitOrderParam = new SubmitOrderParam();
         submitOrderParam.setShopCode(shop.getCode());
         submitOrderParam.setOrderType(OrderTypeEnum.INIT_TEMPLATE.getName());
         submitOrderParam.setMerchandiseName("初始化功能上线");
         submitOrderParam.setOrderItemModelList(orderItemModelList);
         ActionProcessor.submit(submitOrderParam);
+    }
+    /**
+     * 修改初始化功能订单状态
+     */
+    private void updateOrder(Shop shop , SignedParam signedParam) {
+        List<Order> shopCodeAndOrderType = orderService.findShopCodeAndOrderType(shop.getCode(), OrderTypeEnum.INIT_TEMPLATE.getName(), OrderStatusEnum.WAIT_PAY.getName());
+        if (ObjectUtils.isEmpty(shopCodeAndOrderType)) {
+            return;
+        }
+        // 修改订单状态
+        OrderPayParam orderPayParam = new OrderPayParam();
+        orderPayParam.setOrderNo(shopCodeAndOrderType.get(0).getOrderNo());
+        orderPayParam.setTradeNo(String.valueOf(idGenerator.nextId()));
+        orderPayParam.setPayAmount(signedParam.getPayAmount());
+        orderPayParam.setPayChannel(signedParam.getPayChannel());
+        orderPayParam.setPaySucceededTime(shop.getSignedStartAt());
+        ActionProcessor.pay(orderPayParam);
     }
 
 }

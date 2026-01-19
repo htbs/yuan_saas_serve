@@ -65,6 +65,7 @@ public class ShopDataServiceImpl implements ShopDataService {
         save(SaveShopDataParam.builder().shopCode(shopCode).build());
         // 初始化店铺日常营业时间信息配置
         initRegularHours(shopCode);
+        // todo 初始化店铺功能
         return true;
     }
 
@@ -93,11 +94,8 @@ public class ShopDataServiceImpl implements ShopDataService {
             ShopDataConfig shopDataConfig = null;
             if (ObjectUtil.isEmpty(byShopCode)) {
                shopDataConfig = shopMapStruct.toShopDataConfig(updateShopDataParam, shop);
-            } else {
-
             }
             shopDataConfigRepository.save(shopDataConfig);
-
         } ,()->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("店铺不存在");
         });
@@ -116,10 +114,11 @@ public class ShopDataServiceImpl implements ShopDataService {
         ShopDataConfig shopData = getShopDataConfig(businessHoursParam.getShopCode());
         shopData.setStartTime(businessHoursParam.getStartTime());
         shopData.setEndTime(businessHoursParam.getEndTime());
-
+        // 日常时间配置
         if (ObjectUtil.isNotEmpty(businessHoursParam.getRegularHours())) {
             saveOrUpdateRegularHours(businessHoursParam.getRegularHours() , businessHoursParam.getShopCode());
         }
+        // 特殊时间配置
         if (ObjectUtil.isNotEmpty(businessHoursParam.getSpecialHours())) {
             saveOrUpdateSpecialHours(businessHoursParam.getSpecialHours() , businessHoursParam.getShopCode());
         }

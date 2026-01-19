@@ -58,9 +58,20 @@ public class ShopApi {
      * @param id 商家id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/lock/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/disable/{id}",method = RequestMethod.PUT)
     @SecurityAuth
-    public ResponseEntity<ResponseModel<Boolean>> lock(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<ResponseModel<Boolean>> disable(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(shopService.lock(id));
+    }
+
+    /**
+     * 启用商家
+     * @param id 商家id
+     * @author  lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/enable/{id}",method = RequestMethod.PUT)
+    @SecurityAuth
+    public ResponseEntity<ResponseModel<Boolean>> enable(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.lock(id));
     }
 
