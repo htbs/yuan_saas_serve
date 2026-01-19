@@ -124,7 +124,7 @@ public class AppContextUtil {
      * @return 用户ID和用户名的拼接
      */
     public static String getUserInfo() {
-        return AppContextHolder.getUserId().map(id -> id + ":" + AppContextHolder.getUserName().orElse("")).orElse("");
+        return AppContextHolder.getUserId().map(id -> id + ":" + AppContextHolder.getUserType().orElse("") +":" +  AppContextHolder.getUserName().orElse("")).orElse("");
     }
 
     public static String getMerchantCode(){
