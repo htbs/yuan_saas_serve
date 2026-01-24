@@ -3,6 +3,7 @@ package com.yuansaas.integration.sms.service;
 import com.yuansaas.integration.sms.model.CheckVerifyCodeModel;
 import com.yuansaas.integration.sms.model.VerifyCodeModel;
 import com.yuansaas.integration.sms.vo.SendVerifyCodeVo;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -13,12 +14,17 @@ import com.yuansaas.integration.sms.vo.SendVerifyCodeVo;
 public interface SmsVerifyService {
 
     /**
+     * 获取短信验证码的token
+     */
+    String getToken(String phone , HttpServletRequest httpServletRequest);
+
+    /**
      * 获取短信验证码
      *
      * @param verifyCodeModel 验证码模型
      * @author LXZ 2025/12/23 16:08
      */
-    SendVerifyCodeVo getVerifyCode (VerifyCodeModel verifyCodeModel);
+    SendVerifyCodeVo getVerifyCode (VerifyCodeModel verifyCodeModel , HttpServletRequest httpServletRequest);
 
     /**
      * 校验短信验证码

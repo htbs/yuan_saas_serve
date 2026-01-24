@@ -19,6 +19,11 @@ public class SmsProperties {
     private int smsSendIntervalMin = 5 * 60;
 
     /**
+     * 本地发送短信时密钥
+     */
+    private String secretKey;
+
+    /**
      * 阿里云短信配置
      */
     private AliyunProperties aliyun;

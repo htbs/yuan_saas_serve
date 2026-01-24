@@ -1,8 +1,8 @@
 package com.yuansaas.integration.sms.entity;
 
+import com.yuansaas.core.jpa.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -15,24 +15,9 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name="sms_verify_code")
-public class SmsVerifyCode implements Serializable {
+public class SmsVerifyCode extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 主键ID
-     */
-    @Id
-    @GenericGenerator(
-            name = "id",
-            strategy = "com.yuansaas.core.jpa.id.CustomIdentityGenerator"
-    )
-    @GeneratedValue(
-            strategy = GenerationType.AUTO,
-            generator = "id"
-    )
-    private Long id;
-
     /**
      * '手机号码'
      */
@@ -57,16 +42,5 @@ public class SmsVerifyCode implements Serializable {
      * '过期时间'
      */
     private LocalDateTime expiredAt;
-    /**
-     * '创建时间'
-     */
-    private LocalDateTime createAt;
-    /**
-     * '更新时间'
-     */
-    private LocalDateTime updateAt;
-    /**
-     * 备注
-     */
-    private String remark;
+
 }

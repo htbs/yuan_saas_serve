@@ -13,9 +13,6 @@ import com.yuansaas.integration.sms.vo.SendVerifyCodeVo;
  */
 public interface SmsSendService {
 
-
-
-
     /**
      * 保存短信发送记录
      * @param smsRecordModel 短信发送记录

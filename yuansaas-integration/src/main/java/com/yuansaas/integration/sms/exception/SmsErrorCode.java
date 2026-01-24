@@ -25,7 +25,10 @@ public enum SmsErrorCode implements IErrorCodeEnum<SmsErrorCode> {
     SMS_SERVER_EXCEPTION("SMS_0009" , "发送失败,短信服务不可用"),
     SMS_TEMPLATE_PARAMETER_VALIDATION_FAILED("SMS_0010" , "模板参数验证失败"),
     SMS_TEMPLATE_NOT_FOUND("SMS_0011" , "模板不存在"),
-
+    SMS_TOKEN_EXPIRED("SMS_0012" , "token已过期"),
+    SMS_TOKEN_INVALID("SMS_0013" , "token无效"),
+    SMS_REPEAT_REQUEST("SMS_0014" , "重复请求"),
+    SMS_SIGN_ERROR("SMS_0015" , "签名错误")
     ;
 
     private final String  code;

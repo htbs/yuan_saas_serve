@@ -1,5 +1,6 @@
 package com.yuansaas.integration.sms.entity;
 
+import com.yuansaas.core.jpa.model.BaseEntity;
 import com.yuansaas.integration.sms.enums.SmsSceneEnum;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -16,22 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "sms_send_log")
-public class SmsSendLog implements Serializable {
-
-
-    /**
-     * 主键ID
-     */
-    @Id
-    @GenericGenerator(
-            name = "id",
-            strategy = "com.yuansaas.core.jpa.id.CustomIdentityGenerator"
-    )
-    @GeneratedValue(
-            strategy = GenerationType.AUTO,
-            generator = "id"
-    )
-    private Long id;
+public class SmsSendLog extends BaseEntity implements Serializable {
 
     /**
      * 短信类别（verify_code：验证码｜sms_notify：短信通知）
@@ -61,16 +47,30 @@ public class SmsSendLog implements Serializable {
      * 短信发送响应错误信息
      */
     private String errorMsg;
+
     /**
-     * 创建时间
+     * 短信发送状态（success：成功｜fail：失败）
      */
-    private LocalDateTime createAt;
+    private String status;
+
     /**
-     * 更新时间
+     * 标记发送失败
+     *
+     * @param errorCode 响应错误码
+     * @param errorMessage 错误消息
      */
-    private LocalDateTime updateAt;
+    public void markAsFailed(String errorCode, String errorMessage) {
+        this.status = "N";
+        this.respCode = errorCode;
+        this.errorMsg = errorMessage;
+        super.init();
+    }
+
     /**
-     * 备注
+     * 标记发送成功
      */
-    private String remark;
+    public void markAsSuccess() {
+        this.status = "Y";
+        super.init();
+    }
 }

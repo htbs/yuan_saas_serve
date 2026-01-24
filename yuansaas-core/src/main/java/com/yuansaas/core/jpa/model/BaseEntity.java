@@ -1,5 +1,6 @@
 package com.yuansaas.core.jpa.model;
 
+import com.yuansaas.core.context.AppContextUtil;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -57,5 +58,13 @@ public class BaseEntity {
      * 备注
      */
     private String remark;
+
+
+    public void init() {
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+        this.createBy = AppContextUtil.getUserInfo();
+        this.updateBy = AppContextUtil.getUserInfo();
+    }
 
 }

@@ -8,7 +8,6 @@ import java.util.Map;
 /**
  * 发送阿里云短信参数
  * @see：https://help.aliyun.com/document_detail/101414.html
- * @author rlf 2023/10/24 10:54
  */
 @Data
 @Accessors(chain = true)

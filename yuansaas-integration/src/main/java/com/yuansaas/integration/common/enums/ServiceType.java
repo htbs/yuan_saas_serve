@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public enum ServiceType implements IBaseEnum<ServiceType>{
     WX_MP("微信公众号"),
     WX_MINI("微信小程序"),
+    ALI_SMS("阿里云短信"),
     UNKNOWN("未知");
 
     private final String description;

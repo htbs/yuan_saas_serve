@@ -34,4 +34,31 @@ public class SmsRecordModel {
      */
     private String content;
 
+    /**
+     * 状态
+     */
+    private String status;
+
+    /**
+     * 响应错误码
+     */
+    private String errorMsg;
+
+    /**
+     * 标记发送失败
+     *
+     * @param errorCode 响应错误码
+     * @param errorMessage 错误消息
+     */
+    public void markAsFailed(String errorCode, String errorMessage) {
+        this.status = "N";
+        this.errorMsg = errorMessage;
+    }
+
+    /**
+     * 标记发送成功
+     */
+    public void markAsSuccess() {
+        this.status = "Y";
+    }
 }

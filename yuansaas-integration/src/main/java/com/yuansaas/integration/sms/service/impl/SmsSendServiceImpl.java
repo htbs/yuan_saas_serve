@@ -51,7 +51,7 @@ public class SmsSendServiceImpl implements SmsSendService {
         smsSendLog.setRespCode(smsRecordModel.getSendSmsResponseBody().getCode());
         smsSendLog.setErrorMsg(smsRecordModel.getSendSmsResponseBody().getMessage());
         smsSendLog.setRequestId(smsRecordModel.getSendSmsResponseBody().getRequestId());
-        smsSendLog.setCreateAt(LocalDateTime.now());
+        smsSendLog.init();
 
         smsSendLogRepository.save(smsSendLog);
     }
