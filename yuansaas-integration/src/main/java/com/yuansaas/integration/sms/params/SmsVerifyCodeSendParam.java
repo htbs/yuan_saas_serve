@@ -11,7 +11,7 @@ import lombok.Data;
 /**
  * 短信验证码发送参数
  *
- * @author cqq 2024/9/9 15:40
+ * @author lxx 2025 12/27
  */
 @Data
 public class SmsVerifyCodeSendParam {

@@ -21,7 +21,7 @@ public class SysUser extends BaseEntity {
     /**
      * 商户编号
      */
-    private String merchantCode;
+    private String shopCode;
     /**
      * 用户名
      */

@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -56,6 +57,10 @@ public class Shop extends BaseEntity {
      */
     private String  legalPersonName;
     /**
+     * 法人性别
+     */
+    private String  legalPersonSex;
+    /**
      * '法人手机号'
      */
     private String  legalPersonPhone;
@@ -90,11 +95,11 @@ public class Shop extends BaseEntity {
     /**
      * '签约开始时间'
      */
-    private LocalDateTime signedStartAt;
+    private LocalDate signedStartAt;
     /**
      * '签约结束时间'
      */
-    private LocalDateTime  signedEndAt;
+    private LocalDate  signedEndAt;
     /**
      * '签约金额（分）'
      */

@@ -1,5 +1,6 @@
 package com.yuansaas.user.system.api;
 
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
@@ -22,7 +23,7 @@ import java.util.List;
 
 
 /**
- * 系统用户API
+ * 系统用户API(平台用户管理)
  *
  * @author HTB 2025/8/5 09:44
  */
@@ -39,7 +40,7 @@ public class SysUserApi {
      * @return 用户信息
      */
     @GetMapping("/{id}")
-    @SecurityAuth()
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER})
     public ResponseEntity<ResponseModel<SysUserVo>> getUserById(@PathVariable Long id) {
         return ResponseBuilder.okResponse(userService.findLinkDateById(id));
     }
@@ -50,7 +51,7 @@ public class SysUserApi {
      * @return 创建成功的用户信息
      */
     @PostMapping("/save")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER})
     public ResponseEntity<ResponseModel<SysUser>> createUser(@RequestBody @Validated SysUserCreateParam sysUserCreateParam) {
         SysUser user = userService.saveUser(sysUserCreateParam);
         return ResponseBuilder.okResponse( user);

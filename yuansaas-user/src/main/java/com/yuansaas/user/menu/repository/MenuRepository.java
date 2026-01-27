@@ -13,8 +13,8 @@ import java.util.List;
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
 
-    Long countByMerchantCodeAndMenuCode(String merchantCode , String menuCode);
+    Long countByshopCodeAndMenuCode(String shopCode , String menuCode);
 
-    List<Menu> findByMerchantCode(String merchantCode);
+    List<Menu> findByshopCode(String shopCode);
 
 }

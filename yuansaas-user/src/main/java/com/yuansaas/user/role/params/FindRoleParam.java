@@ -2,8 +2,6 @@ package com.yuansaas.user.role.params;
 
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.page.PageModel;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -22,5 +20,5 @@ public class FindRoleParam extends PageModel {
     /**
      * 商家编码
      */
-    private String merchantCode = AppContextUtil.getMerchantCode();
+    private String shopCode = AppContextUtil.getShopCode();
 }

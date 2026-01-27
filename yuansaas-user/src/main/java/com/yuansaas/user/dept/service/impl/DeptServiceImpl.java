@@ -52,7 +52,7 @@ public class DeptServiceImpl implements DeptService {
      */
     @Override
     public List<DeptTreeListVo> list(FindDeptParam findDeptParam) {
-       return RedisUtil.getOrLoad(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, findDeptParam.getMerchantCode()), new TypeReference<>() {}, () -> {
+       return RedisUtil.getOrLoad(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, findDeptParam.getShopCode()), new TypeReference<>() {}, () -> {
            QSysDept qDept = QSysDept.sysDept;
            List<DeptTreeListVo> deptLists = jpaQueryFactory.select(Projections.bean(DeptTreeListVo.class,
                            qDept.id,
@@ -66,7 +66,7 @@ public class DeptServiceImpl implements DeptService {
                            qDept.shopCode))
                    .from(qDept)
                    .where(BoolBuilder.getInstance()
-                           .and(findDeptParam.getMerchantCode(), qDept.shopCode::eq)
+                           .and(findDeptParam.getShopCode(), qDept.shopCode::eq)
                            .and(findDeptParam.getDeptName(), qDept.name::eq)
                            .and(qDept.lockStatus.eq(AppConstants.N))
                            .and(qDept.deleteStatus.eq(AppConstants.N))
@@ -141,12 +141,12 @@ public class DeptServiceImpl implements DeptService {
     /**
      * 部门详情
      *
-     * @param merchantCode
+     * @param shopCode
      * @param id
      */
     @Override
-    public DeptListVo getById(String merchantCode, Long id) {
-        SysDept sysDept = deptRepository.findByShopCodeAndId(merchantCode,id);
+    public DeptListVo getById(String shopCode, Long id) {
+        SysDept sysDept = deptRepository.findByShopCodeAndId(shopCode,id);
         if (ObjectUtil.isEmpty(sysDept)) {
             throw DataErrorCode.DATA_NOT_FOUND.buildException("部门不存在");
         }

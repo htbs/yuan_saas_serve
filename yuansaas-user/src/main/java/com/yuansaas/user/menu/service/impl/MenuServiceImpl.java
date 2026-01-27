@@ -58,7 +58,7 @@ public class MenuServiceImpl implements MenuService {
      */
     @Override
     public List<MenuListVo> list(FindMenuParam findMenuParam) {
-     return    RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),findMenuParam.getMerchantCode()), new TypeReference<List<MenuListVo>>() {
+     return    RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),findMenuParam.getShopCode()), new TypeReference<List<MenuListVo>>() {
         }, () -> {
             QMenu menu = QMenu.menu;
             List<MenuListVo> listVos = jpaQueryFactory.select(Projections.bean(MenuListVo.class,
@@ -70,7 +70,7 @@ public class MenuServiceImpl implements MenuService {
                             menu.sort,
                             menu.menuType,
                             menu.pid,
-                            menu.merchantCode,
+                            menu.shopCode,
                             menu.createAt,
                             menu.updateAt,
                             menu.deleteStatus,
@@ -79,7 +79,7 @@ public class MenuServiceImpl implements MenuService {
                             menu.updateBy))
                     .from(menu)
                     .where(BoolBuilder.getInstance()
-                            .and(findMenuParam.getMerchantCode(), menu.merchantCode::eq)
+                            .and(findMenuParam.getShopCode(), menu.shopCode::eq)
                             .and(findMenuParam.getMenuType(), menu.menuType::eq)
                             .and(menu.deleteStatus.eq(AppConstants.N))
                             .getWhere())
@@ -102,7 +102,7 @@ public class MenuServiceImpl implements MenuService {
         BeanUtils.copyProperties(saveMenuParam, menuModel);
         Menu menu = validated(menuModel);
         // 获取菜单编码
-        String menuCode = getMenuCode(ObjectUtil.isEmpty(menu) ? "": menu.getMenuCode(), saveMenuParam.getMerchantCode());
+        String menuCode = getMenuCode(ObjectUtil.isEmpty(menu) ? "": menu.getMenuCode(), saveMenuParam.getShopCode());
 
         // 保存菜单
         Menu menuNew = new Menu();
@@ -112,7 +112,7 @@ public class MenuServiceImpl implements MenuService {
         menuNew.setCreateBy(AppContextUtil.getUserInfo());
         menuRepository.save(menuNew);
         // 清除缓存
-        RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),saveMenuParam.getMerchantCode()));
+        RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),saveMenuParam.getShopCode()));
         return true;
     }
 
@@ -132,7 +132,7 @@ public class MenuServiceImpl implements MenuService {
             menu.setUpdateBy("admin");
             menuRepository.save(menu);
             // 清除缓存
-            RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),menu.getMerchantCode()));
+            RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),menu.getShopCode()));
             isMenuAffectingUserid(menu.getId());
         } ,()->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("菜单不存在");
@@ -153,7 +153,7 @@ public class MenuServiceImpl implements MenuService {
             menu.setUpdateBy("admin");
             menuRepository.save(menu);
             // 清除缓存
-            RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),menu.getMerchantCode()));
+            RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),menu.getShopCode()));
             isMenuAffectingUserid(menu.getId());
         } ,()->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("菜单不存在");
@@ -247,15 +247,15 @@ public class MenuServiceImpl implements MenuService {
         return menuRepository.findById(menuModel.getPid()).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("父级菜单不存在"));
     }
 
-    public String getMenuCode(String menuCode ,String merchantCode ) {
+    public String getMenuCode(String menuCode ,String shopCode ) {
         String code = "";
         if (ObjectUtil.isEmpty(menuCode)) {
             code =  RandomUtil.randomStringUpper(AppConstants.FOUR);
         } else {
             code = menuCode.concat(AppConstants.DASH_CHAR).concat(RandomUtil.randomStringUpper(AppConstants.FOUR));
         }
-        if (validatedMenuCodeIsExists(code, merchantCode)) {
-            getMenuCode(menuCode,merchantCode);
+        if (validatedMenuCodeIsExists(code, shopCode)) {
+            getMenuCode(menuCode,shopCode);
         }
         return code ;
     }
@@ -264,8 +264,8 @@ public class MenuServiceImpl implements MenuService {
      * 验证菜单编码是否存在
      * @param menuCode 菜单编码
      */
-    public Boolean validatedMenuCodeIsExists(String menuCode ,String merchantCode) {
-        Long num = menuRepository.countByMerchantCodeAndMenuCode(merchantCode, menuCode);
+    public Boolean validatedMenuCodeIsExists(String menuCode ,String shopCode) {
+        Long num = menuRepository.countByshopCodeAndMenuCode(shopCode, menuCode);
         if (num > 0) {
             return true;
         }

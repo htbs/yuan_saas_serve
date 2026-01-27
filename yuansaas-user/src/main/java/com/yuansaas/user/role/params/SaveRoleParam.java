@@ -2,7 +2,6 @@ package com.yuansaas.user.role.params;
 
 import com.yuansaas.core.context.AppContextUtil;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -26,5 +25,5 @@ public class SaveRoleParam {
     /**
      * 商家编码
      */
-    private String shopCode = AppContextUtil.getMerchantCode();
+    private String shopCode = AppContextUtil.getShopCode();
 }

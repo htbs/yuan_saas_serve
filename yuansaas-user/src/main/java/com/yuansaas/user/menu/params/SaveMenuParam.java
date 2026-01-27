@@ -4,7 +4,6 @@ import com.yuansaas.core.context.AppContextUtil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.hibernate.validator.constraints.Range;
 
 /**
  *
@@ -23,7 +22,7 @@ public class SaveMenuParam {
     /**
      * 商户编号
      */
-    private String merchantCode = AppContextUtil.getMerchantCode();
+    private String shopCode = AppContextUtil.getShopCode();
     /**
      * 菜单名称
      */

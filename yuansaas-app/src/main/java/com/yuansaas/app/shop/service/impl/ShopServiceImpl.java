@@ -200,8 +200,8 @@ public class ShopServiceImpl implements ShopService {
         shop.setSignedStatus(ShopSignedStatusEnum.SIGNED.name());
         shop.setSignedUserId(0L);
         shop.setSignedUserName(signedParam.getName());
-        shop.setSignedStartAt(signedParam.getSigneTime());
-        shop.setSignedEndAt(signedParam.getExpireTime());
+        shop.setSignedStartAt(signedParam.getSignedStartAt());
+        shop.setSignedEndAt(signedParam.getSignedEndAt());
         shop.setUpdateAt(LocalDateTime.now());
         shop.setUpdateBy(AppContextUtil.getUserInfo());
         shopRepository.save(shop);
@@ -290,7 +290,7 @@ public class ShopServiceImpl implements ShopService {
         orderPayParam.setTradeNo(String.valueOf(idGenerator.nextId()));
         orderPayParam.setPayAmount(signedParam.getPayAmount());
         orderPayParam.setPayChannel(signedParam.getPayChannel());
-        orderPayParam.setPaySucceededTime(shop.getSignedStartAt());
+        orderPayParam.setPaySucceededTime(shop.getSignedStartAt().atStartOfDay());
         ActionProcessor.pay(orderPayParam);
     }
 

@@ -21,7 +21,7 @@ public class SysUserCreateParam {
     /**
      * 商户编号
      */
-    private String merchantCode = AppContextUtil.getMerchantCode();
+    private String shopCode = AppContextUtil.getShopCode();
     /**
      * 用户名（账号）
      */

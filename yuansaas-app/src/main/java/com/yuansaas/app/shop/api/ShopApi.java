@@ -4,7 +4,6 @@ import com.yuansaas.app.shop.param.FindShopParam;
 import com.yuansaas.app.shop.param.SaveShopParam;
 import com.yuansaas.app.shop.param.SignedParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
-import com.yuansaas.app.shop.service.ShopDataService;
 import com.yuansaas.app.shop.service.ShopService;
 import com.yuansaas.app.shop.vo.ShopListVo;
 import com.yuansaas.app.shop.vo.ShopVo;

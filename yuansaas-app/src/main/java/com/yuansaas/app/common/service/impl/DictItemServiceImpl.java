@@ -8,13 +8,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.app.common.entity.QSysDictData;
 import com.yuansaas.app.common.entity.SysDictData;
 import com.yuansaas.app.common.entity.SysDictType;
-import com.yuansaas.app.common.enums.DictCacheEnum;
+import com.yuansaas.app.common.enums.CacheEnum;
 import com.yuansaas.app.common.params.*;
 import com.yuansaas.app.common.repository.SysDictDataRepository;
 import com.yuansaas.app.common.repository.SysDictTypeRepository;
 import com.yuansaas.app.common.service.DictItemService;
 import com.yuansaas.app.common.vo.SysDictDataVo;
-import com.yuansaas.app.common.vo.SysDictTypeVo;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
@@ -24,7 +23,6 @@ import com.yuansaas.core.redis.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -201,7 +199,7 @@ public class DictItemServiceImpl implements DictItemService {
      * 从缓存中获取
      */
     private SysDictData getCache(String dictCode , String  dictLabel){
-        String key =  RedisUtil.genKey(DictCacheEnum.DICT.getKey(), dictCode, dictLabel);
+        String key =  RedisUtil.genKey(CacheEnum.DICT.getKey(), dictCode, dictLabel);
         return RedisUtil.getOrLoad(key, new TypeReference<SysDictData>() {},
                 () -> {
                     SysDictData byDictLabelAndDictCode = sysDictDataRepository.findByDictLabelAndDictCode(dictLabel, dictCode);
@@ -217,7 +215,7 @@ public class DictItemServiceImpl implements DictItemService {
      * 保存字段项数据到缓存中
      */
     private void setCache(SysDictData sysDictData){
-        String key =RedisUtil.genKey(DictCacheEnum.DICT.getKey(), sysDictData.getDictCode(),sysDictData.getDictLabel());
+        String key =RedisUtil.genKey(CacheEnum.DICT.getKey(), sysDictData.getDictCode(),sysDictData.getDictLabel());
         // 删除key
         RedisUtil.delete(key);
         // 保存数据
@@ -228,7 +226,7 @@ public class DictItemServiceImpl implements DictItemService {
      * 保存字段项数据到缓存中
      */
     private void deleteCache(SysDictData sysDictData){
-        String key =RedisUtil.genKey(DictCacheEnum.DICT.getKey(), sysDictData.getDictCode(),sysDictData.getDictLabel());
+        String key =RedisUtil.genKey(CacheEnum.DICT.getKey(), sysDictData.getDictCode(),sysDictData.getDictLabel());
         // 删除key
         RedisUtil.delete(key);
     }

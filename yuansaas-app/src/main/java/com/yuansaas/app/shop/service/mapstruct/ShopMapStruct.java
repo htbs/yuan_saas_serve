@@ -35,6 +35,7 @@ public class ShopMapStruct {
         shop.setLegalPersonPhone(shopParam.getLegalPersonPhone());
         shop.setLegalPersonEmail(shopParam.getLegalPersonEmail());
         shop.setUnifiedCreditCode(shopParam.getUnifiedCreditCode());
+        shop.setLegalPersonSex(shop.getLegalPersonSex());
         shop.setIdCardFront(shopParam.getIdCardFront());
         shop.setIdCardBack(shopParam.getIdCardBack());
         shop.setBusinessLicense(shopParam.getBusinessLicense());

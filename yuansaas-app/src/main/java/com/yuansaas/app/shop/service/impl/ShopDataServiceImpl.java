@@ -1,6 +1,5 @@
 package com.yuansaas.app.shop.service.impl;
 
-import ch.qos.logback.core.CoreConstants;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
@@ -29,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;

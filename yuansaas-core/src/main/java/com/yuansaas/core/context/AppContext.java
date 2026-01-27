@@ -62,7 +62,7 @@ public class AppContext implements Serializable {
     /**
      * 商户编号
      */
-    private String merchantCode;
+    private String shopCode;
 
     /**
      * 自定义属性
@@ -110,7 +110,7 @@ public class AppContext implements Serializable {
         copy.setTraceId(traceId);
         copy.setIpAddress(ipAddress);
         copy.setSessionId(sessionId);
-        copy.setMerchantCode(merchantCode);
+        copy.setShopCode(shopCode);
         copy.setCustomAttributes(new HashMap<>(customAttributes));
         return copy;
     }

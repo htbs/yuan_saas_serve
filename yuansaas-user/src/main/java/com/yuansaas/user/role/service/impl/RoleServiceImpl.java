@@ -81,7 +81,7 @@ public class RoleServiceImpl implements RoleService {
                 .leftJoin(dept).on(role.deptId.eq(dept.id))
                 .where(BoolBuilder.getInstance()
                         .and(findRoleParam.getName() , role.name::contains)
-                        .and(findRoleParam.getMerchantCode() , role.shopCode::eq)
+                        .and(findRoleParam.getShopCode() , role.shopCode::eq)
                         .getWhere())
                 .orderBy(role.id.desc())
                 .offset(findRoleParam.obtainOffset())
@@ -201,11 +201,11 @@ public class RoleServiceImpl implements RoleService {
      */
     public Long validated ( String shopCode) {
 
-        List<SysDept> byMerchantCodeAndPid = deptService.findByShopCodeAndPid(shopCode, AppConstants.ZERO_L);
-        if (ObjectUtil.isEmpty(byMerchantCodeAndPid)) {
+        List<SysDept> byshopCodeAndPid = deptService.findByShopCodeAndPid(shopCode, AppConstants.ZERO_L);
+        if (ObjectUtil.isEmpty(byshopCodeAndPid)) {
             throw BizErrorCode.BUSINESS_VALIDATION_FAILED.buildException("默认部门不存在");
 
         }
-        return byMerchantCodeAndPid.get(0).getId();
+        return byshopCodeAndPid.get(0).getId();
     }
 }

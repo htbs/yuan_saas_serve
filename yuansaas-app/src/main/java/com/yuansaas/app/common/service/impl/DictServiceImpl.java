@@ -7,7 +7,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.app.common.entity.QSysDictType;
 import com.yuansaas.app.common.entity.SysDictType;
-import com.yuansaas.app.common.enums.DictCacheEnum;
 import com.yuansaas.app.common.enums.DictPlatformTypeEnum;
 import com.yuansaas.app.common.params.FindDictParam;
 import com.yuansaas.app.common.params.SaveDictParam;
@@ -16,21 +15,16 @@ import com.yuansaas.app.common.params.UpdateSortParam;
 import com.yuansaas.app.common.repository.SysDictTypeRepository;
 import com.yuansaas.app.common.service.DictService;
 import com.yuansaas.app.common.vo.SysDictTypeVo;
-import com.yuansaas.app.shop.enums.ShopTypeEnum;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
-import com.yuansaas.core.redis.RedisUtil;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Objects;
 
 /**
  * 字典服务实现类

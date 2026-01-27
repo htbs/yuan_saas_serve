@@ -8,6 +8,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.AuthErrorCode;
 import com.yuansaas.core.exception.ex.BizErrorCode;

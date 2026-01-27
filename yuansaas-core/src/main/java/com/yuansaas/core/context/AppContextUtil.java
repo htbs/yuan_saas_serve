@@ -127,8 +127,8 @@ public class AppContextUtil {
         return AppContextHolder.getUserId().map(id -> id + ":" + AppContextHolder.getUserType().orElse("") +":" +  AppContextHolder.getUserName().orElse("")).orElse("");
     }
 
-    public static String getMerchantCode(){
-        return AppContextHolder.getMerchantCode().orElse("");
+    public static String getShopCode(){
+        return AppContextHolder.getShopCode().orElse("");
     }
 
     /**

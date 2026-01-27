@@ -21,7 +21,7 @@ public class UpdateMenuParam {
     /**
      * 商户编号
      */
-    private String merchantCode = AppContextUtil.getMerchantCode();
+    private String shopCode = AppContextUtil.getShopCode();
     /**
      * 菜单名称
      */

@@ -17,7 +17,7 @@ public enum PayChannelEnum  implements IBaseEnum<PayChannelEnum> {
     ALIPAY("支付宝"),
     WECHAT_PAY("微信支付"),
     CASH("现金支付"),
-    BANK_TRANSFER ("银行转账"),
+    CORPORATE_BANK_TRANSFER("对公转账"),
    ;
 
     private final String message;

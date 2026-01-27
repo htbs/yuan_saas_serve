@@ -1,7 +1,4 @@
 package com.yuansaas.core.context;
-
-import org.hibernate.usertype.UserType;
-
 import java.util.Optional;
 
 /**
@@ -101,8 +98,8 @@ public final class AppContextHolder {
         return getContext().map(AppContext::getSessionId);
     }
 
-    public static Optional<String> getMerchantCode(){
-        return getContext().map(AppContext::getMerchantCode);
+    public static Optional<String> getShopCode(){
+        return getContext().map(AppContext::getShopCode);
     }
 
     public static Optional<Object> getAttribute(String key) {

@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class FindMenuParam {
 
-    private String merchantCode = AppContextUtil.getMerchantCode();
+    private String shopCode = AppContextUtil.getShopCode();
 
     /**
      * 类型   0：菜单   1：按钮

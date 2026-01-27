@@ -1,17 +1,13 @@
 package com.yuansaas.user.dept.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.yuansaas.common.constants.AppConstants;
-import com.yuansaas.core.context.AppContext;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.entity.SysDeptUser;
 import com.yuansaas.user.dept.repository.DeptRepository;
 import com.yuansaas.user.dept.repository.DeptUserRepository;
 import com.yuansaas.user.dept.service.DeptUserService;
-import com.yuansaas.user.role.entity.Role;
-import com.yuansaas.user.role.entity.RoleUser;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,15 +34,15 @@ public class DeptUserServiceImpl implements DeptUserService {
     @Override
     @Transactional
     public void saveOrUpdate(Long userId) {
-        List<SysDept> byMerchantCodeAndPid = deptRepository.findByShopCodeAndPid(AppContextUtil.getMerchantCode(), AppConstants.ZERO_L);
-        if (ObjectUtil.isEmpty(byMerchantCodeAndPid)) {
+        List<SysDept> byshopCodeAndPid = deptRepository.findByShopCodeAndPid(AppContextUtil.getShopCode(), AppConstants.ZERO_L);
+        if (ObjectUtil.isEmpty(byshopCodeAndPid)) {
             return;
         }
-        Long deptId = byMerchantCodeAndPid.get(0).getId();
+        Long deptId = byshopCodeAndPid.get(0).getId();
 
         deptUserRepository.deleteByDeptIdAndUserId(deptId,userId);
         // 查询部门是否存在
-        SysDept sysDept = byMerchantCodeAndPid.get(0);
+        SysDept sysDept = byshopCodeAndPid.get(0);
         if(ObjectUtil.isEmpty(sysDept)){
             return ;
         }

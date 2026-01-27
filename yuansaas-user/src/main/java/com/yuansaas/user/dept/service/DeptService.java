@@ -41,10 +41,10 @@ public interface DeptService {
     Boolean delete(Long id );
     /**
      * 部门详情
-     * @param merchantCode 商家code
+     * @param shopCode 商家code
      * @param id 部门id
      */
-    DeptListVo getById(String merchantCode,Long id );
+    DeptListVo getById(String shopCode,Long id );
 
     /**
      * 通过商家code和父部门id查询部门信息
