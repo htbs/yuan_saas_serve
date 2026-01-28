@@ -18,7 +18,11 @@ public enum MenuCacheEnum implements IBaseEnum<MenuCacheEnum> {
 
     USER_MENU_LIST("USER_MENU_LIST", "用户菜单列表缓存"),
 
-    ROLE_MENU_LIST("ROLE_MENU_LIST", "角色菜单列表缓存"),
+    ROLE_MENU_LIST("ROLE_MENU_LIST", "角色拥有的菜单code列表"),
+
+    USER_ROLE_LIST("USER_ROLE_LIST", "用户拥有的角色列表"),
+
+    PERMISSION_BUTTON_LIST("PERMISSION_BUTTON_LIST" , "权限点关联的按钮列表")
     ;
 
     private final String key;

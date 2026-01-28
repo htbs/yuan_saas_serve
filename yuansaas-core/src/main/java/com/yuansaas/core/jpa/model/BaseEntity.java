@@ -60,10 +60,20 @@ public class BaseEntity {
     private String remark;
 
 
+    /**
+     * 新增初始值
+     */
     public void init() {
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
         this.createBy = AppContextUtil.getUserInfo();
+        this.updateBy = AppContextUtil.getUserInfo();
+    }
+    /**
+     * 修改操作
+     */
+    public void update() {
+        this.updateAt = LocalDateTime.now();
         this.updateBy = AppContextUtil.getUserInfo();
     }
 

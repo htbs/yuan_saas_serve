@@ -61,4 +61,10 @@ public interface MenuService {
      * @param menuType  菜单类型（0 ： 菜单 | 1 ：按钮）
      */
     List<Menu> findByMenuCode(String menuCode  , Integer menuType);
+
+    /**
+     * 获取权限关联的菜单按钮id
+     * @param permission 权限点
+     */
+    List<Long> findByPermission(String permission);
 }

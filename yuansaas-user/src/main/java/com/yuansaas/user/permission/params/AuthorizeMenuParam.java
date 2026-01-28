@@ -1,4 +1,4 @@
-package com.yuansaas.user.role.params;
+package com.yuansaas.user.permission.params;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

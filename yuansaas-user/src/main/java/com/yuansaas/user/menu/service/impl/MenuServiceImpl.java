@@ -1,21 +1,20 @@
 package com.yuansaas.user.menu.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
-import com.yuansaas.core.context.AppContextHolder;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.core.utils.TreeUtils;
+import com.yuansaas.user.auth.security.SecurityConfig;
 import com.yuansaas.user.config.ServiceManager;
 import com.yuansaas.user.menu.entity.Menu;
+import com.yuansaas.user.permission.entity.Permission;
 import com.yuansaas.user.menu.entity.QMenu;
 import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.model.MenuModel;
@@ -24,12 +23,13 @@ import com.yuansaas.user.menu.params.SaveMenuParam;
 import com.yuansaas.user.menu.params.UpdateMenuParam;
 import com.yuansaas.user.menu.repository.MenuRepository;
 import com.yuansaas.user.menu.service.MenuService;
+import com.yuansaas.user.permission.entity.QRoleMenu;
+import com.yuansaas.user.permission.entity.QRoleUser;
+import com.yuansaas.user.permission.service.PermissionService;
 import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.menu.vo.MenuVo;
-import com.yuansaas.user.role.entity.QRoleMenu;
-import com.yuansaas.user.role.entity.QRoleUser;
-import com.yuansaas.user.role.service.RoleMenuService;
-import lombok.AllArgsConstructor;
+import com.yuansaas.user.permission.service.RoleMenuService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +44,7 @@ import java.util.Objects;
  * @author LXZ 2025/10/21 12:02
  */
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MenuServiceImpl implements MenuService {
 
     private final MenuRepository menuRepository;
@@ -100,19 +100,16 @@ public class MenuServiceImpl implements MenuService {
         // 校验参数
         MenuModel menuModel = new MenuModel();
         BeanUtils.copyProperties(saveMenuParam, menuModel);
-        Menu menu = validated(menuModel);
-        // 获取菜单编码
-        String menuCode = getMenuCode(ObjectUtil.isEmpty(menu) ? "": menu.getMenuCode(), saveMenuParam.getShopCode());
-
+        validated(menuModel);
         // 保存菜单
         Menu menuNew = new Menu();
         BeanUtils.copyProperties(saveMenuParam, menuNew);
-        menuNew.setMenuCode(menuCode);
+        menuNew.setMenuCode(getMenuCode());
         menuNew.setCreateAt(LocalDateTime.now());
         menuNew.setCreateBy(AppContextUtil.getUserInfo());
         menuRepository.save(menuNew);
         // 清除缓存
-        RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName(),saveMenuParam.getShopCode()));
+        RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.MENU_LIST.getName()));
         return true;
     }
 
@@ -230,6 +227,26 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /**
+     * 通过菜单code和菜单类型查询菜单
+     *
+     * @param permission 权限点
+     */
+    @Override
+    public List<Long> findByPermission(String permission) {
+
+       return RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.PERMISSION_BUTTON_LIST.getName(), permission) , new TypeReference<List<Long>>(){}, () ->{
+            QMenu menu = QMenu.menu;
+            return jpaQueryFactory.select(menu.id)
+                    .from(menu)
+                    .where(BoolBuilder.getInstance()
+                            .and(permission, menu.permissions::contains)
+                            .getWhere()
+                    ).fetch();
+        } );
+
+    }
+
+    /**
      * 验证父级菜单是否存在
      * @param menuModel 校验model
      */
@@ -237,8 +254,14 @@ public class MenuServiceImpl implements MenuService {
         if (menuModel.getMenuType() == AppConstants.ZERO && ObjectUtil.isNull(menuModel.getUrl())) {
             throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("菜单类型时，路由地址不能为空");
         }
-        if (menuModel.getMenuType() == AppConstants.ONE && Objects.isNull(menuModel.getPermissions())) {
+        if (menuModel.getMenuType() == AppConstants.ONE && Objects.isNull(menuModel.getPermissionCodes())) {
             throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("按钮类型时，权限标识不能为空");
+        }else {
+            // 验证权限标识是否存在
+            List<Permission> byPermissionCode = ServiceManager.permissionService.getByPermissionCodeOrThrow(menuModel.getPermissionCodes());
+            if (byPermissionCode.size() != menuModel.getPermissionCodes().size()) {
+                throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("权限标识不存在！");
+            }
         }
 
         if (menuModel.getPid() == 0) {
@@ -247,15 +270,10 @@ public class MenuServiceImpl implements MenuService {
         return menuRepository.findById(menuModel.getPid()).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("父级菜单不存在"));
     }
 
-    public String getMenuCode(String menuCode ,String shopCode ) {
-        String code = "";
-        if (ObjectUtil.isEmpty(menuCode)) {
-            code =  RandomUtil.randomStringUpper(AppConstants.FOUR);
-        } else {
-            code = menuCode.concat(AppConstants.DASH_CHAR).concat(RandomUtil.randomStringUpper(AppConstants.FOUR));
-        }
-        if (validatedMenuCodeIsExists(code, shopCode)) {
-            getMenuCode(menuCode,shopCode);
+    public String getMenuCode() {
+        String code = RandomUtil.randomStringUpper(AppConstants.FOUR);
+        if (validatedMenuCodeIsExists(code)) {
+            getMenuCode();
         }
         return code ;
     }
@@ -264,12 +282,9 @@ public class MenuServiceImpl implements MenuService {
      * 验证菜单编码是否存在
      * @param menuCode 菜单编码
      */
-    public Boolean validatedMenuCodeIsExists(String menuCode ,String shopCode) {
-        Long num = menuRepository.countByshopCodeAndMenuCode(shopCode, menuCode);
-        if (num > 0) {
-            return true;
-        }
-        return false;
+    public Boolean validatedMenuCodeIsExists(String menuCode ) {
+        Long num = menuRepository.countByAndMenuCode(menuCode);
+        return num > 0;
     }
 
     /**
@@ -299,8 +314,9 @@ public class MenuServiceImpl implements MenuService {
         userIds.forEach(id -> {
             RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.USER_MENU_LIST.getName(),id));
         });
-        // 判断菜单是否影响角色
-        List<Long> roleIdListByMenuIds = ServiceManager.roleMenuService.getRoleIdListByMenuIds(menuId);
+        // 获取菜单拥有的角色id数据
+        List<Long> roleIdListByMenuIds = ServiceManager.permissionService.getRoleIdsByMenuId(menuId);
+
         roleIdListByMenuIds.forEach(roleId -> {
             RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.ROLE_MENU_LIST.getName(),roleId));
         });
