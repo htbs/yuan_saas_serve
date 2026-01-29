@@ -2,6 +2,8 @@ package com.yuansaas.user.role.entity;
 
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.jpa.model.BaseEntity;
+import com.yuansaas.user.role.enums.RoleCodeEnum;
+import com.yuansaas.user.role.enums.RoleTypeEnum;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -28,6 +30,16 @@ public class Role extends BaseEntity {
      * '角色名称'
      */
     private String name;
+    /**
+     * 角色标识
+     * 枚举 {@link RoleCodeEnum}
+     */
+    private String code;
+    /**
+     * 角色类型
+     * 枚举 {@link RoleTypeEnum}
+     */
+    private String type;
     /**
      * 描述
      */

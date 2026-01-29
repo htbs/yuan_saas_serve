@@ -1,7 +1,5 @@
-package com.yuansaas.user.role.entity;
+package com.yuansaas.user.permission.entity;
 
-import com.yuansaas.common.constants.AppConstants;
-import com.yuansaas.core.jpa.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
@@ -10,18 +8,14 @@ import java.time.LocalDateTime;
 
 /**
  *
- * 角色授权菜单
+ * 角色和用户的关系
  *
- * @author LXZ 2025/10/21 11:41
+ * @author LXZ 2025/10/25 17:25
  */
 @Data
 @Entity
-@Table(name = "sys_role_menu")
-public class RoleMenu {
-
-    /**
-     * 主键ID
-     */
+@Table(name = "sys_role_user")
+public class RoleUser {
     @Id
     @GenericGenerator(
             name = "id",
@@ -37,9 +31,9 @@ public class RoleMenu {
      */
     private Long roleId;
     /**
-     * 菜单ID
+     * 用户ID
      */
-    private Long menuId;
+    private Long userId;
     /**
      * 创建人
      */

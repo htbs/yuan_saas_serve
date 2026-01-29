@@ -2,7 +2,7 @@ package com.yuansaas.user.role.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -10,27 +10,24 @@ import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.BizErrorCode;
 import com.yuansaas.core.exception.ex.DataErrorCode;
+import com.yuansaas.core.jpa.model.BaseEntity;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
-import com.yuansaas.core.redis.RedisUtil;
-import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.service.DeptService;
-import com.yuansaas.user.menu.entity.Menu;
-import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.service.MenuService;
-import com.yuansaas.user.menu.vo.MenuListVo;
+import com.yuansaas.user.permission.service.RoleMenuService;
+import com.yuansaas.user.permission.service.RoleUserService;
 import com.yuansaas.user.role.entity.QRole;
 import com.yuansaas.user.role.entity.Role;
-import com.yuansaas.user.role.params.AuthorizeMenuParam;
+import com.yuansaas.user.role.enums.RoleCodeEnum;
+import com.yuansaas.user.role.enums.RoleTypeEnum;
 import com.yuansaas.user.role.params.FindRoleParam;
 import com.yuansaas.user.role.params.SaveRoleParam;
 import com.yuansaas.user.role.params.UpdateRoleParam;
 import com.yuansaas.user.role.repository.RoleRepository;
-import com.yuansaas.user.role.service.RoleMenuService;
 import com.yuansaas.user.role.service.RoleService;
-import com.yuansaas.user.role.service.RoleUserService;
 import com.yuansaas.user.role.vo.RoleListVo;
 import com.yuansaas.user.role.vo.RoleVo;
 import jakarta.transaction.Transactional;
@@ -54,7 +51,6 @@ public class RoleServiceImpl implements RoleService {
     private final DeptService deptService;
     private final RoleMenuService roleMenuService;
     private final RoleUserService roleUserService;
-    private final MenuService menuService;
 
 
     /**
@@ -68,26 +64,52 @@ public class RoleServiceImpl implements RoleService {
         QRole role = QRole.role;
         QSysDept dept = QSysDept.sysDept;
 
-        QueryResults<RoleListVo> deptName = jpaQueryFactory.select(Projections.bean(RoleListVo.class,
-                        role.id,
-                        role.name,
-                        role.description,
-                        role.deptId,
-                        role.createAt,
-                        role.createBy,
-                        dept.name.as("deptName")
-                ))
-                .from(role)
-                .leftJoin(dept).on(role.deptId.eq(dept.id))
-                .where(BoolBuilder.getInstance()
-                        .and(findRoleParam.getName() , role.name::contains)
-                        .and(findRoleParam.getShopCode() , role.shopCode::eq)
-                        .getWhere())
-                .orderBy(role.id.desc())
-                .offset(findRoleParam.obtainOffset())
-                .limit(findRoleParam.getPageSize())
-                .fetchResults();
-        return findRoleParam.getRPage(deptName.getResults() , deptName.getTotal());
+//        QueryResults<RoleListVo> deptName = jpaQueryFactory.select(Projections.bean(RoleListVo.class,
+//                        role.id,
+//                        role.name,
+//                        role.description,
+//                        role.deptId,
+//                        role.createAt,
+//                        role.createBy,
+//                        dept.name.as("deptName")
+//                ))
+//                .from(role)
+//                .leftJoin(dept).on(role.deptId.eq(dept.id))
+//                .where(BoolBuilder.getInstance()
+//                        .and(findRoleParam.getName() , role.name::contains)
+//                        .and(findRoleParam.getShopCode() , role.shopCode::eq)
+//                        .getWhere())
+//                .orderBy(role.id.desc())
+//                .offset(findRoleParam.obtainOffset())
+//                .limit(findRoleParam.getPageSize())
+//                .fetchResults();
+//        return findRoleParam.getRPage(deptName.getResults() , deptName.getTotal());
+
+        BooleanBuilder where = BoolBuilder.getInstance()
+                .and(findRoleParam.getName(), role.name::contains)
+                .and(findRoleParam.getShopCode(), role.shopCode::eq)
+                .getWhere();
+
+        return findRoleParam.getPage(() ->{
+                    return jpaQueryFactory.select(Projections.bean(RoleListVo.class,
+                            role.id,
+                            role.name,
+                            role.description,
+                            role.deptId,
+                            role.createAt,
+                            role.createBy,
+                            dept.name.as("deptName")
+                    ))
+                    .from(role)
+                    .leftJoin(dept).on(role.deptId.eq(dept.id))
+                    .where(where);
+
+                }, () ->{
+                    return jpaQueryFactory.select(role.id.count())
+                           .from(role)
+                           .where(where);
+                }
+        );
     }
 
     /**
@@ -96,15 +118,13 @@ public class RoleServiceImpl implements RoleService {
      * @param saveRoleParam 新增参数
      */
     @Override
-    public Boolean save(SaveRoleParam saveRoleParam) {
+    public Role save(SaveRoleParam saveRoleParam) {
         Long deptId = validated(saveRoleParam.getShopCode());
         Role role = new Role();
         BeanUtil.copyProperties(saveRoleParam, role);
         role.setDeptId(deptId);
-        role.setCreateAt(LocalDateTime.now());
-        role.setCreateBy(AppContextUtil.getUserInfo());
-        roleRepository.save(role);
-        return true;
+        role.init();
+        return roleRepository.save(role);
     }
 
     /**
@@ -118,8 +138,7 @@ public class RoleServiceImpl implements RoleService {
             validated(role.getShopCode());
             role.setName(updateRoleParam.getName());
             role.setDescription(updateRoleParam.getDescription());
-            role.setUpdateAt(LocalDateTime.now());
-            role.setUpdateBy(AppContextUtil.getUserInfo());
+            role.update();
             roleRepository.save(role);
         } , () ->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("角色不存在");
@@ -136,7 +155,10 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     public Boolean delete(Long id) {
         // 删除角色
-        roleRepository.deleteById(id);
+        Role role = roleRepository.findById(id).orElseThrow(DataErrorCode.DATA_NOT_FOUND::buildException);
+        role.setDeleteStatus(AppConstants.Y);
+        role.update();
+        roleRepository.save(role);
         // 删除角色菜单关联和缓存
         roleMenuService.deleteByRoleIds(id);
         // 删除角色用户关联和用户通过角色授权的菜单缓存
@@ -147,7 +169,7 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 角色详情
      *
-     * @param id
+     * @param id 角色id
      */
     @Override
     public RoleVo getById(Long id) {
@@ -158,16 +180,6 @@ public class RoleServiceImpl implements RoleService {
         }).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("角色不存在"));
     }
 
-    /**
-     * 角色授权
-     *
-     * @param authorizeMenuParam 角色授权菜单参数
-     */
-    @Override
-    public Boolean authorize(AuthorizeMenuParam authorizeMenuParam) {
-        roleMenuService.saveOrUpdate(authorizeMenuParam.getRoleId() , authorizeMenuParam.getMenuIds());
-        return true;
-    }
 
     /**
      * 通过角色id查询角色信息
@@ -181,18 +193,26 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * 查询角色授权的菜单列表
+     * 判断角色数组中，是否有超级管理员
      *
-     * @param roleId 角色ID
-     * @return MenuListVo
+     * @param ids 角色编号数组
+     * @return 是否有超级管理员
      */
     @Override
-    public List<MenuListVo> getAuthorizeMenuListByRoleId(Long roleId) {
-        return RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.ROLE_MENU_LIST.getKey() , roleId) , new TypeReference<List<MenuListVo>>(){},() ->{
-            List<Long> menuIdList = roleMenuService.getMenuIdList(roleId);
-            List<Menu> byList = menuService.getByList(menuIdList,AppConstants.N);
-            return TreeUtils.build(BeanUtil.copyToList(byList , MenuListVo.class), AppConstants.ZERO_L);
-        });
+    public Boolean hasAnySuperAdmin(List<Long> ids) {
+        if (ObjectUtil.isEmpty(ids)) {
+            return false;
+        }
+        QRole qRole = QRole.role;
+        return jpaQueryFactory.selectOne()
+                .from(qRole)
+                .where(
+                        qRole.code.eq(RoleCodeEnum.SUPER_ADMIN.getName())
+                                .and(qRole.id.in(ids))
+                                .and(qRole.deleteStatus.eq(AppConstants.N))
+                                .and(qRole.lockStatus.eq(AppConstants.N))
+                )
+                .fetchFirst() != null ;
     }
 
 
@@ -201,11 +221,11 @@ public class RoleServiceImpl implements RoleService {
      */
     public Long validated ( String shopCode) {
 
-        List<SysDept> byshopCodeAndPid = deptService.findByShopCodeAndPid(shopCode, AppConstants.ZERO_L);
-        if (ObjectUtil.isEmpty(byshopCodeAndPid)) {
+        List<SysDept> byShopCodeAndPid = deptService.findByShopCodeAndPid(shopCode, AppConstants.ZERO_L);
+        if (ObjectUtil.isEmpty(byShopCodeAndPid)) {
             throw BizErrorCode.BUSINESS_VALIDATION_FAILED.buildException("默认部门不存在");
 
         }
-        return byshopCodeAndPid.get(0).getId();
+        return byShopCodeAndPid.getFirst().getId();
     }
 }

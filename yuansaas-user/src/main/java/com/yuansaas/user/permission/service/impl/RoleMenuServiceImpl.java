@@ -1,7 +1,8 @@
-package com.yuansaas.user.role.service.impl;
+package com.yuansaas.user.permission.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
@@ -10,16 +11,15 @@ import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.service.MenuService;
-import com.yuansaas.user.role.entity.QRoleMenu;
-import com.yuansaas.user.role.entity.RoleMenu;
-import com.yuansaas.user.role.repository.RoleMenuRepository;
-import com.yuansaas.user.role.service.RoleMenuService;
+import com.yuansaas.user.permission.entity.QRoleMenu;
+import com.yuansaas.user.permission.entity.RoleMenu;
+import com.yuansaas.user.permission.repository.RoleMenuRepository;
+import com.yuansaas.user.permission.service.RoleMenuService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,7 +43,7 @@ public class RoleMenuServiceImpl implements RoleMenuService {
      */
     @Override
     @Transactional
-    public void saveOrUpdate(Long roleId, List<Long> menuIdList) {
+    public void assignRoleMenu(Long roleId, List<Long> menuIdList) {
         // 先删除原有关系
         deleteByRoleIds(roleId);
         // 验证可用的菜单
@@ -111,7 +111,7 @@ public class RoleMenuServiceImpl implements RoleMenuService {
      */
     @Override
     public List<Long> getMenuIdList(Long roleId) {
-        return roleMenuRepository.findMenuIdByRoleId(roleId);
+        return RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.ROLE_MENU_LIST.getKey() , roleId) , new TypeReference<List<Long>>(){},() -> roleMenuRepository.findMenuIdByRoleId(roleId));
     }
 
     /**
