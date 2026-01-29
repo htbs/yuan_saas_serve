@@ -1,9 +1,7 @@
 package com.yuansaas.user.system.param;
 
-import com.yuansaas.core.annotation.EnumValidate;
 import com.yuansaas.integration.sms.enums.SendTypeEnum;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -12,7 +10,7 @@ import java.util.List;
 /**
  * 创建系统用户参数
  *
- * @author HTB 2025/8/11 15:28
+ * @author lxz 2025/12/21 17:51
  */
 @Data
 public class UserUpdateParam {

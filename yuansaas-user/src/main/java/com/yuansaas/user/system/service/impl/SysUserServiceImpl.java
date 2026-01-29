@@ -4,11 +4,9 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.querydsl.core.QueryResults;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
-import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.AuthErrorCode;
 import com.yuansaas.core.exception.ex.BizErrorCode;
@@ -27,8 +25,10 @@ import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.menu.vo.MenuListVo;
-import com.yuansaas.user.role.service.RoleMenuService;
-import com.yuansaas.user.role.service.RoleUserService;
+import com.yuansaas.user.permission.params.AssignUserRoleParam;
+import com.yuansaas.user.permission.service.PermissionService;
+import com.yuansaas.user.permission.service.RoleMenuService;
+import com.yuansaas.user.permission.service.RoleUserService;
 import com.yuansaas.user.system.entity.QSysUser;
 import com.yuansaas.user.system.entity.SysUser;
 import com.yuansaas.user.system.param.FindUserParam;
@@ -61,6 +61,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     private final SysUserRepository sysUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PermissionService permissionService;
     private final RoleUserService roleUserService;
     private final RoleMenuService roleMenuService;
     private final DeptUserService deptUserService;
@@ -112,13 +113,15 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public SysUser saveUser(SysUserCreateParam sysUserCreateParam) {
-        // 手机号和验证码校验
+        //手机号和验证码校验
+        if (sysUserCreateParam.getIsPhoneVerifyCodeValid()) {
         smsVerifyService.checkVerifyCode(CheckVerifyCodeModel.builder()
                         .phone(sysUserCreateParam.getPhone())
                         .verifyContent(sysUserCreateParam.getVerifyCode())
                         .type(sysUserCreateParam.getSendSceneType())
                         .serialNo(sysUserCreateParam.getSerialNo())
                 .build());
+        }
 
         // 校验用户名是否存在
         if (findByUsername(sysUserCreateParam.getUserName()).isPresent()) {
@@ -132,7 +135,7 @@ public class SysUserServiceImpl implements SysUserService {
         sysUser.setCreateBy(AppContextUtil.getUserInfo());
         sysUserRepository.save(sysUser);
         // 授权角色权限
-        roleUserService.saveOrUpdate(sysUser.getId(), sysUserCreateParam.getRoleIds());
+        permissionService.assignUserRole(AssignUserRoleParam.builder().userId(sysUser.getId()).roleId(sysUserCreateParam.getRoleIds()).build());
         // 授权部门权限
         deptUserService.saveOrUpdate(sysUser.getId());
         return sysUser;
@@ -146,7 +149,8 @@ public class SysUserServiceImpl implements SysUserService {
                 if (ObjectUtil.hasEmpty(userUpdateParam.getPhone(),
                         userUpdateParam.getVerifyCode(),
                         userUpdateParam.getSerialNo(),
-                        userUpdateParam.getSendSceneType())) {
+                        userUpdateParam.getSendSceneType())
+                ) {
                     smsVerifyService.checkVerifyCode(CheckVerifyCodeModel.builder()
                             .phone(userUpdateParam.getPhone())
                             .verifyContent(userUpdateParam.getVerifyCode())
@@ -161,7 +165,7 @@ public class SysUserServiceImpl implements SysUserService {
             sysUser.setUpdateAt(LocalDateTime.now());
             sysUserRepository.save(sysUser);
             // 授权角色权限
-            roleUserService.saveOrUpdate(sysUser.getId(), userUpdateParam.getRoleIds());
+            permissionService.assignUserRole(AssignUserRoleParam.builder().userId(sysUser.getId()).roleId(userUpdateParam.getRoleIds()).build());
         },()->{
             throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
         });

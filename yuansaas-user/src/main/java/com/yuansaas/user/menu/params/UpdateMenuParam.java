@@ -19,10 +19,6 @@ public class UpdateMenuParam {
     @NotNull(message = "菜单ID不能为空")
     private Long id;
     /**
-     * 商户编号
-     */
-    private String shopCode = AppContextUtil.getShopCode();
-    /**
      * 菜单名称
      */
     @NotBlank(message = "菜单名称不能为空")

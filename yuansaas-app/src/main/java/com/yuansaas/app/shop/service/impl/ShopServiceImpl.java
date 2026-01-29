@@ -19,6 +19,7 @@ import com.yuansaas.app.shop.entity.QShop;
 import com.yuansaas.app.shop.entity.Shop;
 import com.yuansaas.app.shop.enums.ShopSignedStatusEnum;
 import com.yuansaas.app.shop.enums.ShopTypeEnum;
+import com.yuansaas.app.shop.model.ShopInitModel;
 import com.yuansaas.app.shop.param.*;
 import com.yuansaas.app.shop.repository.ShopRepository;
 import com.yuansaas.app.shop.service.ShopDataService;
@@ -36,6 +37,10 @@ import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.service.DeptService;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.service.MenuService;
+import com.yuansaas.user.role.enums.RoleCodeEnum;
+import com.yuansaas.user.role.enums.RoleTypeEnum;
+import com.yuansaas.user.role.params.SaveRoleParam;
+import com.yuansaas.user.role.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,8 +66,7 @@ public class ShopServiceImpl implements ShopService {
     private final DeptService deptService;
     private final ShopDataService shopDataService;
     private final MenuService menuService;
-    private final OrderService orderService;
-    private final SnowflakeIdGenerator idGenerator;
+
 
 
 
@@ -197,20 +201,30 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public Boolean signed(SignedParam signedParam) {
         Shop shop = shopRepository.findById(signedParam.getId()).orElseThrow(DataErrorCode.DATA_NOT_FOUND::buildException);
+        // 修改签约数据
+        setSignedData(shop , signedParam);
+        // 默认激活店铺
+        shopDataService.init(ShopInitModel.builder()
+                .shop(shop)
+                .payAmount(signedParam.getPayAmount())
+                .payChannel(signedParam.getPayChannel())
+                .build());
+        return true;
+    }
+
+    /**
+     * 编辑签约数据
+     * @param shop  商铺数据
+     * @param signedParam  签约参数
+     */
+    private void setSignedData(Shop shop , SignedParam signedParam){
         shop.setSignedStatus(ShopSignedStatusEnum.SIGNED.name());
         shop.setSignedUserId(0L);
         shop.setSignedUserName(signedParam.getName());
         shop.setSignedStartAt(signedParam.getSignedStartAt());
         shop.setSignedEndAt(signedParam.getSignedEndAt());
-        shop.setUpdateAt(LocalDateTime.now());
-        shop.setUpdateBy(AppContextUtil.getUserInfo());
+        shop.update();
         shopRepository.save(shop);
-        // 签约成功后
-        // 默认激活店铺
-        shopDataService.init(shop.getCode());
-        // 修改功能订单状态
-        updateOrder(shop ,signedParam);
-        return true;
     }
 
 
@@ -276,22 +290,6 @@ public class ShopServiceImpl implements ShopService {
         submitOrderParam.setOrderItemModelList(orderItemModelList);
         ActionProcessor.submit(submitOrderParam);
     }
-    /**
-     * 修改初始化功能订单状态
-     */
-    private void updateOrder(Shop shop , SignedParam signedParam) {
-        List<Order> shopCodeAndOrderType = orderService.findShopCodeAndOrderType(shop.getCode(), OrderTypeEnum.INIT_TEMPLATE.getName(), OrderStatusEnum.WAIT_PAY.getName());
-        if (ObjectUtils.isEmpty(shopCodeAndOrderType)) {
-            return;
-        }
-        // 修改订单状态
-        OrderPayParam orderPayParam = new OrderPayParam();
-        orderPayParam.setOrderNo(shopCodeAndOrderType.get(0).getOrderNo());
-        orderPayParam.setTradeNo(String.valueOf(idGenerator.nextId()));
-        orderPayParam.setPayAmount(signedParam.getPayAmount());
-        orderPayParam.setPayChannel(signedParam.getPayChannel());
-        orderPayParam.setPaySucceededTime(shop.getSignedStartAt().atStartOfDay());
-        ActionProcessor.pay(orderPayParam);
-    }
+
 
 }

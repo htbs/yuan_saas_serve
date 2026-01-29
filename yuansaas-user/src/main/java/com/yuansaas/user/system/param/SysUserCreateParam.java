@@ -71,4 +71,8 @@ public class SysUserCreateParam {
      */
     @NotNull(message = "角色id不能为空")
     private List<Long> roleIds;
+    /**
+     * 手机验证码是否校验
+     */
+    private Boolean isPhoneVerifyCodeValid = true;
 }
