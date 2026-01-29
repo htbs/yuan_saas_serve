@@ -19,7 +19,7 @@ public class Menu extends BaseEntity {
     /**
      * 商家code
      */
-    private String merchantCode;
+    private String shopCode;
     /**
      * 菜单code
      */

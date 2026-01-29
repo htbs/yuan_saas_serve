@@ -1,5 +1,6 @@
 package com.yuansaas.user.system.api;
 
+import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
@@ -22,7 +23,7 @@ import java.util.List;
 
 
 /**
- * 系统用户API
+ * 系统用户API(平台用户管理)
  *
  * @author HTB 2025/8/5 09:44
  */
@@ -39,7 +40,7 @@ public class SysUserApi {
      * @return 用户信息
      */
     @GetMapping("/{id}")
-    @SecurityAuth()
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER})
     public ResponseEntity<ResponseModel<SysUserVo>> getUserById(@PathVariable Long id) {
         return ResponseBuilder.okResponse(userService.findLinkDateById(id));
     }
@@ -50,7 +51,7 @@ public class SysUserApi {
      * @return 创建成功的用户信息
      */
     @PostMapping("/save")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER})
     public ResponseEntity<ResponseModel<SysUser>> createUser(@RequestBody @Validated SysUserCreateParam sysUserCreateParam) {
         SysUser user = userService.saveUser(sysUserCreateParam);
         return ResponseBuilder.okResponse( user);
@@ -80,12 +81,12 @@ public class SysUserApi {
 
     /**
      * 重置密码
-     * @param userUpdateParam 用户修改请求
+     * @param id 用户修改请求
      * @return 修改成功的用户信息
      */
     @PutMapping("/reset/pwd/{id}")
-    @SecurityAuth()
-    public ResponseEntity<ResponseModel<Boolean>> resetUserResetPwd(@PathVariable Long id) {
+    @SecurityAuth(authenticated = false)
+    public ResponseEntity<ResponseModel<Boolean>> resetUserResetPwd(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.resetUserResetPwd(id));
     }
 
@@ -97,7 +98,7 @@ public class SysUserApi {
      */
     @PutMapping("/lcok/{id}")
     @SecurityAuth()
-    public ResponseEntity<ResponseModel<Boolean>> lockUser(@PathVariable Long id) {
+    public ResponseEntity<ResponseModel<Boolean>> lockUser(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse(userService.lockUser(id));
     }
 
@@ -108,7 +109,7 @@ public class SysUserApi {
      */
     @PutMapping("/unlock/{id}")
     @SecurityAuth()
-    public ResponseEntity<ResponseModel<Boolean>> unlockUser(@PathVariable Long id) {
+    public ResponseEntity<ResponseModel<Boolean>> unlockUser(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.unlockUser(id));
     }
 
@@ -119,7 +120,7 @@ public class SysUserApi {
      */
     @DeleteMapping("/delete/{id}")
     @SecurityAuth()
-    public ResponseEntity<ResponseModel<Boolean>> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<ResponseModel<Boolean>> deleteUser(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.deleteUser(id));
     }
 
@@ -131,7 +132,7 @@ public class SysUserApi {
      */
     @GetMapping("/get/menu/list/{id}")
     @SecurityAuth()
-    public ResponseEntity<ResponseModel<List<MenuListVo>>> findMenuListByUserId(@PathVariable Long id) {
+    public ResponseEntity<ResponseModel<List<MenuListVo>>> findMenuListByUserId(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.findMenuListByUserId(id));
     }
 

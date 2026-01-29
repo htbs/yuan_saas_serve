@@ -3,6 +3,9 @@ package com.yuansaas.user.auth.security;
 import com.yuansaas.core.environment.EnvironmentUtil;
 import com.yuansaas.user.auth.filter.JwtAuthFilter;
 import com.yuansaas.user.auth.security.annotations.service.SecurityService;
+import com.yuansaas.user.auth.service.SecurityFrameworkService;
+import com.yuansaas.user.auth.service.impl.SecurityFrameworkServiceImpl;
+import com.yuansaas.user.permission.service.PermissionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -116,5 +119,11 @@ public class SecurityConfig {
                 filterChain.doFilter(request, response);
             }
         };
+    }
+
+    // 使用 Spring Security 的缩写，方便使用
+    @Bean("ss")
+    public SecurityFrameworkService securityFrameworkService(PermissionService permissionService) {
+        return new SecurityFrameworkServiceImpl(permissionService);
     }
 }

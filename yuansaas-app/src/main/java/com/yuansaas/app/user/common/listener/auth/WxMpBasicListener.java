@@ -42,7 +42,7 @@ public class WxMpBasicListener {
      */
 //    @EventListener
 //    public void unsubscribe(SubscribeEvent event) {
-//        log.info("关注公众号事件: {}", event);
+//        log.init("关注公众号事件: {}", event);
 //    }
 
 }

@@ -6,6 +6,7 @@ import com.yuansaas.app.shop.param.SignedParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
 import com.yuansaas.app.shop.service.ShopService;
 import com.yuansaas.app.shop.vo.ShopListVo;
+import com.yuansaas.app.shop.vo.ShopVo;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
@@ -56,9 +57,20 @@ public class ShopApi {
      * @param id 商家id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/lock/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/disable/{id}",method = RequestMethod.PUT)
     @SecurityAuth
-    public ResponseEntity<ResponseModel<Boolean>> lock(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<ResponseModel<Boolean>> disable(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(shopService.lock(id));
+    }
+
+    /**
+     * 启用商家
+     * @param id 商家id
+     * @author  lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/enable/{id}",method = RequestMethod.PUT)
+    @SecurityAuth
+    public ResponseEntity<ResponseModel<Boolean>> enable(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.lock(id));
     }
 
@@ -87,7 +99,20 @@ public class ShopApi {
 
 
     /**
-     * 签约操作
+     * 查询商家详情
+     * @param id 商家id
+     * @return 商家详情
+     * @author  lxz 2025/11/16 14:35
+     */
+    @RequestMapping(value = "/get/{id}",method = RequestMethod.GET)
+    @SecurityAuth
+    public ResponseEntity<ResponseModel<ShopVo>> getById(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(shopService.getById(id));
+    }
+
+
+    /**
+     * 签约操作 (签约成功后，商家的状态会变为已签约, 并生成店铺的基本数据信息)
      * @param signedParam 签约参数
      * @author  lxz 2025/11/16 14:35
      */

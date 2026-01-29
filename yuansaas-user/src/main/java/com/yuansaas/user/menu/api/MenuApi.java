@@ -16,6 +16,7 @@ import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.menu.vo.MenuVo;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +42,8 @@ public class MenuApi {
      *
      */
     @GetMapping("/list")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public ResponseEntity<ResponseModel<List<MenuListVo>>> list(FindMenuParam findMenuParam) {
         return ResponseBuilder.okResponse(menuService.list(findMenuParam));
     }
@@ -52,7 +54,8 @@ public class MenuApi {
      * @return 新增结果
      */
     @PostMapping("/save")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
+    @PreAuthorize("@ss.hasPermission('system:menu:add')")
     public ResponseEntity<ResponseModel<Boolean>> save(@Validated @RequestBody SaveMenuParam saveMenuParam) {
         return ResponseBuilder.okResponse(menuService.save(saveMenuParam));
     }
@@ -62,7 +65,8 @@ public class MenuApi {
      * @return 修改结果
      */
     @PutMapping("/update")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
+    @PreAuthorize("@ss.hasPermission('system:menu:update')")
     public ResponseEntity<ResponseModel<Boolean>> update(@Validated @RequestBody UpdateMenuParam updateMenuParam) {
         return ResponseBuilder.okResponse(menuService.update(updateMenuParam));
     }
@@ -72,17 +76,19 @@ public class MenuApi {
      * @return 删除结果
      */
     @GetMapping("/delete/{id}")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
+    @PreAuthorize("@ss.hasPermission('system:menu:delete')")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(menuService.delete(id));
     }
     /**
-     * 禁用菜单
+     * 禁用/启用菜单
      * @param id 菜单id
      * @return 禁用结果
      */
     @GetMapping("/lock/{id}")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
+    @PreAuthorize("@ss.hasPermission('system:menu:lock')")
     public ResponseEntity<ResponseModel<Boolean>> lock(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(menuService.lock(id));
     }
@@ -92,7 +98,8 @@ public class MenuApi {
      * @return 菜单详情
      */
     @GetMapping("/{id}")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth()
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public ResponseEntity<ResponseModel<MenuVo>> getById(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(menuService.getById(id));
     }

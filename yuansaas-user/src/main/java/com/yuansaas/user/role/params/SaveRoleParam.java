@@ -1,7 +1,9 @@
 package com.yuansaas.user.role.params;
 
+import com.yuansaas.core.context.AppContextUtil;
+import com.yuansaas.user.role.enums.RoleCodeEnum;
+import com.yuansaas.user.role.enums.RoleTypeEnum;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -18,11 +20,17 @@ public class SaveRoleParam {
      */
     @NotBlank(message = "角色名称不能为空")
     private String name;
+
     /**
-     * 部门id
+     * 角色标识
+     * 枚举 {@link RoleCodeEnum}
      */
-    @NotNull(message = "部门id不能为空")
-    private Long deptId;
+    private String code;
+    /**
+     * 角色类型
+     * 枚举{@link RoleTypeEnum}
+     */
+    private String type = RoleTypeEnum.CUSTOM.getName();
     /**
      * 描述
      */
@@ -30,6 +38,5 @@ public class SaveRoleParam {
     /**
      * 商家编码
      */
-    @NotBlank(message = "商家编码不能为空")
-    private String merchantCode;
+    private String shopCode = AppContextUtil.getShopCode();
 }

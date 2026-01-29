@@ -27,7 +27,7 @@ spring:
 
   data:
     redis:
-      host: 120.48.98.242
+      host: 120.48.98.242    # Redis服务器地址
       port: 6379
       password: "yuanshi" # 如果有密码填上
       database: 0
@@ -57,6 +57,18 @@ wx:
     config-storage:
       type: RedisTemplate
 
+sms:
+  smsSendIntervalMin: 3 # 短信发送间隔 5分钟
+  sendSmsEnable: false # 是否开启短信发送功能
+  codeLength: 6 # 验证码长度
+  expireTime: 300 # 验证码过期时间 5分钟
+  show: true # 是否显示验证码
+
+#  aliyun:
+#    accessKeyId: xxxxxxxxxxxxxxxxxx
+#    accessKeySecret: xxxxxxxxxxxxxxxxxx
+#    endpoint: xxxxxxxxxxxxxxxxxx
+
 
 ys:
   app:
@@ -68,13 +80,13 @@ ys:
         body:
           enable: true # 打印请求体 默认 false
           max-size: 10240 # 日志最大长度 10KB
-          include-patterns: "/**" # 匹配的请求路径 多路径用逗号隔开，支持api/**， api/user/info
+          include-patterns: "/**" # 匹配的请求路径 多路径用逗号隔开，支持api/**， api/user/init
       response:
         enable: true # 打印响应日志 默认 false
         body:
           enable: true # 打印响应体 默认 false
           max-size: 10240 # 日志最大长度 10KB
-          include-patterns: "/**" # 匹配的请求路径 多路径用逗号隔开，支持api/**， api/user/info
+          include-patterns: "/**" # 匹配的请求路径 多路径用逗号隔开，支持api/**， api/user/init
       sensitive:
         fields: "password,password_confirmation" # 敏感字段不打印日志
       slow:

@@ -1,17 +1,8 @@
 package com.yuansaas.app.common.service;
 
 import com.yuansaas.app.common.params.*;
-import com.yuansaas.app.common.vo.SysDictTypeVo;
+import com.yuansaas.app.common.vo.SysDictDataVo;
 import com.yuansaas.core.page.RPage;
-import com.yuansaas.core.response.ResponseBuilder;
-import com.yuansaas.core.response.ResponseModel;
-import com.yuansaas.user.auth.security.annotations.SecurityAuth;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  *
@@ -36,13 +27,13 @@ public interface DictItemService {
 
     Boolean updateDict(UpdateDictItemParam updateDictItemParam);
 
-
-    /**
-     * 修改字典排序
-     * @param updateSortParam 修改字典排序
-     * @author  lxz 2025/11/16 14:35
-     */
-    Boolean updateOrderNum(UpdateSortParam updateSortParam);
+//
+//    /**
+//     * 修改字典排序
+//     * @param updateSortParam 修改字典排序
+//     * @author  lxz 2025/11/16 14:35
+//     */
+//    Boolean updateOrderNum(UpdateSortParam updateSortParam);
 
     /**
      * 根据字典id删除字典数据
@@ -52,9 +43,26 @@ public interface DictItemService {
     Boolean deleteDict(Long id);
 
     /**
-     * 查询字典项分页
-     * @param findDictParam 字典id
+     * 操作字典项的禁用和启用状态
+     * @param id 字典id
      * @author  lxz 2025/11/16 14:35
      */
-    ;RPage<SysDictTypeVo> findByPage(FindDictParam findDictParam);
+    Boolean lock(Long id);
+
+    /**
+     * 查询字典项分页
+     *
+     * @param findDictItemParam 字典id
+     * @author lxz 2025/11/16 14:35
+     */
+    RPage<SysDictDataVo> findByPage(FindDictItemParam  findDictItemParam);
+
+    /**
+     * 查询字典项数据
+     *
+     * @param dictCode 字典code
+     * @param dictLabel  字典keu
+     * @author lxz 2025/11/16 14:35
+     */
+    SysDictDataVo findByDictCodeAndDictLabel(String dictCode , String dictLabel);
 }

@@ -1,32 +1,54 @@
 package com.yuansaas.app.shop.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yuansaas.app.order.platform.entity.Order;
+import com.yuansaas.app.order.platform.enums.OrderItemTypeEnum;
+import com.yuansaas.app.order.platform.enums.OrderStatusEnum;
+import com.yuansaas.app.order.platform.enums.OrderTypeEnum;
+import com.yuansaas.app.order.platform.model.FunctionTemplateModel;
+import com.yuansaas.app.order.platform.model.OrderItemModel;
+import com.yuansaas.app.order.platform.model.OrderPayParam;
+import com.yuansaas.app.order.platform.params.SubmitOrderParam;
+import com.yuansaas.app.order.platform.service.OrderService;
+import com.yuansaas.app.order.platform.service.processor.ActionProcessor;
 import com.yuansaas.app.shop.entity.QShop;
 import com.yuansaas.app.shop.entity.Shop;
+import com.yuansaas.app.shop.enums.ShopSignedStatusEnum;
 import com.yuansaas.app.shop.enums.ShopTypeEnum;
-import com.yuansaas.app.shop.param.FindShopParam;
-import com.yuansaas.app.shop.param.SaveShopParam;
-import com.yuansaas.app.shop.param.SignedParam;
-import com.yuansaas.app.shop.param.UpdateShopParam;
+import com.yuansaas.app.shop.model.ShopInitModel;
+import com.yuansaas.app.shop.param.*;
 import com.yuansaas.app.shop.repository.ShopRepository;
+import com.yuansaas.app.shop.service.ShopDataService;
 import com.yuansaas.app.shop.service.ShopService;
 import com.yuansaas.app.shop.service.mapstruct.ShopMapStruct;
 import com.yuansaas.app.shop.vo.ShopListVo;
+import com.yuansaas.app.shop.vo.ShopVo;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
+import com.yuansaas.core.utils.id.SnowflakeIdGenerator;
 import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.service.DeptService;
+import com.yuansaas.user.menu.entity.Menu;
+import com.yuansaas.user.menu.service.MenuService;
+import com.yuansaas.user.role.enums.RoleCodeEnum;
+import com.yuansaas.user.role.enums.RoleTypeEnum;
+import com.yuansaas.user.role.params.SaveRoleParam;
+import com.yuansaas.user.role.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -42,6 +64,11 @@ public class ShopServiceImpl implements ShopService {
     private final ShopRepository shopRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final DeptService deptService;
+    private final ShopDataService shopDataService;
+    private final MenuService menuService;
+
+
+
 
     /**
      * 添加商家
@@ -50,17 +77,12 @@ public class ShopServiceImpl implements ShopService {
      * @author lxz 2025/11/16 14:35
      */
     @Override
+    @Transactional
     public Boolean add(SaveShopParam saveShopParam) {
-        Shop saveShop = shopMapStruct.toSaveShop(saveShopParam);
-        // 生成code
-        saveShop.setCode(getCode(saveShopParam.getType()));
-        shopRepository.save(saveShop);
-        // 生成默认部门id
-        SaveDeptParam saveDeptParam = new SaveDeptParam();
-        saveDeptParam.setName(saveShop.getName());
-        saveDeptParam.setPid(-1l);
-        saveDeptParam.setMerchantCode(saveShop.getCode());
-        deptService.save(saveDeptParam);
+        // 保存商家并创建部门
+        Shop shop = saveShop(saveShopParam);
+        // 生成订单
+        addOrder(shop);
         return true;
     }
 
@@ -82,7 +104,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     /**
-     * 禁用商家
+     * 禁用/启用 商家
      *
      * @param id 商家id
      * @author lxz 2025/11/16 14:35
@@ -158,6 +180,19 @@ public class ShopServiceImpl implements ShopService {
     }
 
     /**
+     * 查询商家列表
+     *
+     * @param id 商家id
+     * @return 商家信息
+     * @author lxz 2025/11/16 14:35
+     */
+    @Override
+    public ShopVo getById(Long id) {
+        Shop shop = shopRepository.findById(id).orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("商家不存在"));
+        return BeanUtil.copyProperties(shop, ShopVo.class);
+    }
+
+    /**
      * 签约操作
      *
      * @param signedParam 签约参数
@@ -165,19 +200,31 @@ public class ShopServiceImpl implements ShopService {
      */
     @Override
     public Boolean signed(SignedParam signedParam) {
-        Shop shop = shopRepository.findById(signedParam.getId()).orElse(null);
-        if (ObjectUtils.isEmpty(shop)) {
-            throw DataErrorCode.DATA_NOT_FOUND.buildException();
-        }
-        shop.setSignedStatus(AppConstants.Y);
+        Shop shop = shopRepository.findById(signedParam.getId()).orElseThrow(DataErrorCode.DATA_NOT_FOUND::buildException);
+        // 修改签约数据
+        setSignedData(shop , signedParam);
+        // 默认激活店铺
+        shopDataService.init(ShopInitModel.builder()
+                .shop(shop)
+                .payAmount(signedParam.getPayAmount())
+                .payChannel(signedParam.getPayChannel())
+                .build());
+        return true;
+    }
+
+    /**
+     * 编辑签约数据
+     * @param shop  商铺数据
+     * @param signedParam  签约参数
+     */
+    private void setSignedData(Shop shop , SignedParam signedParam){
+        shop.setSignedStatus(ShopSignedStatusEnum.SIGNED.name());
         shop.setSignedUserId(0L);
         shop.setSignedUserName(signedParam.getName());
-        shop.setSignedStartAt(signedParam.getSigneTime());
-        shop.setSignedEndAt(signedParam.getExpireTime());
-        shop.setUpdateAt(LocalDateTime.now());
-        shop.setUpdateBy(AppContextUtil.getUserInfo());
+        shop.setSignedStartAt(signedParam.getSignedStartAt());
+        shop.setSignedEndAt(signedParam.getSignedEndAt());
+        shop.update();
         shopRepository.save(shop);
-        return true;
     }
 
 
@@ -195,5 +242,54 @@ public class ShopServiceImpl implements ShopService {
         return code;
 
     }
+
+    /**
+     * 保存商家
+     */
+    private Shop saveShop(SaveShopParam saveShopParam){
+        Shop saveShop = shopMapStruct.toSaveShop(saveShopParam);
+        // 生成code
+        saveShop.setCode(getCode(saveShopParam.getType()));
+        shopRepository.save(saveShop);
+        // 生成默认部门id
+        SaveDeptParam saveDeptParam = new SaveDeptParam();
+        saveDeptParam.setName(saveShop.getName());
+        saveDeptParam.setPid(0L);
+        saveDeptParam.setShopCode(saveShop.getCode());
+        deptService.save(saveDeptParam);
+        return saveShop;
+    }
+    /**
+     * 生成功能订单
+     */
+    private void addOrder(Shop shop){
+        // 获取初始化的功能
+        List<Menu> wcu3 = menuService.findByMenuCode("WCU3", 0);
+        if (ObjectUtils.isEmpty(wcu3)) {
+            return;
+        }
+        List<OrderItemModel> orderItemModelList = new ArrayList<>();
+        wcu3.forEach(f ->{
+            OrderItemModel orderItemModel = new OrderItemModel();
+            orderItemModel.setType(OrderItemTypeEnum.FUNCTION_TEMPLATE);
+            orderItemModel.setMerchandiseName(f.getName());
+            // todo 每个菜单应该有对应的价格
+            orderItemModel.setMerchandiseAmount(1);
+            FunctionTemplateModel functionTemplateModel = new FunctionTemplateModel();
+            functionTemplateModel.setFunctionCode(f.getMenuCode());
+            // todo 在签约后给菜单设值开始和结束时间
+            orderItemModel.setMerchantOrderExtModel(functionTemplateModel);
+            orderItemModelList.add(orderItemModel);
+        });
+
+        // todo  创建功能订单
+        SubmitOrderParam submitOrderParam = new SubmitOrderParam();
+        submitOrderParam.setShopCode(shop.getCode());
+        submitOrderParam.setOrderType(OrderTypeEnum.INIT_TEMPLATE.getName());
+        submitOrderParam.setMerchandiseName("初始化功能上线");
+        submitOrderParam.setOrderItemModelList(orderItemModelList);
+        ActionProcessor.submit(submitOrderParam);
+    }
+
 
 }

@@ -1,11 +1,14 @@
 package com.yuansaas.core.page;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.validation.constraints.Min;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  *
@@ -69,5 +72,21 @@ public class PageModel {
      */
     public Integer obtainOffset() {
         return (this.getPageNo() <= 0 ? 0 : this.getPageNo() - 1) * getPageSize();
+    }
+
+    /**
+     * 构建分页查询
+     */
+    public <T> RPage<T> getPage(Supplier<JPAQuery<T>> dataQuerySupplier ,
+                                Supplier<JPAQuery<Long>> countQuerySupplier){
+
+        List<T> fetch = dataQuerySupplier.get()
+                .limit(this.pageSize)
+                .offset(this.obtainOffset())
+                .fetch();
+
+        long total = fetch.isEmpty() ? 0L : Objects.requireNonNullElse(countQuerySupplier.get().fetchOne() , 0L);
+
+        return this.getRPage(fetch , total);
     }
 }

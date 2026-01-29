@@ -73,6 +73,11 @@ public class CustomUserDetails implements UserDetails {
     private UserStatus status;
 
     /**
+     * 商户编号
+     */
+    private String shopCode;
+
+    /**
      * 权限列表
      */
     private final Collection<? extends GrantedAuthority> authorities;

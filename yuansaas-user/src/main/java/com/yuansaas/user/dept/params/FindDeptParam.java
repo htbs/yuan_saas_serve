@@ -1,6 +1,6 @@
 package com.yuansaas.user.dept.params;
 
-import com.yuansaas.core.page.PageModel;
+import com.yuansaas.core.context.AppContextUtil;
 import lombok.Data;
 
 /**
@@ -14,7 +14,7 @@ public class FindDeptParam {
     /**
      * 商家code
      */
-    private String merchantCode;
+    private String shopCode = AppContextUtil.getShopCode();
     /**
      * 部门名称
      */

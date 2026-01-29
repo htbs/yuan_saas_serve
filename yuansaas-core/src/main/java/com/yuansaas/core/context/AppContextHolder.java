@@ -1,5 +1,4 @@
 package com.yuansaas.core.context;
-
 import java.util.Optional;
 
 /**
@@ -97,6 +96,10 @@ public final class AppContextHolder {
 
     public static Optional<String> getSessionId() {
         return getContext().map(AppContext::getSessionId);
+    }
+
+    public static Optional<String> getShopCode(){
+        return getContext().map(AppContext::getShopCode);
     }
 
     public static Optional<Object> getAttribute(String key) {

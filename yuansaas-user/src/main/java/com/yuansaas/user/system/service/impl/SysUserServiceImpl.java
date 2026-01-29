@@ -4,17 +4,19 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.querydsl.core.QueryResults;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.AuthErrorCode;
+import com.yuansaas.core.exception.ex.BizErrorCode;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.core.utils.TreeUtils;
+import com.yuansaas.integration.sms.model.CheckVerifyCodeModel;
+import com.yuansaas.integration.sms.service.SmsVerifyService;
 import com.yuansaas.user.common.enums.UserStatus;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.entity.QSysDeptUser;
@@ -23,8 +25,10 @@ import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.menu.vo.MenuListVo;
-import com.yuansaas.user.role.service.RoleMenuService;
-import com.yuansaas.user.role.service.RoleUserService;
+import com.yuansaas.user.permission.params.AssignUserRoleParam;
+import com.yuansaas.user.permission.service.PermissionService;
+import com.yuansaas.user.permission.service.RoleMenuService;
+import com.yuansaas.user.permission.service.RoleUserService;
 import com.yuansaas.user.system.entity.QSysUser;
 import com.yuansaas.user.system.entity.SysUser;
 import com.yuansaas.user.system.param.FindUserParam;
@@ -57,11 +61,13 @@ public class SysUserServiceImpl implements SysUserService {
 
     private final SysUserRepository sysUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PermissionService permissionService;
     private final RoleUserService roleUserService;
     private final RoleMenuService roleMenuService;
     private final DeptUserService deptUserService;
     private final MenuService menuService;
     private final JPAQueryFactory jpaQueryFactory;
+    private final SmsVerifyService smsVerifyService;
 
 
     @Override
@@ -107,31 +113,59 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public SysUser saveUser(SysUserCreateParam sysUserCreateParam) {
+        //手机号和验证码校验
+        if (sysUserCreateParam.getIsPhoneVerifyCodeValid()) {
+        smsVerifyService.checkVerifyCode(CheckVerifyCodeModel.builder()
+                        .phone(sysUserCreateParam.getPhone())
+                        .verifyContent(sysUserCreateParam.getVerifyCode())
+                        .type(sysUserCreateParam.getSendSceneType())
+                        .serialNo(sysUserCreateParam.getSerialNo())
+                .build());
+        }
+
+        // 校验用户名是否存在
+        if (findByUsername(sysUserCreateParam.getUserName()).isPresent()) {
+            throw BizErrorCode.BUSINESS_VALIDATION_FAILED.buildException("用户名已存在");
+        }
         // 保存用户信息
         SysUser sysUser = new SysUser();
         BeanUtils.copyProperties(sysUserCreateParam, sysUser);
-        sysUser.setPassword(passwordEncoder.encode(sysUserCreateParam.getPassword()));
+        sysUser.setPassword(passwordEncoder.encode(AppConstants.PWD));
         sysUser.setCreateAt(LocalDateTime.now());
         sysUser.setCreateBy(AppContextUtil.getUserInfo());
         sysUserRepository.save(sysUser);
         // 授权角色权限
-        roleUserService.saveOrUpdate(sysUser.getId(), sysUserCreateParam.getRoleList());
+        permissionService.assignUserRole(AssignUserRoleParam.builder().userId(sysUser.getId()).roleId(sysUserCreateParam.getRoleIds()).build());
         // 授权部门权限
-        deptUserService.saveOrUpdate(sysUser.getId(),sysUserCreateParam.getDeptId());
+        deptUserService.saveOrUpdate(sysUser.getId());
         return sysUser;
     }
 
     @Override
     public Boolean updateUser(UserUpdateParam userUpdateParam) {
         sysUserRepository.findById(userUpdateParam.getId()).ifPresentOrElse(sysUser -> {
+            // 手机号和验证码校验
+            if (!ObjectUtil.equals(userUpdateParam.getPhone(), sysUser.getPhone())) {
+                if (ObjectUtil.hasEmpty(userUpdateParam.getPhone(),
+                        userUpdateParam.getVerifyCode(),
+                        userUpdateParam.getSerialNo(),
+                        userUpdateParam.getSendSceneType())
+                ) {
+                    smsVerifyService.checkVerifyCode(CheckVerifyCodeModel.builder()
+                            .phone(userUpdateParam.getPhone())
+                            .verifyContent(userUpdateParam.getVerifyCode())
+                            .type(userUpdateParam.getSendSceneType())
+                            .serialNo(userUpdateParam.getSerialNo())
+                            .build());
+                }
+            }
+
             BeanUtils.copyProperties(userUpdateParam, sysUser);
             sysUser.setUpdateBy(AppContextUtil.getUserInfo());
             sysUser.setUpdateAt(LocalDateTime.now());
             sysUserRepository.save(sysUser);
             // 授权角色权限
-            roleUserService.saveOrUpdate(sysUser.getId(), userUpdateParam.getRoleList());
-            // 授权部门权限
-            deptUserService.saveOrUpdate(sysUser.getId(),userUpdateParam.getDeptId());
+            permissionService.assignUserRole(AssignUserRoleParam.builder().userId(sysUser.getId()).roleId(userUpdateParam.getRoleIds()).build());
         },()->{
             throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
         });
@@ -151,7 +185,7 @@ public class SysUserServiceImpl implements SysUserService {
                         if (!passwordEncoder.matches(updateUserPwd.getOldPassword(), sysUser.getPassword())) {
                             throw AuthErrorCode.AUTHENTICATION_FAILED.buildException("旧密码输入错误，请重新输入") ;
                         }
-                        sysUser.setPassword(updateUserPwd.getNewPassword());
+                        sysUser.setPassword(passwordEncoder.encode(updateUserPwd.getNewPassword()));
                         sysUser.setUpdateAt(LocalDateTime.now());
                         sysUser.setUpdateBy(AppContextUtil.getUserInfo());
                         sysUserRepository.save(sysUser);
@@ -172,7 +206,7 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public Boolean resetUserResetPwd(Long id) {
         sysUserRepository.findById(id).ifPresentOrElse(sysUser -> {
-                    sysUser.setPassword(AppConstants.PWD);
+                    sysUser.setPassword(passwordEncoder.encode(AppConstants.PWD));
                     sysUser.setUpdateAt(LocalDateTime.now());
                     sysUser.setUpdateBy(AppContextUtil.getUserInfo());
                     sysUserRepository.save(sysUser);
@@ -181,7 +215,7 @@ public class SysUserServiceImpl implements SysUserService {
                     throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
                 }
         );
-        return null;
+        return true;
     }
 
     @Override
