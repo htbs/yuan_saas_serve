@@ -7,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
@@ -14,8 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
- *
- *
+ * 商铺表
  * @author LXZ 2025/12/12 15:12
  */
 @Data

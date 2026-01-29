@@ -1,9 +1,9 @@
 package com.yuansaas.user.config;
 
-import com.yuansaas.user.role.service.RoleMenuService;
+import com.yuansaas.user.permission.service.PermissionService;
+import com.yuansaas.user.permission.service.RoleMenuService;
 import com.yuansaas.user.system.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,14 +16,18 @@ public class ServiceManager {
 
 
     public static SysUserService sysUserService;
-    public static RoleMenuService roleMenuService;
+    public static PermissionService permissionService;
+
+
+
     @Autowired
     public void setSysUserService(SysUserService sysUserService) {
         ServiceManager.sysUserService = sysUserService;
     }
+
     @Autowired
-    public void setRoleMenuService(RoleMenuService roleMenuService) {
-        ServiceManager.roleMenuService = roleMenuService;
+    public void setPermissionService(PermissionService permissionService) {
+        ServiceManager.permissionService = permissionService;
     }
 
 }

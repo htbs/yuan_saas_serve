@@ -6,7 +6,7 @@
  * 版权所有，侵权必究！
  */
 
-package com.yuansaas.user.role.service;
+package com.yuansaas.user.permission.service;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface RoleUserService {
      * @param userId      用户ID
      * @param roleIdList  角色ID列表
      */
-    void saveOrUpdate(Long userId, List<Long> roleIdList);
+    void assignUserRole(Long userId, List<Long> roleIdList);
 
     /**
      * 根据角色ids，删除角色用户关系

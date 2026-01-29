@@ -1,8 +1,6 @@
-package com.yuansaas.user.role.params;
+package com.yuansaas.user.permission.params;
 
 import com.yuansaas.core.context.AppContextUtil;
-import com.yuansaas.user.role.enums.RoleCodeEnum;
-import com.yuansaas.user.role.enums.RoleTypeEnum;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -20,17 +18,6 @@ public class SaveRoleParam {
      */
     @NotBlank(message = "角色名称不能为空")
     private String name;
-
-    /**
-     * 角色标识
-     * 枚举 {@link RoleCodeEnum}
-     */
-    private String code;
-    /**
-     * 角色类型
-     * 枚举{@link RoleTypeEnum}
-     */
-    private String type = RoleTypeEnum.CUSTOM.getName();
     /**
      * 描述
      */

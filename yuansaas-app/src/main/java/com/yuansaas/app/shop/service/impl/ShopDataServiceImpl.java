@@ -3,36 +3,45 @@ package com.yuansaas.app.shop.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.yuansaas.app.order.enums.PayChannelEnum;
+import com.yuansaas.app.order.platform.entity.Order;
+import com.yuansaas.app.order.platform.enums.OrderStatusEnum;
+import com.yuansaas.app.order.platform.enums.OrderTypeEnum;
+import com.yuansaas.app.order.platform.model.OrderPayParam;
+import com.yuansaas.app.order.platform.service.OrderService;
+import com.yuansaas.app.order.platform.service.processor.ActionProcessor;
+import com.yuansaas.app.shop.entity.Shop;
 import com.yuansaas.app.shop.entity.ShopDataConfig;
 import com.yuansaas.app.shop.entity.ShopRegularHours;
 import com.yuansaas.app.shop.entity.ShopSpecialHours;
-import com.yuansaas.app.shop.model.BusinessDataModel;
-import com.yuansaas.app.shop.model.RegularHoursModel;
-import com.yuansaas.app.shop.model.SpecialHoursModel;
-import com.yuansaas.app.shop.model.TimeSlotsModel;
-import com.yuansaas.app.shop.param.BusinessHoursParam;
-import com.yuansaas.app.shop.param.SaveShopDataParam;
-import com.yuansaas.app.shop.param.UpdateShopDataParam;
+import com.yuansaas.app.shop.model.*;
+import com.yuansaas.app.shop.param.*;
 import com.yuansaas.app.shop.repository.ShopDataConfigRepository;
 import com.yuansaas.app.shop.repository.ShopRegularHoursRepository;
 import com.yuansaas.app.shop.repository.ShopRepository;
 import com.yuansaas.app.shop.repository.ShopSpecialHoursRepository;
 import com.yuansaas.app.shop.service.ShopDataService;
+import com.yuansaas.app.shop.service.ShopUserService;
 import com.yuansaas.app.shop.service.mapstruct.ShopMapStruct;
 import com.yuansaas.app.shop.vo.ShopBusinessHoursVo;
 import com.yuansaas.common.constants.AppConstants;
+import com.yuansaas.core.context.AppContext;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jackson.JacksonUtil;
+import com.yuansaas.core.utils.id.SnowflakeIdGenerator;
+import com.yuansaas.user.role.enums.RoleCodeEnum;
+import com.yuansaas.user.role.enums.RoleTypeEnum;
+import com.yuansaas.user.role.params.SaveRoleParam;
+import com.yuansaas.user.role.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 商家基本配置服务实现类
@@ -49,21 +58,33 @@ public class ShopDataServiceImpl implements ShopDataService {
     private final ShopMapStruct shopMapStruct;
     private final ShopRegularHoursRepository shopRegularHoursRepository;
     private final ShopSpecialHoursRepository shopSpecialHoursRepository;
+    private final RoleService roleService;
+    private final OrderService orderService;
+    private final SnowflakeIdGenerator idGenerator;
+    private final ShopUserService shopUserService;
 
     /**
-     * 编辑商家基本信息
+     * 激活商家
      *
-     * @param shopCode 店铺编码
+     * @param shopInitModel 激活商铺参数
      *
      * @author lxz 2025/11/16 14:35
      */
     @Override
-    public Boolean init(String shopCode) {
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean init(ShopInitModel shopInitModel) {
         // 初始化店铺基本配置信息
-        save(SaveShopDataParam.builder().shopCode(shopCode).build());
+        save(SaveShopDataParam.builder().shopCode(shopInitModel.getShop().getCode()).build());
         // 初始化店铺日常营业时间信息配置
-        initRegularHours(shopCode);
+        initRegularHours(shopInitModel.getShop().getCode());
+        // 设置初始值角色
+        Long roleId = setRoleInit(shopInitModel.getShop().getCode());
+        // 设置初始值admin账号
+        initUserAccount(shopInitModel.getShop().getCode(),shopInitModel.getShop().getName() , roleId);
+        // 修改初始化功能订单状态
+        updateInitOrder(shopInitModel.getShop(),shopInitModel.getPayChannel(),shopInitModel.getPayAmount());
         // todo 初始化店铺功能
+
         return true;
     }
 
@@ -321,9 +342,53 @@ public class ShopDataServiceImpl implements ShopDataService {
             shopRegularHoursList.add(shopRegularHours);
         }
         shopRegularHoursRepository.saveAll(shopRegularHoursList);
-        // todo 保存到redis缓存
     }
 
 
+    /**
+     * 设置角色初始值
+     * @param shopCode 商铺code
+     */
+    private Long setRoleInit (String shopCode) {
+        SaveRoleParam saveRoleParam = new SaveRoleParam();
+        saveRoleParam.setName(RoleCodeEnum.SUPER_ADMIN.getDescribe());
+        saveRoleParam.setType(RoleTypeEnum.SYSTEM.getName());
+        saveRoleParam.setCode(RoleCodeEnum.SUPER_ADMIN.getCode());
+        saveRoleParam.setDescription(RoleCodeEnum.SUPER_ADMIN.getDescribe());
+        saveRoleParam.setShopCode(shopCode);
+        return roleService.save(saveRoleParam).getId();
+    }
+
+    /**
+     * 修改初始化功能订单状态
+     */
+    private void updateInitOrder(Shop shop , PayChannelEnum payChannel , Long payAmount) {
+        List<Order> shopCodeAndOrderType = orderService.findShopCodeAndOrderType(shop.getCode(), OrderTypeEnum.INIT_TEMPLATE.getName(), OrderStatusEnum.WAIT_PAY.getName());
+        if (ObjectUtils.isEmpty(shopCodeAndOrderType)) {
+            return;
+        }
+        // 修改订单状态
+        OrderPayParam orderPayParam = new OrderPayParam();
+        orderPayParam.setOrderNo(shopCodeAndOrderType.getFirst().getOrderNo());
+        orderPayParam.setTradeNo(String.valueOf(idGenerator.nextId()));
+        orderPayParam.setPayAmount(payAmount);
+        orderPayParam.setPayChannel(payChannel);
+        orderPayParam.setPaySucceededTime(shop.getSignedStartAt().atStartOfDay());
+        ActionProcessor.pay(orderPayParam);
+    }
+
+    /**
+     * 设置初始化用户账号
+     */
+    private void initUserAccount (String shopCode , String shopName,Long roleId) {
+        ShopUserSaveParam shopUserSaveParam = new ShopUserSaveParam();
+        shopUserSaveParam.setShopCode(shopCode);
+        // 因为是初始化所以账号使用商铺的code
+        shopUserSaveParam.setUserName(shopCode);
+        shopUserSaveParam.setPassword(AppConstants.PWD);
+        shopUserSaveParam.setNickName(shopName);
+        shopUserSaveParam.setRoleId(Collections.singletonList(roleId));
+        shopUserService.createUser(shopUserSaveParam);
+    }
 
 }

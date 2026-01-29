@@ -1,6 +1,6 @@
-package com.yuansaas.user.role.repository;
+package com.yuansaas.user.permission.repository;
 
-import com.yuansaas.user.role.entity.RoleUser;
+import com.yuansaas.user.permission.entity.RoleUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

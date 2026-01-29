@@ -1,6 +1,7 @@
 package com.yuansaas.app.shop.service;
 
 import com.yuansaas.app.shop.model.BusinessDataModel;
+import com.yuansaas.app.shop.model.ShopInitModel;
 import com.yuansaas.app.shop.param.*;
 import com.yuansaas.app.shop.vo.ShopBusinessHoursVo;
 
@@ -15,12 +16,12 @@ import java.util.Date;
 public interface ShopDataService {
 
     /**
-     * 编辑店铺基本信息
+     * 激活店铺
      *
-     * @param shopCode 店铺编码
+     * @param shopInitModel  激活店铺参数
      * @author lxz 2025/11/16 14:35
      */
-    Boolean init(String shopCode);
+    Boolean init(ShopInitModel shopInitModel);
 
     /**
      * 编辑店铺基本信息

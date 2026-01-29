@@ -1,6 +1,5 @@
 package com.yuansaas.user.menu.params;
 
-import com.yuansaas.core.context.AppContextUtil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -19,10 +18,6 @@ public class SaveMenuParam {
      */
     @NotNull(message = "父菜单ID不能为空")
     private Long pid = 0L;
-    /**
-     * 商户编号
-     */
-    private String shopCode = AppContextUtil.getShopCode();
     /**
      * 菜单名称
      */

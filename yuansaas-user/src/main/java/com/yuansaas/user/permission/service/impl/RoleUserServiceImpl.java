@@ -1,14 +1,16 @@
-package com.yuansaas.user.role.service.impl;
+package com.yuansaas.user.permission.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.user.menu.enums.MenuCacheEnum;
+import com.yuansaas.user.permission.entity.RoleUser;
+import com.yuansaas.user.permission.repository.RoleUserRepository;
+import com.yuansaas.user.permission.service.RoleUserService;
 import com.yuansaas.user.role.entity.Role;
-import com.yuansaas.user.role.entity.RoleUser;
 import com.yuansaas.user.role.repository.RoleRepository;
-import com.yuansaas.user.role.repository.RoleUserRepository;
-import com.yuansaas.user.role.service.RoleUserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,9 +37,9 @@ public class RoleUserServiceImpl implements RoleUserService {
      */
     @Override
     @Transactional
-    public void saveOrUpdate(Long userId, List<Long> roleIdList) {
-        //用户没有一个角色权限的情况
-        List<Role> byIdAll = roleRepository.findAllById(roleIdList);
+    public void assignUserRole(Long userId, List<Long> roleIdList) {
+        // 获取未删除的角色
+        List<Role> byIdAll = roleRepository.findByIdInAndDeleteStatus(roleIdList , AppConstants.N);
         if(ObjectUtil.isEmpty(byIdAll)){
             return ;
         }
@@ -92,6 +94,6 @@ public class RoleUserServiceImpl implements RoleUserService {
      */
     @Override
     public List<Long> getRoleIdList(Long userId) {
-        return roleUserRepository.findByUserId(userId).stream().map(RoleUser::getRoleId).toList();
+        return  RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.USER_ROLE_LIST.getKey() , userId) , new TypeReference<List<Long>>(){},() -> roleUserRepository.findByUserId(userId).stream().map(RoleUser::getRoleId).toList());
     }
 }
