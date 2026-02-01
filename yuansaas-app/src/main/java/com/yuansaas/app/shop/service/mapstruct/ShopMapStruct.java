@@ -2,27 +2,34 @@ package com.yuansaas.app.shop.service.mapstruct;
 
 import com.yuansaas.app.shop.entity.Shop;
 import com.yuansaas.app.shop.entity.ShopDataConfig;
+import com.yuansaas.app.shop.entity.ShopUser;
 import com.yuansaas.app.shop.param.SaveShopParam;
+import com.yuansaas.app.shop.param.ShopUserSaveParam;
 import com.yuansaas.app.shop.param.UpdateShopDataParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
 import com.yuansaas.common.constants.AppConstants;
-import com.yuansaas.core.context.AppContext;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.jackson.JacksonUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 /**
- *
+ * 商铺信息结构映射类
  *
  * @author LXZ 2025/12/12 10:57
  */
 @Component
+@RequiredArgsConstructor
 public class ShopMapStruct {
 
+    private final PasswordEncoder passwordEncoder;
 
-
+    /**
+     * 商铺保存映射方法
+     */
     public Shop toSaveShop (SaveShopParam shopParam) {
         Shop shop = new Shop();
         shop.setName(shopParam.getName());
@@ -46,7 +53,9 @@ public class ShopMapStruct {
         shop.setCreateAt(LocalDateTime.now());
         return shop;
     }
-
+    /**
+     * 商铺修改参数映射方法
+     */
     public void toUpdateShop ( Shop shop , UpdateShopParam shopParam) {
         shop.setName(shopParam.getName());
         shop.setProvinceCode(shopParam.getAddress().getProvinceCode());
@@ -66,8 +75,10 @@ public class ShopMapStruct {
         shop.setCreateBy(AppContextUtil.getUserInfo());
         shop.setCreateAt(LocalDateTime.now());
     }
-
-    public ShopDataConfig toShopDataConfig (UpdateShopDataParam shopDataParam, Shop shop) {
+    /**
+     * 商铺基本信息映射方法
+     */
+    public ShopDataConfig toShopInfoDataConfig(UpdateShopDataParam shopDataParam, Shop shop) {
         ShopDataConfig shopDataConfig = new ShopDataConfig();
         shopDataConfig.setShopCode(shop.getCode());
         shopDataConfig.setIntro(shopDataParam.getIntro());
@@ -82,5 +93,22 @@ public class ShopMapStruct {
         shopDataConfig.setUpdateAt(LocalDateTime.now());
         shopDataConfig.setUpdateBy(AppContextUtil.getUserInfo());
         return shopDataConfig;
+    }
+
+    /**
+     * 商铺用户信息映射方法
+     */
+    public ShopUser toShopUserSave(ShopUserSaveParam shopUserSaveParam) {
+        ShopUser shopUser = new ShopUser();
+        shopUser.setShopCode(shopUserSaveParam.getShopCode());
+        shopUser.setUserName(shopUserSaveParam.getUserName());
+        shopUser.setPassword(passwordEncoder.encode(AppConstants.PWD));
+        shopUser.setNickName(shopUserSaveParam.getNickName());
+        shopUser.setRealName(shopUserSaveParam.getRealName());
+        shopUser.setEmail(shopUserSaveParam.getEmail());
+        shopUser.setHeadUrl(shopUserSaveParam.getAvatar());
+        shopUser.setSex(shopUserSaveParam.getSex());
+        shopUser.setPhone(shopUserSaveParam.getPhone());
+        return shopUser;
     }
 }

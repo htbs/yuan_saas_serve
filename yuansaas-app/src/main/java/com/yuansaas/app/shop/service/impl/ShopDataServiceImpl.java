@@ -25,7 +25,6 @@ import com.yuansaas.app.shop.service.ShopUserService;
 import com.yuansaas.app.shop.service.mapstruct.ShopMapStruct;
 import com.yuansaas.app.shop.vo.ShopBusinessHoursVo;
 import com.yuansaas.common.constants.AppConstants;
-import com.yuansaas.core.context.AppContext;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jackson.JacksonUtil;
@@ -85,6 +84,7 @@ public class ShopDataServiceImpl implements ShopDataService {
         updateInitOrder(shopInitModel.getShop(),shopInitModel.getPayChannel(),shopInitModel.getPayAmount());
         // todo 初始化店铺功能
 
+        // todo 后期可以考虑是否通过短信的方式通知商铺法人的账号和密码
         return true;
     }
 
@@ -96,7 +96,7 @@ public class ShopDataServiceImpl implements ShopDataService {
      */
     @Override
     @Transactional
-    public Boolean update(UpdateShopDataParam updateShopDataParam) {
+    public Boolean updateInfoData(UpdateShopDataParam updateShopDataParam) {
         shopRepository.findById(updateShopDataParam.getId()).ifPresentOrElse( shop -> {
             // 更新商家信息
             shop.setName(updateShopDataParam.getName());
@@ -112,7 +112,7 @@ public class ShopDataServiceImpl implements ShopDataService {
             ShopDataConfig byShopCode = shopDataConfigRepository.findByShopCode(shop.getCode());
             ShopDataConfig shopDataConfig = null;
             if (ObjectUtil.isEmpty(byShopCode)) {
-               shopDataConfig = shopMapStruct.toShopDataConfig(updateShopDataParam, shop);
+               shopDataConfig = shopMapStruct.toShopInfoDataConfig(updateShopDataParam, shop);
             }
             shopDataConfigRepository.save(shopDataConfig);
         } ,()->{

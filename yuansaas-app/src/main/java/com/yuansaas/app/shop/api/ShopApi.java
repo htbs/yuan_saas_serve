@@ -46,7 +46,7 @@ public class ShopApi {
      * @param updateShopParam 商家参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    @RequestMapping(value = "/updateInfoData",method = RequestMethod.POST)
     @SecurityAuth
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated UpdateShopParam updateShopParam) {
         return ResponseBuilder.okResponse(shopService.update(updateShopParam));

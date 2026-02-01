@@ -28,7 +28,7 @@ public interface ShopDataService {
      * @param updateShopDataParam 店铺参数
      * @author  lxz 2025/11/16 14:35
      */
-    Boolean update(UpdateShopDataParam updateShopDataParam);
+    Boolean updateInfoData(UpdateShopDataParam updateShopDataParam);
 
     /**
      * 设置商家营业时间

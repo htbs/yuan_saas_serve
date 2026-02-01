@@ -203,6 +203,7 @@ public class MenuServiceImpl implements MenuService {
                 .from(menu)
                 .where(BoolBuilder.getInstance()
                         .and(lockStatus, menu.lockStatus::eq)
+                        .and(AppConstants.N , menu.deleteStatus::eq)
                         .and(ids, menu.id::in)
                         .getWhere()
                 ).fetch();

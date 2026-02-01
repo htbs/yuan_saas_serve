@@ -11,9 +11,12 @@ import java.util.List;
 public interface DeptUserService {
     /**
      * 保存或修改
-     * @param userId      用户ID
+     *
+     * @param shopCode 商铺code
+     * @param userId   用户ID
+     * @param deptId 部门id
      */
-    void saveOrUpdate(Long userId);
+    void saveOrUpdate(String shopCode,Long userId,Long deptId);
 
     /**
      * 根据部门ids，删除部门用户关系

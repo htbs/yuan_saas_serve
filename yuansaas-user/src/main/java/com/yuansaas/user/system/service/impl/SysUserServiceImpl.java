@@ -25,6 +25,7 @@ import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.menu.vo.MenuListVo;
+import com.yuansaas.user.permission.params.AssignUserDeptParam;
 import com.yuansaas.user.permission.params.AssignUserRoleParam;
 import com.yuansaas.user.permission.service.PermissionService;
 import com.yuansaas.user.permission.service.RoleMenuService;
@@ -137,7 +138,7 @@ public class SysUserServiceImpl implements SysUserService {
         // 授权角色权限
         permissionService.assignUserRole(AssignUserRoleParam.builder().userId(sysUser.getId()).roleId(sysUserCreateParam.getRoleIds()).build());
         // 授权部门权限
-        deptUserService.saveOrUpdate(sysUser.getId());
+        permissionService.assignUserDept(AssignUserDeptParam.builder().shopCode(AppContextUtil.getShopCode()).userId(sysUser.getId()).build());
         return sysUser;
     }
 

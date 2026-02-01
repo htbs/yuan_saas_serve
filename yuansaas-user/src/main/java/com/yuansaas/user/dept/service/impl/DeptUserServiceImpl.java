@@ -3,6 +3,7 @@ package com.yuansaas.user.dept.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
+import com.yuansaas.core.exception.ex.ParamErrorCode;
 import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.entity.SysDeptUser;
 import com.yuansaas.user.dept.repository.DeptRepository;
@@ -29,23 +30,29 @@ public class DeptUserServiceImpl implements DeptUserService {
     /**
      * 保存或修改
      *
-     * @param userId     用户ID
+     * @param shopCode 商铺code
+     * @param userId   用户ID
+     * @param deptId 部门id
      */
     @Override
     @Transactional
-    public void saveOrUpdate(Long userId) {
-        List<SysDept> byshopCodeAndPid = deptRepository.findByShopCodeAndPid(AppContextUtil.getShopCode(), AppConstants.ZERO_L);
-        if (ObjectUtil.isEmpty(byshopCodeAndPid)) {
-            return;
-        }
-        Long deptId = byshopCodeAndPid.get(0).getId();
+    public void saveOrUpdate(String shopCode, Long userId, Long deptId) {
 
-        deptUserRepository.deleteByDeptIdAndUserId(deptId,userId);
-        // 查询部门是否存在
-        SysDept sysDept = byshopCodeAndPid.get(0);
-        if(ObjectUtil.isEmpty(sysDept)){
-            return ;
+        if (ObjectUtil.isEmpty(deptId)) {
+            List<SysDept> byshopCodeAndPid = deptRepository.findByShopCodeAndPid(shopCode, AppConstants.ZERO_L);
+            if (ObjectUtil.isEmpty(byshopCodeAndPid)) {
+                return;
+            }
+            deptId = byshopCodeAndPid.getFirst().getId();
+        } else {
+            SysDept byshopCodeAndPid = deptRepository.findByShopCodeAndId(shopCode,deptId);
+            if (ObjectUtil.isEmpty(byshopCodeAndPid)) {
+                throw ParamErrorCode.PARAMETER_INVALID.buildException("部门id不存在");
+            }
         }
+
+        // 删除用户之前的部门关系
+        deptUserRepository.deleteByUserId(userId);
         //保存部门用户关系
         SysDeptUser sysDeptUser = new SysDeptUser();
         sysDeptUser.setDeptId(deptId);

@@ -4,21 +4,22 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
+import com.yuansaas.user.dept.service.DeptUserService;
 import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.permission.entity.Permission;
 import com.yuansaas.user.menu.repository.PermissionRepository;
+import com.yuansaas.user.permission.params.AssignUserDeptParam;
 import com.yuansaas.user.permission.params.AssignUserRoleParam;
 import com.yuansaas.user.permission.params.AuthorizeMenuParam;
 import com.yuansaas.user.permission.service.PermissionService;
 import com.yuansaas.user.permission.service.RoleMenuService;
 import com.yuansaas.user.permission.service.RoleUserService;
 import com.yuansaas.user.role.service.RoleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -35,6 +36,7 @@ public class PermissionServiceImpl implements PermissionService {
     private final RoleUserService roleUserService;
     private final MenuService menuService;
     private final RoleService roleService;
+    private final DeptUserService deptUserService;
 
     /**
      * 判断是否有权限，任一一个即可
@@ -109,7 +111,7 @@ public class PermissionServiceImpl implements PermissionService {
      * @return true/false
      */
     @Override
-    public Boolean assignRoleMenu(AuthorizeMenuParam authorizeMenuParam) {
+    public Boolean assignRoleMenu(@Valid AuthorizeMenuParam authorizeMenuParam) {
         roleMenuService.assignRoleMenu(authorizeMenuParam.getRoleId(), authorizeMenuParam.getMenuIds());
         return true;
     }
@@ -143,7 +145,7 @@ public class PermissionServiceImpl implements PermissionService {
      * @return true/false
      */
     @Override
-    public Boolean assignUserRole(AssignUserRoleParam assignUserRoleParam) {
+    public Boolean assignUserRole(@Valid AssignUserRoleParam assignUserRoleParam) {
         roleUserService.assignUserRole(assignUserRoleParam.getUserId() , assignUserRoleParam.getRoleId());
         return true;
     }
@@ -157,6 +159,18 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public List<Long> getUserRoleListByRoleId(Long userId) {
         return roleUserService.getRoleIdList(userId);
+    }
+
+    /**
+     * 分配用户给部门
+     *
+     * @param assignUserDeptParam 分配参数
+     * @return true/false
+     */
+    @Override
+    public Boolean assignUserDept(AssignUserDeptParam assignUserDeptParam) {
+        deptUserService.saveOrUpdate(assignUserDeptParam.getShopCode() , assignUserDeptParam.getUserId(), assignUserDeptParam.getDeptId());
+        return true;
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.yuansaas.user.permission.service;
 
 import com.yuansaas.user.permission.entity.Permission;
+import com.yuansaas.user.permission.params.AssignUserDeptParam;
 import com.yuansaas.user.permission.params.AssignUserRoleParam;
 import com.yuansaas.user.permission.params.AuthorizeMenuParam;
 
@@ -82,5 +83,13 @@ public interface PermissionService {
      * @return Long
      */
     List<Long> getUserRoleListByRoleId(Long userId);
+
+    /**
+     * 分配用户给部门
+     * @param assignUserDeptParam 分配参数
+     * @return true/false
+     */
+    Boolean assignUserDept(AssignUserDeptParam assignUserDeptParam);
+
 
 }

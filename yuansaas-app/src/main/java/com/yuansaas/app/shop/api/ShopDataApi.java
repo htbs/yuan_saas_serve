@@ -30,10 +30,10 @@ public class ShopDataApi {
      * @param updateShopDataParam 店铺参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    @RequestMapping(value = "/update/info",method = RequestMethod.POST)
     @SecurityAuth
-    public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated UpdateShopDataParam updateShopDataParam) {
-        return ResponseBuilder.okResponse(shopDataService.update(updateShopDataParam));
+    public ResponseEntity<ResponseModel<Boolean>> updateInfoData(@RequestBody @Validated UpdateShopDataParam updateShopDataParam) {
+        return ResponseBuilder.okResponse(shopDataService.updateInfoData(updateShopDataParam));
     }
 
 

@@ -41,7 +41,7 @@ public class DictItemApi {
      * @param updateDictItemParam 编辑字典相关参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/update",method = RequestMethod.PUT)
+    @RequestMapping(value = "/updateInfoData",method = RequestMethod.PUT)
     @SecurityAuth
     public ResponseEntity<ResponseModel<Boolean>> updateDict(@RequestBody @Validated UpdateDictItemParam updateDictItemParam) {
         return ResponseBuilder.okResponse(dictItemService.updateDict(updateDictItemParam));

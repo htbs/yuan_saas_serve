@@ -45,7 +45,7 @@ public class DictApi {
      * @param updateDictParam 修改字典排序
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/update",method = RequestMethod.PUT)
+    @RequestMapping(value = "/updateInfoData",method = RequestMethod.PUT)
     @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> updateDict(@RequestBody @Validated UpdateDictParam updateDictParam) {
         return ResponseBuilder.okResponse(dictService.updateDict(updateDictParam));
@@ -56,7 +56,7 @@ public class DictApi {
      * @param updateSortParam 修改字典排序
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/update/order_num",method = RequestMethod.POST)
+    @RequestMapping(value = "/updateInfoData/order_num",method = RequestMethod.POST)
     @SecurityAuth()
     public ResponseEntity<ResponseModel<Boolean>> updateOrderNum(@RequestBody @Validated UpdateSortParam updateSortParam) {
         return ResponseBuilder.okResponse(dictService.updateOrderNum(updateSortParam));
