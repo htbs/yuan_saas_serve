@@ -3,9 +3,11 @@ package com.yuansaas.app.feature.service;
 import com.yuansaas.app.feature.params.AssignFeatureMenuParam;
 import com.yuansaas.app.feature.params.FeatureCreateParam;
 import com.yuansaas.app.feature.params.FeatureUpdateParam;
+import com.yuansaas.user.menu.vo.MenuVo;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -27,6 +29,17 @@ public interface FeatureService {
      */
     Boolean update(@Valid FeatureUpdateParam featureUpdateParam);
 
+
+
+
+    /**
+     * 获取功能列表
+     *
+     * @param featureCode 功能code
+     * @author lxz 2026/01/29 14:35
+     */
+    List<String> getFeatureCodeListByFeatureCodes(List<String> featureCode);
+
     /**
      * 分配菜单给功能点
      *
@@ -42,6 +55,16 @@ public interface FeatureService {
      * @param lockStatus 锁定状态
      * @author lxz 2026/01/29 14:35
      */
-    List<Long> getMenuCodeListByFeatureCodeAndLockStatus(String featureCode,String lockStatus) ;
+    List<Long> getMenuCodeListByFeatureCodeAndLockStatus(String featureCode,String lockStatus);
+
+    /**
+     * 获取功能点下分配的菜单cod列表
+     *
+     * @param featureCode 功能code
+     * @param menuType    菜单类型  0：菜单 1：按钮  不传则全部返回
+     * @author lxz 2026/01/29 14:35
+     */
+    Map<String , List<MenuVo>> getMenuListByFeatureCodesAndMenuType(List<String> featureCode  , Integer menuType);
+
 
 }

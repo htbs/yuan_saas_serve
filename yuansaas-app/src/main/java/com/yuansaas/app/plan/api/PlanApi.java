@@ -1,9 +1,7 @@
 package com.yuansaas.app.plan.api;
 
-import com.yuansaas.app.feature.params.FeatureCreateParam;
-import com.yuansaas.app.feature.params.FeatureUpdateParam;
-import com.yuansaas.app.feature.service.FeatureService;
-import com.yuansaas.app.order.shop.vo.ShopOrderCountVo;
+import com.yuansaas.app.feature.vo.FeatureMenuBriefVo;
+import com.yuansaas.app.plan.params.AssignPlanFeatureParam;
 import com.yuansaas.app.plan.params.FindPlanParam;
 import com.yuansaas.app.plan.params.PlanCreateParam;
 import com.yuansaas.app.plan.params.PlanUpdateParam;
@@ -18,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  *
@@ -61,10 +61,10 @@ public class PlanApi {
      * @param planId 套餐id
      * @author  lxz 2026/01/29 14:35
      */
-    @RequestMapping(method = RequestMethod.PUT ,value = "/lock/{id}")
+    @RequestMapping(method = RequestMethod.PUT ,value = "/disable/{id}")
     @SecurityAuth
     @PreAuthorize("@ss.hasPermission('system:plan:lock')")
-    public ResponseEntity<ResponseModel<Boolean>> lock( @PathVariable Long planId) {
+    public ResponseEntity<ResponseModel<Boolean>> disable( @PathVariable Long planId) {
         return ResponseBuilder.okResponse(planService.lock(planId));
     }
     /**
@@ -72,15 +72,15 @@ public class PlanApi {
      * @param planId 套餐id
      * @author  lxz 2026/01/29 14:35
      */
-    @RequestMapping(method = RequestMethod.PUT ,value = "/lock/{id}")
+    @RequestMapping(method = RequestMethod.PUT ,value = "/enable/{id}")
     @SecurityAuth
     @PreAuthorize("@ss.hasPermission('system:plan:lock')")
-    public ResponseEntity<ResponseModel<Boolean>> lock( @PathVariable Long planId) {
+    public ResponseEntity<ResponseModel<Boolean>> enable( @PathVariable Long planId) {
         return ResponseBuilder.okResponse(planService.lock(planId));
     }
 
     /**
-     * 禁用套餐
+     * 删除套餐
      * @param planId 套餐id
      * @author  lxz 2026/01/29 14:35
      */
@@ -102,5 +102,31 @@ public class PlanApi {
     public ResponseEntity<ResponseModel<RPage<PlanPageListVo>>> findByPage(FindPlanParam findPlanParam) {
         return ResponseBuilder.okResponse(planService.findByPage(findPlanParam));
     }
+
+
+    /**
+     * 分配功能给套餐
+     * @param assignPlanFeatureParam 套餐编辑参数
+     * @author  lxz 2026/01/29 14:35
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = "/assign/feature")
+    @SecurityAuth
+    @PreAuthorize("@ss.hasPermission('system:assign:plan-feature')")
+    public ResponseEntity<ResponseModel<Boolean>> assignPlanFeature(@RequestBody @Validated AssignPlanFeatureParam assignPlanFeatureParam) {
+        return ResponseBuilder.okResponse(planService.assignPlanFeature(assignPlanFeatureParam));
+    }
+
+    /**
+     * 获取分配给套餐的功能列表
+     * @param planCode 套餐code
+     * @author  lxz 2026/01/29 14:35
+     */
+    @RequestMapping(method = RequestMethod.GET , value = "/assign/feature/list")
+    @SecurityAuth
+    @PreAuthorize("@ss.hasPermission('system:assign:plan-feature')")
+    public ResponseEntity<ResponseModel<List<FeatureMenuBriefVo>>> findAssignFeatureListByPlanCode(@RequestParam String planCode) {
+        return ResponseBuilder.okResponse(planService.findAssignFeatureListByPlanCode(planCode));
+    }
+
 
 }

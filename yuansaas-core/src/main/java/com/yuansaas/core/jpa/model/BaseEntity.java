@@ -77,4 +77,12 @@ public class BaseEntity {
         this.updateBy = AppContextUtil.getUserInfo();
     }
 
+    /**
+     * 新增操作
+     */
+    public void create() {
+        this.createAt = LocalDateTime.now();
+        this.createBy = AppContextUtil.getUserInfo();
+    }
+
 }

@@ -2,8 +2,12 @@ package com.yuansaas.app.feature.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.app.feature.entity.Feature;
 import com.yuansaas.app.feature.entity.FeatureMenuLink;
+import com.yuansaas.app.feature.entity.QFeatureMenuLink;
 import com.yuansaas.app.feature.params.AssignFeatureMenuParam;
 import com.yuansaas.app.feature.params.FeatureCreateParam;
 import com.yuansaas.app.feature.params.FeatureUpdateParam;
@@ -12,15 +16,18 @@ import com.yuansaas.app.feature.repository.FeatureRepository;
 import com.yuansaas.app.feature.service.FeatureService;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
+import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.user.menu.entity.Menu;
+import com.yuansaas.user.menu.entity.QMenu;
 import com.yuansaas.user.menu.service.MenuService;
+import com.yuansaas.user.menu.vo.MenuVo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -35,6 +42,7 @@ public class FeatureServiceImpl implements FeatureService {
     private final FeatureRepository featureRepository;
     private final FeatureMenuLinkRepository featureMenuLinkRepository;
     private final MenuService menuService;
+    private final JPAQueryFactory jpaQueryFactory;
 
     /**
      * 新增功能
@@ -77,6 +85,17 @@ public class FeatureServiceImpl implements FeatureService {
     }
 
     /**
+     * 获取功能列表
+     *
+     * @param featureCode 功能code
+     * @author lxz 2026/01/29 14:35
+     */
+    @Override
+    public List<String> getFeatureCodeListByFeatureCodes(List<String> featureCode) {
+        return featureRepository.getFeatureCodeListByFeatureCodes(featureCode);
+    }
+
+    /**
      * 分配菜单给功能点
      *
      * @param assignFeatureMenuParam 功能编辑参数
@@ -116,6 +135,52 @@ public class FeatureServiceImpl implements FeatureService {
     @Override
     public List<Long> getMenuCodeListByFeatureCodeAndLockStatus(String featureCode  , String lockStatus) {
         return featureMenuLinkRepository.featIdByFeatureCodeAndLockStatus(featureCode, lockStatus);
+    }
+
+    /**
+     * 获取功能点下分配的菜单cod列表
+     *
+     * @param featureCode 功能code
+     * @param menuType    菜单类型  0：菜单 1：按钮  不传则全部返回
+     * @author lxz 2026/01/29 14:35
+     */
+    @Override
+    public Map<String, List<MenuVo>> getMenuListByFeatureCodesAndMenuType(List<String> featureCode, Integer menuType) {
+
+        QFeatureMenuLink qFeatureMenuLink = QFeatureMenuLink.featureMenuLink;
+        QMenu qMenu = QMenu.menu;
+
+        Expression<MenuVo> menuExpr =
+                Projections.bean(
+                        MenuVo.class,
+                        qMenu.menuCode,
+                        qMenu.name,
+                        qMenu.menuType,
+                        qMenu.pid,
+                        qMenu.url,
+                        qMenu.icon,
+                        qMenu.sort,
+                        qMenu.permissions
+                );
+
+        return jpaQueryFactory.select(
+                        qFeatureMenuLink.featureCode,
+                        menuExpr
+                )
+                .from(qFeatureMenuLink)
+                .leftJoin(qMenu).on(qFeatureMenuLink.menuCode.eq(qMenu.menuCode))
+                .where(BoolBuilder.getInstance()
+                        .and(featureCode , qFeatureMenuLink.featureCode::in)
+                        .and(menuType , qMenu.menuType::eq)
+                        .getWhere())
+                .fetch()
+                .stream()
+                .collect(
+                        Collectors.groupingBy(
+                        tuple -> tuple.get(qFeatureMenuLink.featureCode),
+                         Collectors.mapping(tuple -> tuple.get(menuExpr),Collectors.toList())
+                        )
+                );
     }
 
 

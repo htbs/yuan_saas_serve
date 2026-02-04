@@ -1,14 +1,22 @@
 package com.yuansaas.app.plan.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yuansaas.app.feature.entity.QFeature;
+import com.yuansaas.app.feature.service.FeatureService;
+import com.yuansaas.app.feature.vo.FeatureMenuBriefVo;
 import com.yuansaas.app.plan.entity.Plan;
+import com.yuansaas.app.plan.entity.PlanFeatureLink;
 import com.yuansaas.app.plan.entity.QPlan;
+import com.yuansaas.app.plan.entity.QPlanFeatureLink;
+import com.yuansaas.app.plan.params.AssignPlanFeatureParam;
 import com.yuansaas.app.plan.params.FindPlanParam;
 import com.yuansaas.app.plan.params.PlanCreateParam;
 import com.yuansaas.app.plan.params.PlanUpdateParam;
+import com.yuansaas.app.plan.repository.PlanFeatureLinkRepository;
 import com.yuansaas.app.plan.repository.PlanRepository;
 import com.yuansaas.app.plan.service.PlanService;
 import com.yuansaas.app.plan.vo.PlanPageListVo;
@@ -16,9 +24,17 @@ import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
+import com.yuansaas.user.menu.vo.MenuVo;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -32,6 +48,9 @@ public class PlanServiceImpl implements PlanService {
 
     private final PlanRepository planRepository;
     private final JPAQueryFactory jpaQueryFactory;
+    private final FeatureService featureService;
+    private final PlanFeatureLinkRepository planFeatureLinkRepository;
+
     /**
      * 新增套餐
      *
@@ -146,6 +165,74 @@ public class PlanServiceImpl implements PlanService {
                     .where(boolBuilder)
                     ;
         });
+    }
+
+    /**
+     * 分配功能给套餐
+     *
+     * @param assignPlanFeatureParam 分配参数
+     * @author lxz 2026/01/29 14:35
+     */
+    @Override
+    public Boolean assignPlanFeature(@Valid AssignPlanFeatureParam assignPlanFeatureParam) {
+        Integer count = planRepository.countByPlanCode(assignPlanFeatureParam.getPlanCode());
+        if (count == 0) {
+            throw DataErrorCode.DATA_NOT_FOUND.buildException("套餐不存在");
+        }
+        List<String> featureCodeIn = featureService.getFeatureCodeListByFeatureCodes(assignPlanFeatureParam.getFeatureCode());
+        if (ObjectUtil.isEmpty(featureCodeIn)) {
+            throw DataErrorCode.DATA_NOT_FOUND.buildException("功能不存在");
+        }
+        // 组装数据
+        List<PlanFeatureLink> planFeatureLinks = new ArrayList<>();
+        featureCodeIn.forEach(f ->{
+            PlanFeatureLink planFeatureLink = new PlanFeatureLink();
+            planFeatureLink.setFeatureCode(f);
+            planFeatureLink.setPlanCode(assignPlanFeatureParam.getPlanCode());
+            planFeatureLink.create();
+            planFeatureLinks.add(planFeatureLink);
+        });
+        planFeatureLinkRepository.saveAll(planFeatureLinks);
+
+        return true;
+    }
+
+    /**
+     * 获取分配给套餐的功能列表
+     *
+     * @param planCode 套餐code
+     * @author lxz 2026/01/29 14:35
+     */
+    @Override
+    public List<FeatureMenuBriefVo> findAssignFeatureListByPlanCode(String planCode) {
+
+        QPlanFeatureLink qPlanFeatureLink = QPlanFeatureLink.planFeatureLink;
+        QFeature qFeature = QFeature.feature;
+
+        List<FeatureMenuBriefVo> featureMenuBriefVos = jpaQueryFactory.select(Projections.bean(FeatureMenuBriefVo.class,
+                        qFeature.featureCode,
+                        qFeature.featureName,
+                        qFeature.featureType,
+                        qFeature.description,
+                        qFeature.featureScope
+                ))
+                .from(qPlanFeatureLink)
+                .leftJoin(qFeature).on(qPlanFeatureLink.featureCode.eq(qFeature.featureCode))
+                .where(qPlanFeatureLink.planCode.eq(planCode))
+                .fetch();
+        if (ObjectUtil.isEmpty(featureMenuBriefVos)) {
+            return null;
+        }
+        // 获取功能code
+        List<String> featureCodes = featureMenuBriefVos.stream().map(FeatureMenuBriefVo::getFeatureCode).collect(Collectors.toList());
+        Map<String, List<MenuVo>> menuListByFeatureCodesAndMenuType = featureService.getMenuListByFeatureCodesAndMenuType(featureCodes, AppConstants.ZERO);
+
+        featureMenuBriefVos.forEach(f ->{
+            if (menuListByFeatureCodesAndMenuType.containsKey(f.getFeatureCode())) {
+                f.setMenuVos(menuListByFeatureCodesAndMenuType.get(f.getFeatureCode()));
+            }
+        });
+        return featureMenuBriefVos;
     }
 
     /**

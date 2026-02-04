@@ -1,11 +1,15 @@
 package com.yuansaas.app.plan.service;
 
+import com.yuansaas.app.feature.vo.FeatureMenuBriefVo;
+import com.yuansaas.app.plan.params.AssignPlanFeatureParam;
 import com.yuansaas.app.plan.params.FindPlanParam;
 import com.yuansaas.app.plan.params.PlanCreateParam;
 import com.yuansaas.app.plan.params.PlanUpdateParam;
 import com.yuansaas.app.plan.vo.PlanPageListVo;
 import com.yuansaas.core.page.RPage;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  *
@@ -49,4 +53,20 @@ public interface PlanService {
      * @author  lxz 2026/01/29 14:35
      */
     RPage<PlanPageListVo> findByPage(FindPlanParam findPlanParam);
+
+    /**
+     * 分配功能给套餐
+     *
+     * @param assignPlanFeatureParam 分配参数
+     * @author lxz 2026/01/29 14:35
+     */
+    Boolean assignPlanFeature(@Valid AssignPlanFeatureParam assignPlanFeatureParam);
+
+    /**
+     * 获取分配给套餐的功能列表
+     *
+     * @param planCode 套餐code
+     * @author lxz 2026/01/29 14:35
+     */
+    List<FeatureMenuBriefVo> findAssignFeatureListByPlanCode(String planCode);
 }

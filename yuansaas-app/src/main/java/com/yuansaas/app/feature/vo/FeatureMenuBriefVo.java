@@ -1,20 +1,18 @@
-package com.yuansaas.app.feature.entity;
+package com.yuansaas.app.feature.vo;
 
-import com.yuansaas.core.jpa.model.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.yuansaas.user.menu.vo.MenuVo;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  *
- * 功能表
+ * 功能菜单简要信息vo
  *
- * @author LXZ 2026/1/29 17:42
+ * @author LXZ 2026/2/2 11:44
  */
 @Data
-@Entity
-@Table(name = "feature")
-public class Feature extends BaseEntity {
+public class FeatureMenuBriefVo {
     /**
      * 功能code
      */
@@ -37,12 +35,10 @@ public class Feature extends BaseEntity {
      * 枚举 {@link com.yuansaas.app.feature.enums.FeatureScopeEnum}
      */
     private String featureScope;
+
     /**
-     * 锁定状态
+     * 关联的菜单信息
      */
-    private String lockStatus;
-    /**
-     * 删除状态
-     */
-    private String deleteStatus;
+    private List<MenuVo> menuVos;
+
 }

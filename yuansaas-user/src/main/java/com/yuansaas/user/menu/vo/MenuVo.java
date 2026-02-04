@@ -20,6 +20,10 @@ public class MenuVo {
      */
     private Long   pid;
     /**
+     * 菜单类型 0：菜单 1：按钮
+     */
+    private Integer menuType;
+    /**
      * 名称
      */
     private String name;

@@ -1,4 +1,4 @@
-package com.yuansaas.app.feature.vo;
+package com.yuansaas.app.template.vo;
 
 import lombok.Data;
 
