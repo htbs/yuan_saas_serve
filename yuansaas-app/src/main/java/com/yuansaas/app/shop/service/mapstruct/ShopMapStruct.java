@@ -10,6 +10,7 @@ import com.yuansaas.app.shop.param.UpdateShopParam;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.jackson.JacksonUtil;
+import com.yuansaas.user.config.AppProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 public class ShopMapStruct {
 
     private final PasswordEncoder passwordEncoder;
+    private final AppProperties appProperties;
 
     /**
      * 商铺保存映射方法
@@ -102,7 +104,7 @@ public class ShopMapStruct {
         ShopUser shopUser = new ShopUser();
         shopUser.setShopCode(shopUserSaveParam.getShopCode());
         shopUser.setUserName(shopUserSaveParam.getUserName());
-        shopUser.setPassword(passwordEncoder.encode(AppConstants.PWD));
+        shopUser.setPassword(passwordEncoder.encode(appProperties.getDefaultPassword()));
         shopUser.setNickName(shopUserSaveParam.getNickName());
         shopUser.setRealName(shopUserSaveParam.getRealName());
         shopUser.setEmail(shopUserSaveParam.getEmail());

@@ -1,11 +1,19 @@
 package com.yuansaas.user.permission.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
+import com.yuansaas.core.redis.RedisUtil;
+import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.dept.service.DeptUserService;
+import com.yuansaas.user.menu.entity.Menu;
+import com.yuansaas.user.menu.enums.MenuCacheEnum;
 import com.yuansaas.user.menu.service.MenuService;
+import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.permission.entity.Permission;
 import com.yuansaas.user.menu.repository.PermissionRepository;
 import com.yuansaas.user.permission.params.AssignUserDeptParam;
@@ -125,6 +133,25 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public List<Long> getRoleMenuListByRoleId(Long roleId) {
         return roleMenuService.getMenuIdList(roleId);
+    }
+
+    /**
+     * 根据用户id查询菜单列表
+     *
+     * @param userId 用户id
+     * @return 菜单列表
+     */
+    @Override
+    public List<MenuListVo> findMenuListByUserId(Long userId) {
+        return RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.USER_MENU_LIST, userId), new TypeReference<List<MenuListVo>>() {}, () -> {
+            // 查询角色列表
+            List<Long> roleIdList = roleUserService.getRoleIdList(userId);
+            // 查询菜单列表
+            List<Long> menuIdList = roleMenuService.getMenuIdList(roleIdList);
+            // 构建树形菜单
+            List<Menu> menuList = menuService.getByList(menuIdList, AppConstants.N);
+            return TreeUtils.build(BeanUtil.copyToList(menuList, MenuListVo.class), AppConstants.ZERO_L);
+        });
     }
 
     /**

@@ -255,25 +255,6 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     /**
-     * 根据用户id查询菜单列表
-     *
-     * @param userId 用户id
-     * @return 菜单列表
-     */
-    @Override
-    public List<MenuListVo> findMenuListByUserId(Long userId) {
-        return RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.USER_MENU_LIST, userId), new TypeReference<List<MenuListVo>>() {}, () -> {
-            // 查询角色列表
-            List<Long> roleIdList = roleUserService.getRoleIdList(userId);
-            // 查询菜单列表
-            List<Long> menuIdList = roleMenuService.getMenuIdList(roleIdList);
-            // 构建树形菜单
-            List<Menu> menuList = menuService.getByList(menuIdList,AppConstants.N);
-            return TreeUtils.build(BeanUtil.copyToList(menuList, MenuListVo.class), AppConstants.ZERO_L);
-        });
-    }
-
-    /**
      * 列表查询
      *
      * @param findUserParam 查询参数

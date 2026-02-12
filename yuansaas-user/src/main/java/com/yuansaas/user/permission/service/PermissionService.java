@@ -1,5 +1,6 @@
 package com.yuansaas.user.permission.service;
 
+import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.permission.entity.Permission;
 import com.yuansaas.user.permission.params.AssignUserDeptParam;
 import com.yuansaas.user.permission.params.AssignUserRoleParam;
@@ -62,6 +63,13 @@ public interface PermissionService {
      * @return Long
      */
     List<Long> getRoleMenuListByRoleId(Long roleId);
+
+    /**
+     * 根据用户id查询菜单列表
+     * @param userId 用户id
+     * @return 菜单列表
+     */
+    List<MenuListVo> findMenuListByUserId(Long userId);
 
     /**
      * 获取菜单拥有的角色id

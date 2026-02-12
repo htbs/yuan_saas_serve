@@ -29,11 +29,13 @@ import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jackson.JacksonUtil;
 import com.yuansaas.core.utils.id.SnowflakeIdGenerator;
+import com.yuansaas.user.config.AppProperties;
 import com.yuansaas.user.role.enums.AuthorityEnum;
 import com.yuansaas.user.role.enums.RoleTypeEnum;
 import com.yuansaas.user.role.params.SaveRoleParam;
 import com.yuansaas.user.role.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -61,6 +63,8 @@ public class ShopDataServiceImpl implements ShopDataService {
     private final OrderService orderService;
     private final SnowflakeIdGenerator idGenerator;
     private final ShopUserService shopUserService;
+    private final AppProperties appProperties;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 激活商家
@@ -379,7 +383,7 @@ public class ShopDataServiceImpl implements ShopDataService {
         shopUserSaveParam.setShopCode(shopCode);
         // 因为是初始化所以账号使用商铺的code
         shopUserSaveParam.setUserName(shopCode);
-        shopUserSaveParam.setPassword(AppConstants.PWD);
+        shopUserSaveParam.setPassword(passwordEncoder.encode(appProperties.getDefaultPassword()));
         shopUserSaveParam.setNickName(shopName);
         shopUserSaveParam.setRoleId(Collections.singletonList(roleId));
         shopUserService.createUser(shopUserSaveParam);

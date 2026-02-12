@@ -90,18 +90,12 @@ public interface SysUserService {
      */
     Boolean unlockUser(Long userId);
 
-
     /**
      * 删除用户
      * @param userId  用户id
      */
     Boolean deleteUser(Long userId);
-    /**
-     * 根据用户id查询菜单列表
-     * @param userId 用户id
-     * @return 菜单列表
-     */
-    List<MenuListVo> findMenuListByUserId(Long userId);
+
     /**
      * 列表查询
      * @param findUserParam 查询参数

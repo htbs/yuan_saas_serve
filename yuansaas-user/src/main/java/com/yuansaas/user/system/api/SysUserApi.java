@@ -6,6 +6,7 @@ import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
 import com.yuansaas.user.menu.vo.MenuListVo;
+import com.yuansaas.user.permission.service.PermissionService;
 import com.yuansaas.user.system.entity.SysUser;
 import com.yuansaas.user.system.param.FindUserParam;
 import com.yuansaas.user.system.param.SysUserCreateParam;
@@ -33,6 +34,7 @@ import java.util.List;
 public class SysUserApi {
 
     private final SysUserService userService;
+    private final PermissionService permissionService;
 
     /**
      * 创建用户
@@ -122,7 +124,7 @@ public class SysUserApi {
     @GetMapping("/get/menu/list/{id}")
     @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER})
     public ResponseEntity<ResponseModel<List<MenuListVo>>> findMenuListByUserId(@PathVariable(name = "id") Long id) {
-        return ResponseBuilder.okResponse( userService.findMenuListByUserId(id));
+        return ResponseBuilder.okResponse( permissionService.findMenuListByUserId(id));
     }
 
     /**
