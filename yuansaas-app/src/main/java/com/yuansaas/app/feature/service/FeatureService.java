@@ -1,5 +1,6 @@
 package com.yuansaas.app.feature.service;
 
+import com.yuansaas.app.feature.entity.Feature;
 import com.yuansaas.app.feature.params.AssignFeatureMenuParam;
 import com.yuansaas.app.feature.params.FeatureCreateParam;
 import com.yuansaas.app.feature.params.FeatureUpdateParam;
@@ -29,16 +30,22 @@ public interface FeatureService {
      */
     Boolean update(@Valid FeatureUpdateParam featureUpdateParam);
 
-
-
+    /**
+     * 获取功能code列表
+     *
+     * @param featureCodes 功能code
+     * @author lxz 2026/01/29 14:35
+     */
+    List<String> getFeatureCodeListByFeatureCodes(List<String> featureCodes);
 
     /**
      * 获取功能列表
      *
-     * @param featureCode 功能code
+     * @param featureCodes 功能code
      * @author lxz 2026/01/29 14:35
      */
-    List<String> getFeatureCodeListByFeatureCodes(List<String> featureCode);
+    List<Feature> getFeatureListByFeatureCodes(List<String> featureCodes);
+
 
     /**
      * 分配菜单给功能点
@@ -67,4 +74,11 @@ public interface FeatureService {
     Map<String , List<MenuVo>> getMenuListByFeatureCodesAndMenuType(List<String> featureCode  , Integer menuType);
 
 
+    /**
+     * 根据行业类型获取功能code
+     *
+     * @param industryType 行业类型
+     * @author lxz 2026/01/29 14:35
+     */
+    List<Feature> getFeatureCodesByIndustryType(String industryType);
 }

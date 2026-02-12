@@ -3,7 +3,7 @@ package com.yuansaas.user.system.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.querydsl.core.QueryResults;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
@@ -18,6 +18,7 @@ import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.integration.sms.model.CheckVerifyCodeModel;
 import com.yuansaas.integration.sms.service.SmsVerifyService;
 import com.yuansaas.user.common.enums.UserStatus;
+import com.yuansaas.user.config.AppProperties;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.entity.QSysDeptUser;
 import com.yuansaas.user.dept.service.DeptUserService;
@@ -46,9 +47,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -62,6 +61,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     private final SysUserRepository sysUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AppProperties appProperties;
     private final PermissionService permissionService;
     private final RoleUserService roleUserService;
     private final RoleMenuService roleMenuService;
@@ -114,15 +114,6 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public SysUser saveUser(SysUserCreateParam sysUserCreateParam) {
-        //手机号和验证码校验
-        if (sysUserCreateParam.getIsPhoneVerifyCodeValid()) {
-        smsVerifyService.checkVerifyCode(CheckVerifyCodeModel.builder()
-                        .phone(sysUserCreateParam.getPhone())
-                        .verifyContent(sysUserCreateParam.getVerifyCode())
-                        .type(sysUserCreateParam.getSendSceneType())
-                        .serialNo(sysUserCreateParam.getSerialNo())
-                .build());
-        }
 
         // 校验用户名是否存在
         if (findByUsername(sysUserCreateParam.getUserName()).isPresent()) {
@@ -131,7 +122,7 @@ public class SysUserServiceImpl implements SysUserService {
         // 保存用户信息
         SysUser sysUser = new SysUser();
         BeanUtils.copyProperties(sysUserCreateParam, sysUser);
-        sysUser.setPassword(passwordEncoder.encode(AppConstants.PWD));
+        sysUser.setPassword(passwordEncoder.encode(appProperties.getDefaultPassword()));
         sysUser.setCreateAt(LocalDateTime.now());
         sysUser.setCreateBy(AppContextUtil.getUserInfo());
         sysUserRepository.save(sysUser);
@@ -146,8 +137,7 @@ public class SysUserServiceImpl implements SysUserService {
     public Boolean updateUser(UserUpdateParam userUpdateParam) {
         sysUserRepository.findById(userUpdateParam.getId()).ifPresentOrElse(sysUser -> {
             // 手机号和验证码校验
-            if (!ObjectUtil.equals(userUpdateParam.getPhone(), sysUser.getPhone())) {
-                if (ObjectUtil.hasEmpty(userUpdateParam.getPhone(),
+            if (!ObjectUtil.equals(userUpdateParam.getPhone(), sysUser.getPhone()) && ObjectUtil.hasEmpty(userUpdateParam.getPhone(),
                         userUpdateParam.getVerifyCode(),
                         userUpdateParam.getSerialNo(),
                         userUpdateParam.getSendSceneType())
@@ -159,7 +149,7 @@ public class SysUserServiceImpl implements SysUserService {
                             .serialNo(userUpdateParam.getSerialNo())
                             .build());
                 }
-            }
+
 
             BeanUtils.copyProperties(userUpdateParam, sysUser);
             sysUser.setUpdateBy(AppContextUtil.getUserInfo());
@@ -168,7 +158,7 @@ public class SysUserServiceImpl implements SysUserService {
             // 授权角色权限
             permissionService.assignUserRole(AssignUserRoleParam.builder().userId(sysUser.getId()).roleId(userUpdateParam.getRoleIds()).build());
         },()->{
-            throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
         });
         return true;
     }
@@ -192,10 +182,10 @@ public class SysUserServiceImpl implements SysUserService {
                         sysUserRepository.save(sysUser);
                     }
                     ,() ->{
-                        throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
+                        throw  DataErrorCode.DATA_NOT_FOUND.buildException();
                     }
         );
-        return null;
+        return true;
     }
 
     /**
@@ -207,13 +197,13 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public Boolean resetUserResetPwd(Long id) {
         sysUserRepository.findById(id).ifPresentOrElse(sysUser -> {
-                    sysUser.setPassword(passwordEncoder.encode(AppConstants.PWD));
+                    sysUser.setPassword(passwordEncoder.encode(appProperties.getDefaultPassword()));
                     sysUser.setUpdateAt(LocalDateTime.now());
                     sysUser.setUpdateBy(AppContextUtil.getUserInfo());
                     sysUserRepository.save(sysUser);
                 }
                 ,() ->{
-                    throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
+                    throw  DataErrorCode.DATA_NOT_FOUND.buildException();
                 }
         );
         return true;
@@ -227,7 +217,7 @@ public class SysUserServiceImpl implements SysUserService {
             sysUser.setUpdateBy(AppContextUtil.getUserInfo());
             sysUserRepository.save(sysUser);
         }, () -> {
-            throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
         });
         return true;
     }
@@ -240,7 +230,7 @@ public class SysUserServiceImpl implements SysUserService {
             sysUser.setUpdateBy(AppContextUtil.getUserInfo());
             sysUserRepository.save(sysUser);
         }, () -> {
-            throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
         });
         return true;
     }
@@ -259,7 +249,7 @@ public class SysUserServiceImpl implements SysUserService {
             // 删除菜单缓存
             RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.USER_MENU_LIST, userId));
         }, () -> {
-            throw  DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在");
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
         });
         return true;
     }
@@ -302,7 +292,12 @@ public class SysUserServiceImpl implements SysUserService {
         QSysUser sysUser = QSysUser.sysUser;
         QSysDept qSysDept = QSysDept.sysDept;
         QSysDeptUser qSysDeptUser = QSysDeptUser.sysDeptUser;
-        QueryResults<SysUserListVo> page = jpaQueryFactory.select(Projections.bean(SysUserListVo.class,
+        BooleanBuilder boolBuilder =  BoolBuilder.getInstance()
+                .and(findUserParam.getUserName(), sysUser.userName::contains)
+                .and(findUserParam.getPhone(), sysUser.phone::eq)
+                .and(sysUser.status.in(status))
+                .getWhere();
+        return findUserParam.getPage(()-> jpaQueryFactory.select(Projections.bean(SysUserListVo.class,
                         sysUser.id,
                         sysUser.userName,
                         sysUser.realName,
@@ -318,16 +313,14 @@ public class SysUserServiceImpl implements SysUserService {
                 .from(sysUser)
                 .leftJoin(qSysDeptUser).on(sysUser.id.eq(qSysDeptUser.userId))
                 .leftJoin(qSysDept).on(qSysDeptUser.deptId.eq(qSysDept.id))
-                .where(
-                        BoolBuilder.getInstance()
-                                .and(findUserParam.getUserName(), sysUser.userName::contains)
-                                .and(findUserParam.getPhone(), sysUser.phone::eq)
-                                .and(sysUser.status.in(status))
-                                .getWhere()
-                ).orderBy(sysUser.createAt.desc())
-                .offset(findUserParam.obtainOffset())
-                .limit(findUserParam.getPageSize())
-                .fetchResults();
-        return findUserParam.getRPage(page.getResults(),page.getTotal());
+                .where(boolBuilder)
+                .orderBy(sysUser.createAt.desc())
+                ,
+                ()->
+                        jpaQueryFactory.select(sysUser.id.countDistinct())
+                                .from(sysUser)
+                                .where(boolBuilder)
+        );
+
     }
 }

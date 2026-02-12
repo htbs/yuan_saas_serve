@@ -29,7 +29,7 @@ import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jackson.JacksonUtil;
 import com.yuansaas.core.utils.id.SnowflakeIdGenerator;
-import com.yuansaas.user.role.enums.RoleCodeEnum;
+import com.yuansaas.user.role.enums.AuthorityEnum;
 import com.yuansaas.user.role.enums.RoleTypeEnum;
 import com.yuansaas.user.role.params.SaveRoleParam;
 import com.yuansaas.user.role.service.RoleService;
@@ -172,37 +172,31 @@ public class ShopDataServiceImpl implements ShopDataService {
     @Override
     public BusinessDataModel getBusinessHoursByShopCode(Date date , String shopCode) {
         // 查询商家日常营业时间
-        List<RegularHoursModel> regularHoursByShopCode = getRegularHoursByShopCode(shopCode);
+        List<RegularHoursModel> regularHoursByShopCode = Optional.ofNullable(getRegularHoursByShopCode(shopCode)).orElse(Collections.emptyList());
         // 查询商家特殊营业时间
-        List<SpecialHoursModel> specialHoursByShopCode = getSpecialHoursByShopCode(shopCode);
-        BusinessDataModel businessDataModel = null;
-        if (ObjectUtil.isNotEmpty(specialHoursByShopCode)) {
-            businessDataModel =  specialHoursByShopCode.stream()
-                    .filter(f -> AppConstants.Y.equals(f.getIsOpen()))
-                    .filter(f -> DateUtil.isIn(date, DateUtil.beginOfDay(f.getStartDate()), DateUtil.endOfDay(f.getEndDate())))
-                    .findFirst()
-                    .map( f ->{
-                        BusinessDataModel businessData = new BusinessDataModel();
-                        businessData.setIsBusiness(AppConstants.Y);
-                        businessData.setStartTime(f.getTimeSlots().getStartTime());
-                        businessData.setEndTime(f.getTimeSlots().getStartTime());
-                        return businessData;
-                    }).orElse(null);
-        }
-        if (ObjectUtil.isNotEmpty(regularHoursByShopCode)) {
-            businessDataModel =  regularHoursByShopCode.stream()
-                    .filter(f -> AppConstants.Y.equals(f.getIsOpen()))
-                    .filter(f -> f.getDayOfWeek() == DateUtil.dayOfWeek(date))
-                    .findFirst()
-                    .map( f ->{
-                        BusinessDataModel businessData = new BusinessDataModel();
-                        businessData.setIsBusiness(AppConstants.Y);
-                        businessData.setStartTime(f.getTimeSlots().getStartTime());
-                        businessData.setEndTime(f.getTimeSlots().getStartTime());
-                        return businessData;
-                    }).orElse(null);
-        }
-        return ObjectUtil.isEmpty(businessDataModel) ? new BusinessDataModel() : businessDataModel;
+        List<SpecialHoursModel> specialHoursByShopCode =Optional.ofNullable(getSpecialHoursByShopCode(shopCode)).orElse(Collections.emptyList());
+
+        return specialHoursByShopCode.stream()
+                .filter(f -> AppConstants.Y.equals(f.getIsOpen()))
+                .filter(f -> DateUtil.isIn(date, DateUtil.beginOfDay(f.getStartDate()), DateUtil.endOfDay(f.getEndDate())))
+                .findFirst()
+                .map( f ->{
+                    BusinessDataModel businessData = new BusinessDataModel();
+                    businessData.setIsBusiness(AppConstants.Y);
+                    businessData.setStartTime(f.getTimeSlots().getStartTime());
+                    businessData.setEndTime(f.getTimeSlots().getStartTime());
+                    return businessData;
+                }).orElseGet( () -> regularHoursByShopCode.stream()
+                        .filter(f -> AppConstants.Y.equals(f.getIsOpen()))
+                        .filter(f -> f.getDayOfWeek() == DateUtil.dayOfWeek(date))
+                        .findFirst()
+                        .map( f ->{
+                            BusinessDataModel businessData = new BusinessDataModel();
+                            businessData.setIsBusiness(AppConstants.Y);
+                            businessData.setStartTime(f.getTimeSlots().getStartTime());
+                            businessData.setEndTime(f.getTimeSlots().getStartTime());
+                            return businessData;
+                        }).orElse(null));
     }
 
 
@@ -351,10 +345,10 @@ public class ShopDataServiceImpl implements ShopDataService {
      */
     private Long setRoleInit (String shopCode) {
         SaveRoleParam saveRoleParam = new SaveRoleParam();
-        saveRoleParam.setName(RoleCodeEnum.SUPER_ADMIN.getDescribe());
+        saveRoleParam.setName(AuthorityEnum.TENANT_ADMIN.getDescribe());
         saveRoleParam.setType(RoleTypeEnum.SYSTEM.getName());
-        saveRoleParam.setCode(RoleCodeEnum.SUPER_ADMIN.getCode());
-        saveRoleParam.setDescription(RoleCodeEnum.SUPER_ADMIN.getDescribe());
+        saveRoleParam.setAuthorityType(AuthorityEnum.TENANT_ADMIN.getCode());
+        saveRoleParam.setDescription(AuthorityEnum.TENANT_ADMIN.getDescribe());
         saveRoleParam.setShopCode(shopCode);
         return roleService.save(saveRoleParam).getId();
     }

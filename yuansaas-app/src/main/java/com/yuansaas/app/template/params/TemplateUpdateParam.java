@@ -1,21 +1,22 @@
 package com.yuansaas.app.template.params;
 
+import com.yuansaas.app.common.enums.IndustryTypeEnum;
 import com.yuansaas.app.template.enums.TemplateTypeEnum;
+import com.yuansaas.app.template.model.ImagesUrlModel;
 import com.yuansaas.core.annotation.EnumValidate;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-
-import java.io.Serializable;
+import java.util.List;
 
 /**
  *
- * 保存模版参数
+ * 修改模版参数
  *
  * @author LXZ 2026/2/3 18:48
  */
 @Data
-public class TemplateUpdateParam implements Serializable {
+public class TemplateUpdateParam {
 
     /**
      * 模版id
@@ -35,15 +36,19 @@ public class TemplateUpdateParam implements Serializable {
     @EnumValidate(enumClass = TemplateTypeEnum.class , message = "模版类型无效")
     private String templateType;
     /**
-     * 套餐code
+     * 行业类型
+     * 枚举 {@link IndustryTypeEnum}
      */
-    @NotBlank(message = "套餐不能为空")
-    private String planCode;
+    @EnumValidate(enumClass = IndustryTypeEnum.class , message = "行业类型无效")
+    private String industryType;
     /**
      * 预览图
      */
-    @NotBlank(message = "预览图不能为空")
-    private String previewUrl;
+    private List<ImagesUrlModel> imagesUrl;
+    /**
+     * 预览视频
+     */
+    private String videoUrl;
     /**
      * 封面
      */

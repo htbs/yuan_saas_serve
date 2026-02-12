@@ -1,9 +1,26 @@
 package com.yuansaas.app.template.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.RandomUtil;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yuansaas.app.template.entity.QTemplate;
+import com.yuansaas.app.template.entity.Template;
 import com.yuansaas.app.template.params.FindTemplateRPageParam;
 import com.yuansaas.app.template.params.TemplateCreateParam;
 import com.yuansaas.app.template.params.TemplateUpdateParam;
+import com.yuansaas.app.template.repository.TemplateRepository;
+import com.yuansaas.app.template.service.TemplateFeatureService;
 import com.yuansaas.app.template.service.TemplateService;
+import com.yuansaas.app.template.vo.TemplateInfoVo;
+import com.yuansaas.app.template.vo.TemplatePageVo;
+import com.yuansaas.common.constants.AppConstants;
+import com.yuansaas.core.exception.ex.DataErrorCode;
+import com.yuansaas.core.jpa.querydsl.BoolBuilder;
+import com.yuansaas.core.page.RPage;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,7 +30,13 @@ import org.springframework.stereotype.Service;
  * @author LXZ 2026/2/4 20:30
  */
 @Service
+@RequiredArgsConstructor
 public class TemplateServiceImpl implements TemplateService {
+
+    private final TemplateRepository templateRepository;
+    private final JPAQueryFactory jpaQueryFactory;
+    private final TemplateFeatureService templateFeatureService;
+
     /**
      * 创建模版
      *
@@ -21,8 +44,15 @@ public class TemplateServiceImpl implements TemplateService {
      * @author lxz 2025/11/16 14:35
      */
     @Override
-    public Boolean add(TemplateCreateParam templateCreateParam) {
-        return null;
+    public Boolean add(@Valid TemplateCreateParam templateCreateParam) {
+        Template template = new Template();
+        BeanUtil.copyProperties(templateCreateParam , template);
+        template.setTemplateCode(getCode());
+        template.init();
+        templateRepository.save(template);
+        // 初始化功能点
+        templateFeatureService.init(template.getTemplateCode() , templateCreateParam.getIndustryType());
+        return true;
     }
 
     /**
@@ -32,30 +62,39 @@ public class TemplateServiceImpl implements TemplateService {
      * @author lxz 2025/11/16 14:35
      */
     @Override
-    public Boolean update(TemplateUpdateParam templateUpdateParam) {
-        return null;
+    public Boolean update(@Valid TemplateUpdateParam templateUpdateParam) {
+        templateRepository.findById(templateUpdateParam.getTemplateId()).ifPresentOrElse(template -> {
+            template.setTemplateName(templateUpdateParam.getTemplateName());
+            template.setTemplateType(templateUpdateParam.getTemplateType());
+            template.setCoverImage(templateUpdateParam.getCoverImage());
+            template.setImagesUrl(templateUpdateParam.getImagesUrl());
+            template.setVideoUrl(templateUpdateParam.getVideoUrl());
+            template.setIndustryType(templateUpdateParam.getIndustryType());
+            template.setIsDefault(templateUpdateParam.getIsDefault());
+            template.update();
+            templateRepository.save(template);
+        } , ()->{
+            throw DataErrorCode.DATA_NOT_FOUND.buildException();
+        });
+        return true;
     }
 
     /**
-     * 禁用模版
+     * 操作模版
      *
      * @param id 模版id
      * @author lxz 2025/11/16 14:35
      */
     @Override
-    public Boolean disable(Long id) {
-        return null;
-    }
-
-    /**
-     * 启用模版
-     *
-     * @param id 模版id
-     * @author lxz 2025/11/16 14:35
-     */
-    @Override
-    public Boolean enable(Long id) {
-        return null;
+    public Boolean lock(Long id) {
+        templateRepository.findById(id).ifPresentOrElse(template -> {
+            template.setLockStatus(AppConstants.N.equals(template.getLockStatus()) ? AppConstants.Y : AppConstants.N);
+            template.update();
+            templateRepository.save(template);
+        } , ()->{
+            throw DataErrorCode.DATA_NOT_FOUND.buildException();
+        });
+        return true;
     }
 
     /**
@@ -66,7 +105,14 @@ public class TemplateServiceImpl implements TemplateService {
      */
     @Override
     public Boolean delete(Long id) {
-        return null;
+        templateRepository.findById(id).ifPresentOrElse(template -> {
+            template.setDeleteStatus(AppConstants.Y);
+            template.update();
+            templateRepository.save(template);
+        } , ()->{
+            throw DataErrorCode.DATA_NOT_FOUND.buildException();
+        });
+        return true;
     }
 
     /**
@@ -76,18 +122,58 @@ public class TemplateServiceImpl implements TemplateService {
      * @author lxz 2025/11/16 14:35
      */
     @Override
-    public Boolean getByRPage(FindTemplateRPageParam findTemplateRPageParam) {
-        return null;
+    public RPage<TemplatePageVo> getByRPage(FindTemplateRPageParam findTemplateRPageParam) {
+        QTemplate template = QTemplate.template;
+        BooleanBuilder booleanBuilder = BoolBuilder.getInstance()
+                .and(findTemplateRPageParam.getTemplateName() , template.templateName::contains )
+                .and(findTemplateRPageParam.getTemplateType() , template.templateType::eq)
+                .and(findTemplateRPageParam.getIsDefault() , template.isDefault::eq)
+                .and(findTemplateRPageParam.getIndustryType() , template.industryType::eq)
+                .and(findTemplateRPageParam.getLockStatus() , template.lockStatus::eq)
+                .getWhere();
+
+        return  findTemplateRPageParam.getPage(() ->
+             jpaQueryFactory.select(Projections.bean(TemplatePageVo.class,
+                            template.id,
+                            template.templateName,
+                            template.templateType,
+                            template.industryType,
+                            template.imagesUrl,
+                            template.videoUrl,
+                            template.coverImage,
+                            template.isDefault,
+                            template.updateBy,
+                            template.updateAt
+                    )).from(template)
+                    .where(booleanBuilder)
+        ,()-> jpaQueryFactory.select(template.id.countDistinct()
+                    ).from(template)
+                    .where(booleanBuilder));
     }
 
     /**
      * 获取模版详情
-     *
      * @param id 模版id
      * @author lxz 2025/11/16 14:35
      */
     @Override
-    public Boolean getInfoById(Long id) {
-        return null;
+    public TemplateInfoVo getInfoById(Long id) {
+        Template template = templateRepository.findById(id).orElseThrow(DataErrorCode.DATA_NOT_FOUND::buildException);
+        return BeanUtil.copyProperties(template , TemplateInfoVo.class);
+    }
+
+    /**
+     * 生成 模版code
+     */
+    private String getCode() {
+        // 生成code
+        String code = RandomUtil.randomStringUpper(4);
+        // 判断code是否存在
+        Integer count =templateRepository.countByTemplateCode(code);
+        if (count > 0) {
+            getCode();
+        }
+        return code;
+
     }
 }

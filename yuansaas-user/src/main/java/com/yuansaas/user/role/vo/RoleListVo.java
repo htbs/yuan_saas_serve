@@ -20,6 +20,16 @@ public class RoleListVo {
      */
     private String name;
     /**
+     * 角色类型
+     * 枚举 {@link  com.yuansaas.user.role.enums.RoleTypeEnum}
+     */
+    private String type;
+    /**
+     * 角色标识
+     * 枚举 {@link com.yuansaas.user.role.enums.AuthorityEnum}
+     */
+    private String authorityType;
+    /**
      * 描述
      */
     private String description;

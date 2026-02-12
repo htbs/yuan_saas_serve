@@ -3,26 +3,21 @@ package com.yuansaas.user.role.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
-import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.BizErrorCode;
 import com.yuansaas.core.exception.ex.DataErrorCode;
-import com.yuansaas.core.jpa.model.BaseEntity;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.service.DeptService;
-import com.yuansaas.user.menu.service.MenuService;
 import com.yuansaas.user.permission.service.RoleMenuService;
 import com.yuansaas.user.permission.service.RoleUserService;
 import com.yuansaas.user.role.entity.QRole;
 import com.yuansaas.user.role.entity.Role;
-import com.yuansaas.user.role.enums.RoleCodeEnum;
-import com.yuansaas.user.role.enums.RoleTypeEnum;
+import com.yuansaas.user.role.enums.AuthorityEnum;
 import com.yuansaas.user.role.params.FindRoleParam;
 import com.yuansaas.user.role.params.SaveRoleParam;
 import com.yuansaas.user.role.params.UpdateRoleParam;
@@ -34,7 +29,6 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -60,41 +54,21 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public RPage<RoleListVo> getByPage(FindRoleParam findRoleParam) {
-
         QRole role = QRole.role;
         QSysDept dept = QSysDept.sysDept;
-
-//        QueryResults<RoleListVo> deptName = jpaQueryFactory.select(Projections.bean(RoleListVo.class,
-//                        role.id,
-//                        role.name,
-//                        role.description,
-//                        role.deptId,
-//                        role.createAt,
-//                        role.createBy,
-//                        dept.name.as("deptName")
-//                ))
-//                .from(role)
-//                .leftJoin(dept).on(role.deptId.eq(dept.id))
-//                .where(BoolBuilder.getInstance()
-//                        .and(findRoleParam.getName() , role.name::contains)
-//                        .and(findRoleParam.getShopCode() , role.shopCode::eq)
-//                        .getWhere())
-//                .orderBy(role.id.desc())
-//                .offset(findRoleParam.obtainOffset())
-//                .limit(findRoleParam.getPageSize())
-//                .fetchResults();
-//        return findRoleParam.getRPage(deptName.getResults() , deptName.getTotal());
-
         BooleanBuilder where = BoolBuilder.getInstance()
                 .and(findRoleParam.getName(), role.name::contains)
                 .and(findRoleParam.getShopCode(), role.shopCode::eq)
+                .and(AppConstants.N , role.deleteStatus::eq)
                 .getWhere();
 
-        return findRoleParam.getPage(() ->{
-                    return jpaQueryFactory.select(Projections.bean(RoleListVo.class,
+        return findRoleParam.getPage(() ->
+                     jpaQueryFactory.select(Projections.bean(RoleListVo.class,
                             role.id,
                             role.name,
                             role.description,
+                            role.type,
+                            role.authorityType,
                             role.deptId,
                             role.createAt,
                             role.createBy,
@@ -102,13 +76,11 @@ public class RoleServiceImpl implements RoleService {
                     ))
                     .from(role)
                     .leftJoin(dept).on(role.deptId.eq(dept.id))
-                    .where(where);
-
-                }, () ->{
-                    return jpaQueryFactory.select(role.id.count())
+                    .where(where)
+                , () ->
+                     jpaQueryFactory.select(role.id.count())
                            .from(role)
-                           .where(where);
-                }
+                           .where(where)
         );
     }
 
@@ -207,7 +179,7 @@ public class RoleServiceImpl implements RoleService {
         return jpaQueryFactory.selectOne()
                 .from(qRole)
                 .where(
-                        qRole.code.eq(RoleCodeEnum.SUPER_ADMIN.getName())
+                        qRole.authorityType.eq(AuthorityEnum.SUPER_ADMIN.getName())
                                 .and(qRole.id.in(ids))
                                 .and(qRole.deleteStatus.eq(AppConstants.N))
                                 .and(qRole.lockStatus.eq(AppConstants.N))

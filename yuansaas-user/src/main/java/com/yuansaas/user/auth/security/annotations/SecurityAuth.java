@@ -31,7 +31,7 @@ public @interface SecurityAuth {
     /**
      * 需要的权限
      */
-    String[] permissions() default {};
+    String permissions() default "";
 
     /**
      * 是否要求必须认证（默认true）

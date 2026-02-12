@@ -17,10 +17,6 @@ import lombok.Data;
 @Table(name = "sys_menu")
 public class Menu extends BaseEntity {
     /**
-     * 商家code
-     */
-    private String shopCode;
-    /**
      * 菜单code
      */
     private String menuCode;

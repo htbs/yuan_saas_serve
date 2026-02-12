@@ -7,7 +7,6 @@ import com.yuansaas.user.permission.params.AuthorizeMenuParam;
 import com.yuansaas.user.permission.service.PermissionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +31,7 @@ public class PermissionApi {
      * @return true/false
      */
     @PostMapping("/assign/role/menu")
-    @SecurityAuth()
-    @PreAuthorize("@ss.hasPermission('system:permission:assign-role-menu')")
+    @SecurityAuth(permissions = "system:permission:assign-role-menu")
     public ResponseEntity<ResponseModel<Boolean>> assignRoleMenu(@RequestBody @Validated AuthorizeMenuParam authorizeMenuParam) {
         return ResponseBuilder.okResponse(permissionService.assignRoleMenu(authorizeMenuParam));
     }
@@ -44,8 +42,7 @@ public class PermissionApi {
      * @return Long
      */
     @GetMapping("/assign/role/menu/list/{roleId}")
-    @SecurityAuth()
-    @PreAuthorize("@ss.hasPermission('system:permission:assign-role-menu')")
+    @SecurityAuth(permissions = "system:permission:assign-role-menu")
     public ResponseEntity<ResponseModel<List<Long>>> getRoleMenuListByRoleId(@PathVariable("roleId") Long roleId) {
         return ResponseBuilder.okResponse(permissionService.getRoleMenuListByRoleId(roleId));
     }

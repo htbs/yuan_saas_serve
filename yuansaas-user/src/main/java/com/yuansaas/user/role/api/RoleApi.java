@@ -12,7 +12,6 @@ import com.yuansaas.user.role.vo.RoleListVo;
 import com.yuansaas.user.role.vo.RoleVo;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +35,7 @@ public class RoleApi {
      * @return roleListVo
      */
     @GetMapping("/page")
-    @SecurityAuth()
-    @PreAuthorize("@ss.hasPermission('system:role:query')")
+    @SecurityAuth(permissions = "system:role:find")
     public ResponseEntity<ResponseModel<RPage<RoleListVo>>> getByPage(FindRoleParam findRoleParam) {
         return ResponseBuilder.okResponse(roleService.getByPage(findRoleParam));
     }
@@ -48,10 +46,10 @@ public class RoleApi {
      * @return true/false
      */
     @PostMapping("/save")
-    @SecurityAuth()
-    @PreAuthorize("@ss.hasPermission('system:role:add')")
+    @SecurityAuth(permissions = "system:role:create")
     public ResponseEntity<ResponseModel<Boolean>> save(@Validated @RequestBody SaveRoleParam saveRoleParam) {
-        return ResponseBuilder.okResponse(roleService.save(saveRoleParam));
+        roleService.save(saveRoleParam);
+        return ResponseBuilder.okResponse(true);
     }
     /**
      * 修改角色
@@ -59,8 +57,7 @@ public class RoleApi {
      * @return true/false
      */
     @PutMapping("/update")
-    @SecurityAuth()
-    @PreAuthorize("@ss.hasPermission('system:role:update')")
+    @SecurityAuth(permissions = "system:role:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@Validated @RequestBody UpdateRoleParam updateRoleParam) {
         return ResponseBuilder.okResponse(roleService.update(updateRoleParam));
     }
@@ -70,8 +67,7 @@ public class RoleApi {
      * @return true/false
      */
     @DeleteMapping("/delete/{id}")
-    @SecurityAuth()
-    @PreAuthorize("@ss.hasPermission('system:role:delete')")
+    @SecurityAuth(permissions = "system:role:delete")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.delete(id));
     }
@@ -81,8 +77,7 @@ public class RoleApi {
      * @return roleVo
      */
     @GetMapping("/{id}")
-    @SecurityAuth()
-    @PreAuthorize("@ss.hasPermission('system:role:query')")
+    @SecurityAuth(permissions = "system:role:find")
     public ResponseEntity<ResponseModel<RoleVo>> getById(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.getById(id));
     }

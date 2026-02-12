@@ -1,6 +1,8 @@
 package com.yuansaas.app.template.params;
 
+import com.yuansaas.app.common.enums.IndustryTypeEnum;
 import com.yuansaas.app.template.enums.TemplateTypeEnum;
+import com.yuansaas.core.annotation.EnumValidate;
 import com.yuansaas.core.page.PageModel;
 import lombok.Data;
 
@@ -22,11 +24,14 @@ public class FindTemplateRPageParam extends PageModel implements Serializable {
      * 模版类型  H5/MINI/APP
      * 枚举 {@link  TemplateTypeEnum}
      */
+    @EnumValidate(enumClass = TemplateTypeEnum.class , message = "无效的模版类型")
     private String templateType;
     /**
-     * 套餐code
+     * 行业类型
+     * 枚举 {@link IndustryTypeEnum}
      */
-    private String planCode;
+    @EnumValidate(enumClass = IndustryTypeEnum.class , message = "行业类型无效")
+    private String industryType;
 
     /**
      * 是否默认  （Y 默认 | N 非默认）

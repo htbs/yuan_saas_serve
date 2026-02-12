@@ -2,18 +2,14 @@ package com.yuansaas.app.shop.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
-import com.querydsl.core.QueryResults;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.yuansaas.app.order.platform.entity.Order;
 import com.yuansaas.app.order.platform.enums.OrderItemTypeEnum;
-import com.yuansaas.app.order.platform.enums.OrderStatusEnum;
 import com.yuansaas.app.order.platform.enums.OrderTypeEnum;
 import com.yuansaas.app.order.platform.model.FunctionTemplateModel;
 import com.yuansaas.app.order.platform.model.OrderItemModel;
-import com.yuansaas.app.order.platform.model.OrderPayParam;
 import com.yuansaas.app.order.platform.params.SubmitOrderParam;
-import com.yuansaas.app.order.platform.service.OrderService;
 import com.yuansaas.app.order.platform.service.processor.ActionProcessor;
 import com.yuansaas.app.shop.entity.QShop;
 import com.yuansaas.app.shop.entity.Shop;
@@ -32,15 +28,10 @@ import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
-import com.yuansaas.core.utils.id.SnowflakeIdGenerator;
 import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.service.DeptService;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.service.MenuService;
-import com.yuansaas.user.role.enums.RoleCodeEnum;
-import com.yuansaas.user.role.enums.RoleTypeEnum;
-import com.yuansaas.user.role.params.SaveRoleParam;
-import com.yuansaas.user.role.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,7 +87,7 @@ public class ShopServiceImpl implements ShopService {
     public Boolean update(UpdateShopParam updateShopParam) {
         Shop shop = shopRepository.findById(updateShopParam.getId()).orElse(null);
         if (ObjectUtils.isEmpty(shop)) {
-            throw DataErrorCode.DATA_ALREADY_EXISTS.buildException("商家不存在");
+            throw DataErrorCode.DATA_ALREADY_EXISTS.buildException();
         }
         shopMapStruct.toUpdateShop(shop,updateShopParam);
         shopRepository.save(shop);
@@ -113,7 +104,7 @@ public class ShopServiceImpl implements ShopService {
     public Boolean lock(Long id) {
         Shop shop = shopRepository.findById(id).orElse(null);
         if (ObjectUtils.isEmpty(shop)) {
-            throw DataErrorCode.DATA_ALREADY_EXISTS.buildException("商家不存在");
+            throw DataErrorCode.DATA_ALREADY_EXISTS.buildException();
         }
         shop.setLockStatus(AppConstants.N.equals(shop.getLockStatus()) ? AppConstants.Y : AppConstants.N);
         shop.setUpdateAt(LocalDateTime.now());
@@ -149,34 +140,34 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public RPage<ShopListVo> getByPage(FindShopParam findShopParam) {
         QShop qShop = QShop.shop;
-        QueryResults<ShopListVo> longQueryResults = jpaQueryFactory.select(Projections.bean(
-                        ShopListVo.class,
-                        qShop.id,
-                        qShop.name,
-                        qShop.code,
-                        qShop.type,
-                        qShop.signedStatus,
-                        qShop.signedStartAt,
-                        qShop.signedEndAt,
-                        qShop.createAt,
-                        qShop.lockStatus
-                ))
-                .from(qShop)
-                .where(BoolBuilder.getInstance()
-                        .and(findShopParam.getCode(), qShop.code::eq)
-                        .and(findShopParam.getName(), qShop.name::contains)
-                        .and(findShopParam.getSignedStatus(), qShop.signedStatus::eq)
-                        .and(AppConstants.N , qShop.deleteStatus::eq)
-                        .getWhere())
-                .orderBy(qShop.createAt.desc())
-                .limit(findShopParam.getPageSize())
-                .offset(findShopParam.obtainOffset())
-                .fetchResults();
+        BooleanBuilder boolBuilder = BoolBuilder.getInstance()
+                .and(findShopParam.getCode(), qShop.code::eq)
+                .and(findShopParam.getName(), qShop.name::contains)
+                .and(findShopParam.getSignedStatus(), qShop.signedStatus::eq)
+                .and(AppConstants.N , qShop.deleteStatus::eq)
+                .getWhere();
 
-        if (ObjectUtils.isEmpty(longQueryResults)) {
-            return new RPage<>(findShopParam.getPageNo(), findShopParam.getPageSize());
-        }
-        return new RPage<>(findShopParam.getPageNo(), findShopParam.getPageSize(),longQueryResults.getResults(),longQueryResults.getTotal());
+        return  findShopParam.getPage( ()->
+                jpaQueryFactory.select(Projections.bean(
+                                ShopListVo.class,
+                                qShop.id,
+                                qShop.name,
+                                qShop.code,
+                                qShop.type,
+                                qShop.signedStatus,
+                                qShop.signedStartAt,
+                                qShop.signedEndAt,
+                                qShop.createAt,
+                                qShop.lockStatus
+                        ))
+                        .from(qShop)
+                        .where(boolBuilder)
+                        .orderBy(qShop.createAt.desc())
+                , ()->
+                        jpaQueryFactory.select(qShop.id.countDistinct())
+                                .from(qShop)
+                                .where(boolBuilder)
+                );
     }
 
     /**

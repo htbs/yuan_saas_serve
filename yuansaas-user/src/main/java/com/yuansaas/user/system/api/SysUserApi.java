@@ -35,23 +35,12 @@ public class SysUserApi {
     private final SysUserService userService;
 
     /**
-     * 根据ID获取用户信息
-     * @param id 用户ID
-     * @return 用户信息
-     */
-    @GetMapping("/{id}")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER})
-    public ResponseEntity<ResponseModel<SysUserVo>> getUserById(@PathVariable Long id) {
-        return ResponseBuilder.okResponse(userService.findLinkDateById(id));
-    }
-
-    /**
      * 创建用户
      * @param sysUserCreateParam 用户创建请求
      * @return 创建成功的用户信息
      */
     @PostMapping("/save")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER})
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:users:create")
     public ResponseEntity<ResponseModel<SysUser>> createUser(@RequestBody @Validated SysUserCreateParam sysUserCreateParam) {
         SysUser user = userService.saveUser(sysUserCreateParam);
         return ResponseBuilder.okResponse( user);
@@ -63,7 +52,7 @@ public class SysUserApi {
      * @return 修改成功的用户信息
      */
     @PostMapping("/update")
-    @SecurityAuth()
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:users:update")
     public ResponseEntity<ResponseModel<Boolean>> updateUser(@RequestBody @Validated UserUpdateParam userUpdateParam) {
         return ResponseBuilder.okResponse( userService.updateUser(userUpdateParam));
     }
@@ -74,7 +63,7 @@ public class SysUserApi {
      * @return 修改成功的用户信息
      */
     @PostMapping("/update/pwd")
-    @SecurityAuth()
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:users:update_pwd")
     public ResponseEntity<ResponseModel<Boolean>> updateUserPwd(@RequestBody @Validated UpdateUserPwdParam updateUserPwd) {
         return ResponseBuilder.okResponse( userService.updateUserPwd(updateUserPwd));
     }
@@ -85,7 +74,7 @@ public class SysUserApi {
      * @return 修改成功的用户信息
      */
     @PutMapping("/reset/pwd/{id}")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth(authenticated = false ,userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:users:reset_pwd")
     public ResponseEntity<ResponseModel<Boolean>> resetUserResetPwd(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.resetUserResetPwd(id));
     }
@@ -96,8 +85,8 @@ public class SysUserApi {
      * @param id 用户id
      * @return 冻结成功的用户信息 true or false
      */
-    @PutMapping("/lcok/{id}")
-    @SecurityAuth()
+    @PutMapping("/lock/{id}")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:users:lock")
     public ResponseEntity<ResponseModel<Boolean>> lockUser(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse(userService.lockUser(id));
     }
@@ -108,7 +97,7 @@ public class SysUserApi {
      * @return 解释成功的用户信息 true or false
      */
     @PutMapping("/unlock/{id}")
-    @SecurityAuth()
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:users:lock")
     public ResponseEntity<ResponseModel<Boolean>> unlockUser(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.unlockUser(id));
     }
@@ -119,7 +108,7 @@ public class SysUserApi {
      * @return  删除成功的用户信息 true or false
      */
     @DeleteMapping("/delete/{id}")
-    @SecurityAuth()
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:users:delete")
     public ResponseEntity<ResponseModel<Boolean>> deleteUser(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.deleteUser(id));
     }
@@ -131,7 +120,7 @@ public class SysUserApi {
      * @return  用户可访问的菜单列表
      */
     @GetMapping("/get/menu/list/{id}")
-    @SecurityAuth()
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER})
     public ResponseEntity<ResponseModel<List<MenuListVo>>> findMenuListByUserId(@PathVariable(name = "id") Long id) {
         return ResponseBuilder.okResponse( userService.findMenuListByUserId(id));
     }
@@ -142,9 +131,19 @@ public class SysUserApi {
      * @return roleListVo
      */
     @GetMapping("/page")
-    @SecurityAuth()
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:users:find")
     public ResponseEntity<ResponseModel<RPage<SysUserListVo>>> getByPage(FindUserParam findUserParam) {
         return ResponseBuilder.okResponse(userService.getByPage(findUserParam));
+    }
+    /**
+     * 根据ID获取用户信息
+     * @param id 用户ID
+     * @return 用户信息
+     */
+    @GetMapping("/{id}")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:users:find")
+    public ResponseEntity<ResponseModel<SysUserVo>> getUserById(@PathVariable Long id) {
+        return ResponseBuilder.okResponse(userService.findLinkDateById(id));
     }
 
 

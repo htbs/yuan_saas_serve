@@ -1,14 +1,18 @@
 package com.yuansaas.app.template.api;
 
-import com.yuansaas.app.template.params.FindTemplateRPageParam;
-import com.yuansaas.app.template.params.TemplateCreateParam;
-import com.yuansaas.app.template.params.TemplateUpdateParam;
+import com.yuansaas.app.template.params.*;
+import com.yuansaas.app.template.service.TemplateFeatureService;
+import com.yuansaas.app.template.service.TemplateService;
+import com.yuansaas.app.template.vo.TemplateFeaturePageVo;
+import com.yuansaas.app.template.vo.TemplateInfoVo;
+import com.yuansaas.app.template.vo.TemplatePageVo;
+import com.yuansaas.common.enums.UserTypeEnum;
+import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,16 +27,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class TemplateApi {
 
+    private final TemplateService templateService;
+    private final TemplateFeatureService templateFeatureService;
+
     /**
      * 创建模版
      * @param templateCreateParam 模版新增参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/create",method = RequestMethod.POST)
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:template:create')")
+    @PostMapping(value = "/create")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:create")
     public ResponseEntity<ResponseModel<Boolean>> add(@RequestBody @Validated TemplateCreateParam templateCreateParam) {
-        return ResponseBuilder.okResponse(null);
+        return ResponseBuilder.okResponse(templateService.add(templateCreateParam));
     }
 
     /**
@@ -40,11 +46,10 @@ public class TemplateApi {
      * @param templateUpdateParam 模版修改参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/update",method = RequestMethod.PUT)
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:template:update')")
+    @PutMapping(value = "/update")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated TemplateUpdateParam templateUpdateParam) {
-        return ResponseBuilder.okResponse(null);
+        return ResponseBuilder.okResponse(templateService.update(templateUpdateParam));
     }
 
     /**
@@ -52,11 +57,10 @@ public class TemplateApi {
      * @param id 模版id
      * @author lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/disable/{id}",method = RequestMethod.PUT)
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:template:lock')")
+    @PutMapping(value = "/disable/{id}")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:lock")
     public ResponseEntity<ResponseModel<Boolean>> disable(@PathVariable(value = "id") Long id) {
-        return ResponseBuilder.okResponse(null);
+        return ResponseBuilder.okResponse(templateService.lock(id));
     }
 
     /**
@@ -64,11 +68,10 @@ public class TemplateApi {
      * @param id 模版id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/enable/{id}",method = RequestMethod.PUT)
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:template:lock')")
+    @PutMapping(value = "/enable/{id}")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:lock")
     public ResponseEntity<ResponseModel<Boolean>> enable(@PathVariable(value = "id") Long id) {
-        return ResponseBuilder.okResponse(null);
+        return ResponseBuilder.okResponse(templateService.lock(id));
     }
 
     /**
@@ -77,23 +80,21 @@ public class TemplateApi {
      * @param id 模版id
      * @author lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/delete/{id}",method = RequestMethod.DELETE)
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:template:delete')")
+    @DeleteMapping(value = "/delete/{id}")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:delete")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable(value = "id") Long id) {
-        return ResponseBuilder.okResponse(null);
+        return ResponseBuilder.okResponse(templateService.delete(id));
     }
 
     /**
      * 获取模版分页列表
-     * @param findTemplateRPageParam 模版
+     * @param findTemplateRpageParam 模版
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/page",method = RequestMethod.GET)
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:template:find')")
-    public ResponseEntity<ResponseModel<Boolean>> getByRPage(@RequestBody FindTemplateRPageParam findTemplateRPageParam) {
-        return ResponseBuilder.okResponse(null);
+    @GetMapping(value = "/page")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:find")
+    public ResponseEntity<ResponseModel<RPage<TemplatePageVo>>> getByRpage(@RequestBody FindTemplateRPageParam findTemplateRpageParam) {
+        return ResponseBuilder.okResponse(templateService.getByRPage(findTemplateRpageParam));
     }
 
     /**
@@ -101,11 +102,65 @@ public class TemplateApi {
      * @param id 模版id
      * @author lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/get/{id}",method = RequestMethod.GET)
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:template:find')")
-    public ResponseEntity<ResponseModel<Boolean>> getInfoById(@PathVariable(value = "id") Long id) {
-        return ResponseBuilder.okResponse(null);
+    @GetMapping(value = "/get/{id}")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:find")
+    public ResponseEntity<ResponseModel<TemplateInfoVo>> getInfoById(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(templateService.getInfoById(id));
+    }
+
+    /**
+     * 分配功能给模版
+     * @param assignTemplateFeatureParam 分配参数
+     * @author lxz 2025/11/16 14:35
+     */
+    @PostMapping(value = "/assign")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "'system:template:assign_feature_template")
+    public ResponseEntity<ResponseModel<Boolean>> assignFeature(@RequestBody @Validated AssignTemplateFeatureParam assignTemplateFeatureParam) {
+        return ResponseBuilder.okResponse(templateFeatureService.assignFeature(assignTemplateFeatureParam));
+    }
+
+    /**
+     * 获取模版名下分配的功能列表
+     * @param findTemplateFeatureRPageParam 分配参数
+     * @author lxz 2025/11/16 14:35
+     */
+    @PostMapping(value = "/find/feature")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:assign_feature_template")
+    public ResponseEntity<ResponseModel<RPage<TemplateFeaturePageVo>>> getFeatureByTemplateCode(@RequestBody @Validated FindTemplateFeatureRPageParam findTemplateFeatureRPageParam ){
+        return ResponseBuilder.okResponse(templateFeatureService.getFeatureByTemplateCode(findTemplateFeatureRPageParam));
+    }
+
+    /**
+     * 关闭功能
+     * @param id 关系id
+     * @author lxz 2025/11/16 14:35
+     */
+    @PutMapping(value = "/feature/disable/{id}")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "template:feature:lock")
+    public ResponseEntity<ResponseModel<Boolean>> disableFeature(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(templateFeatureService.lock(id));
+    }
+
+    /**
+     *  开启功能
+     * @param id 关系id
+     * @author lxz 2025/11/16 14:35
+     */
+    @PutMapping(value = "/feature/enable/{id}")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "template:feature:lock'")
+    public ResponseEntity<ResponseModel<Boolean>> enableFeature(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(templateFeatureService.lock(id));
+    }
+
+    /**
+     *  删除功能
+     * @param assignTemplateFeatureParam 删除操作
+     * @author lxz 2025/11/16 14:35
+     */
+    @DeleteMapping(value = "/feature/remove")
+    @SecurityAuth( userTypes = {UserTypeEnum.YUAN_SHI_USER},permissions = "template:feature:remove")
+    public ResponseEntity<ResponseModel<Boolean>> removeFeature(@RequestBody @Validated AssignTemplateFeatureParam assignTemplateFeatureParam) {
+        return ResponseBuilder.okResponse(templateFeatureService.removeFeature(assignTemplateFeatureParam));
     }
 
 }

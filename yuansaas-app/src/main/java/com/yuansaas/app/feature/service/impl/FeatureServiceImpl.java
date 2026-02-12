@@ -1,5 +1,6 @@
 package com.yuansaas.app.feature.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.querydsl.core.types.Expression;
@@ -52,12 +53,8 @@ public class FeatureServiceImpl implements FeatureService {
      */
     @Override
     public Boolean create(@Valid FeatureCreateParam featureCreateParam) {
-        Feature feature = new Feature();
+        Feature feature = BeanUtil.copyProperties(featureCreateParam , Feature.class);
         feature.setFeatureCode(getFeatureCode());
-        feature.setFeatureName(feature.getFeatureName());
-        feature.setDescription(feature.getDescription());
-        feature.setLockStatus(AppConstants.N);
-        feature.setLockStatus(AppConstants.N);
         feature.init();
         featureRepository.save(feature);
         return true;
@@ -75,28 +72,40 @@ public class FeatureServiceImpl implements FeatureService {
             feature.setFeatureName(feature.getFeatureName());
             feature.setFeatureType(feature.getFeatureType());
             feature.setFeatureScope(feature.getFeatureScope());
+            feature.setIndustryType(feature.getIndustryType());
             feature.setDescription(feature.getDescription());
             feature.update();
             featureRepository.save(feature);
         } , ()->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException();
         });
-        return null;
+        return true;
+    }
+
+    /**
+     * 获取功能code列表
+     *
+     * @param featureCodes 功能code
+     * @author lxz 2026/01/29 14:35
+     */
+    @Override
+    public List<String> getFeatureCodeListByFeatureCodes(List<String> featureCodes) {
+        return featureRepository.getFeatureCodeListByFeatureCodes(featureCodes);
     }
 
     /**
      * 获取功能列表
      *
-     * @param featureCode 功能code
+     * @param featureCodes 功能code
      * @author lxz 2026/01/29 14:35
      */
     @Override
-    public List<String> getFeatureCodeListByFeatureCodes(List<String> featureCode) {
-        return featureRepository.getFeatureCodeListByFeatureCodes(featureCode);
+    public List<Feature> getFeatureListByFeatureCodes(List<String> featureCodes) {
+        return featureRepository.getFeatureListByFeatureCodes(featureCodes);
     }
 
     /**
-     * 分配菜单给功能点
+     * 分配菜单给功能点上
      *
      * @param assignFeatureMenuParam 功能编辑参数
      * @author lxz 2026/01/29 14:35
@@ -183,6 +192,17 @@ public class FeatureServiceImpl implements FeatureService {
                 );
     }
 
+    /**
+     * 根据行业类型获取功能code
+     *
+     * @param industryType 行业类型
+     * @author lxz 2026/01/29 14:35
+     */
+    @Override
+    public List<Feature> getFeatureCodesByIndustryType(String industryType) {
+        return featureRepository.getFeatureCodeListByIndustryType(industryType);
+    }
+
 
     /**
      * 生成功能code
@@ -199,7 +219,7 @@ public class FeatureServiceImpl implements FeatureService {
      * 验证功能code是否存在
      * @param featureCode 功能code
      */
-    private Boolean validatedFeatureCodeIsExists(String featureCode) {
+    private boolean validatedFeatureCodeIsExists(String featureCode) {
         return featureRepository.countByFeatureCode(featureCode) > 0;
     }
 

@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  *
  * 保存
@@ -31,7 +33,7 @@ public class SaveMenuParam {
     /**
      * 授权
      */
-    private String permissions;
+    private List<String> permissions;
     /**
      * 菜单图标
      */

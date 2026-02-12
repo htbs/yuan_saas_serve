@@ -1,6 +1,5 @@
 package com.yuansaas.user.menu.params;
 
-import com.yuansaas.core.context.AppContextUtil;
 import lombok.Data;
 
 /**
@@ -11,11 +10,8 @@ import lombok.Data;
  */
 @Data
 public class FindMenuParam {
-
-    private String shopCode = AppContextUtil.getShopCode();
-
     /**
-     * 类型   0：菜单   1：按钮
+     * 菜单名字
      */
-    private Integer menuType;
+    private String name;
 }

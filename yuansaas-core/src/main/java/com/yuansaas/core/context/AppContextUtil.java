@@ -24,7 +24,7 @@ public class AppContextUtil {
      * @param runnable 运行函数
      * @return 运行结果
      */
-    public static <T, R> R runInContext(AppContext appContext, Function<AppContext, R> runnable) {
+    public static <R> R runInContext(AppContext appContext, Function<AppContext, R> runnable) {
         AppContext previousContext = AppContextHolder.getContext().orElse(null);
         try {
             AppContextHolder.setContext(appContext);
@@ -53,9 +53,7 @@ public class AppContextUtil {
      * @return 运行结果
      */
     public static <R> R runInContext(AppContext appContext , Supplier<R> supplier){
-        return runInContext(appContext, ctx -> {
-            return supplier.get();
-        });
+        return runInContext(appContext, (Function<AppContext, R>) ctx -> supplier.get());
     }
 
     /**
@@ -128,7 +126,7 @@ public class AppContextUtil {
     }
 
     public static String getShopCode(){
-        return AppContextHolder.getShopCode().orElse("");
+        return AppContextHolder.getShopCode().orElse("0");
     }
 
     /**

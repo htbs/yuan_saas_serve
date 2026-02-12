@@ -4,6 +4,8 @@ import cn.hutool.core.util.ObjectUtil;
 import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.user.auth.model.CustomUserDetails;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
+import com.yuansaas.user.auth.service.SecurityFrameworkService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,8 +22,10 @@ import java.util.stream.Collectors;
  * @author HTB 2025/8/12 16:16
  */
 @Service
+@RequiredArgsConstructor
 public class SecurityService {
 
+    private final SecurityFrameworkService securityFrameworkService;
     /**
      * 组合认证检查
      */
@@ -29,7 +33,7 @@ public class SecurityService {
         // 获取注解属性
         UserTypeEnum[] userTypes = annotation.userTypes();
         String[] roles = annotation.roles();
-        String[] permissions = annotation.permissions();
+        String permissions = annotation.permissions();
 
         // 检查接口是否需要token
         if (annotation.authenticated() ) {
@@ -57,7 +61,7 @@ public class SecurityService {
         }
 
         // 4. 检查权限
-        if (permissions!= null && permissions.length > 0 && !checkPermissions(authentication, permissions)) {
+        if (ObjectUtil.isNotEmpty(permissions) && !checkPermissions(permissions)) {
             return false;
         }
 
@@ -77,9 +81,8 @@ public class SecurityService {
         return Arrays.stream(requiredRoles).anyMatch(userRoles::contains);
     }
 
-    private boolean checkPermissions(Authentication authentication, String[] requiredPermissions) {
-        // todo 实现具体权限检查逻辑
-        return true;
+    private boolean checkPermissions( String requiredPermissions) {
+        return securityFrameworkService.hasPermission(requiredPermissions);
     }
 
     private UserTypeEnum extractUserType(Authentication authentication) {

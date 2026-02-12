@@ -19,10 +19,6 @@ import lombok.Setter;
 public class SysUser extends BaseEntity {
 
     /**
-     * 商户编号
-     */
-    private String shopCode;
-    /**
      * 用户名
      */
     @Column(name = "user_name", nullable = false, length = 50)

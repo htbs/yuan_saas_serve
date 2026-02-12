@@ -1,7 +1,7 @@
 package com.yuansaas.user.role.params;
 
 import com.yuansaas.core.context.AppContextUtil;
-import com.yuansaas.user.role.enums.RoleCodeEnum;
+import com.yuansaas.user.role.enums.AuthorityEnum;
 import com.yuansaas.user.role.enums.RoleTypeEnum;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -23,9 +23,9 @@ public class SaveRoleParam {
 
     /**
      * 角色标识
-     * 枚举 {@link RoleCodeEnum}
+     * 枚举 {@link AuthorityEnum}
      */
-    private String code;
+    private String authorityType;
     /**
      * 角色类型
      * 枚举{@link RoleTypeEnum}

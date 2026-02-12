@@ -13,7 +13,6 @@ import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +36,8 @@ public class PlanApi {
      * @param planCreateParam 套餐保存参数
      * @author  lxz 2026/01/29 14:35
      */
-    @RequestMapping(method = RequestMethod.POST)
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:plan:create')")
+    @PostMapping
+    @SecurityAuth(permissions = "system:plan:create")
     public ResponseEntity<ResponseModel<Boolean>> create(@RequestBody @Validated PlanCreateParam planCreateParam) {
         return ResponseBuilder.okResponse(planService.create(planCreateParam));
     }
@@ -49,9 +47,8 @@ public class PlanApi {
      * @param planUpdateParam 套餐编辑参数
      * @author  lxz 2026/01/29 14:35
      */
-    @RequestMapping(method = RequestMethod.PUT)
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:plan:update')")
+    @PutMapping
+    @SecurityAuth(permissions = "system:plan:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated PlanUpdateParam planUpdateParam) {
         return ResponseBuilder.okResponse(planService.update(planUpdateParam));
     }
@@ -61,10 +58,9 @@ public class PlanApi {
      * @param planId 套餐id
      * @author  lxz 2026/01/29 14:35
      */
-    @RequestMapping(method = RequestMethod.PUT ,value = "/disable/{id}")
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:plan:lock')")
-    public ResponseEntity<ResponseModel<Boolean>> disable( @PathVariable Long planId) {
+    @PutMapping(value = "/disable/{id}")
+    @SecurityAuth(permissions = "system:plan:lock")
+    public ResponseEntity<ResponseModel<Boolean>> disable( @PathVariable(value = "id") Long planId) {
         return ResponseBuilder.okResponse(planService.lock(planId));
     }
     /**
@@ -72,10 +68,9 @@ public class PlanApi {
      * @param planId 套餐id
      * @author  lxz 2026/01/29 14:35
      */
-    @RequestMapping(method = RequestMethod.PUT ,value = "/enable/{id}")
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:plan:lock')")
-    public ResponseEntity<ResponseModel<Boolean>> enable( @PathVariable Long planId) {
+    @PutMapping(value = "/enable/{id}")
+    @SecurityAuth(permissions = "system:plan:lock")
+    public ResponseEntity<ResponseModel<Boolean>> enable( @PathVariable(value = "id") Long planId) {
         return ResponseBuilder.okResponse(planService.lock(planId));
     }
 
@@ -84,10 +79,9 @@ public class PlanApi {
      * @param planId 套餐id
      * @author  lxz 2026/01/29 14:35
      */
-    @RequestMapping(method = RequestMethod.DELETE ,value = "/delete/{id}")
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:plan:delete')")
-    public ResponseEntity<ResponseModel<Boolean>> delete( @PathVariable Long planId) {
+    @DeleteMapping("/delete/{id}")
+    @SecurityAuth(permissions = "system:plan:delete")
+    public ResponseEntity<ResponseModel<Boolean>> delete( @PathVariable(value = "id") Long planId) {
         return ResponseBuilder.okResponse(planService.delete(planId));
     }
 
@@ -96,9 +90,8 @@ public class PlanApi {
      * @param findPlanParam 套餐编辑参数
      * @author  lxz 2026/01/29 14:35
      */
-    @RequestMapping(method = RequestMethod.GET)
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:plan:find')")
+    @GetMapping
+    @SecurityAuth(permissions = "system:plan:find")
     public ResponseEntity<ResponseModel<RPage<PlanPageListVo>>> findByPage(FindPlanParam findPlanParam) {
         return ResponseBuilder.okResponse(planService.findByPage(findPlanParam));
     }
@@ -109,9 +102,8 @@ public class PlanApi {
      * @param assignPlanFeatureParam 套餐编辑参数
      * @author  lxz 2026/01/29 14:35
      */
-    @RequestMapping(method = RequestMethod.PUT, value = "/assign/feature")
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:assign:plan-feature')")
+    @PutMapping(value = "/assign/feature")
+    @SecurityAuth(permissions = "system:assign:plan-feature")
     public ResponseEntity<ResponseModel<Boolean>> assignPlanFeature(@RequestBody @Validated AssignPlanFeatureParam assignPlanFeatureParam) {
         return ResponseBuilder.okResponse(planService.assignPlanFeature(assignPlanFeatureParam));
     }
@@ -121,9 +113,8 @@ public class PlanApi {
      * @param planCode 套餐code
      * @author  lxz 2026/01/29 14:35
      */
-    @RequestMapping(method = RequestMethod.GET , value = "/assign/feature/list")
-    @SecurityAuth
-    @PreAuthorize("@ss.hasPermission('system:assign:plan-feature')")
+    @GetMapping( value = "/assign/feature/list"   )
+    @SecurityAuth(permissions = "system:assign:plan-feature")
     public ResponseEntity<ResponseModel<List<FeatureMenuBriefVo>>> findAssignFeatureListByPlanCode(@RequestParam String planCode) {
         return ResponseBuilder.okResponse(planService.findAssignFeatureListByPlanCode(planCode));
     }

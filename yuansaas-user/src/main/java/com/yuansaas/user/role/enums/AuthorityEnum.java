@@ -11,10 +11,12 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum RoleCodeEnum  implements IBaseEnum<RoleCodeEnum> {
+public enum AuthorityEnum implements IBaseEnum<AuthorityEnum> {
 
     SUPER_ADMIN("super_admin", "超级管理员"),
+    PLATFORM_ADMIN("platform_admin", "平台管理员"),
     TENANT_ADMIN("tenant_admin", "租户管理员"),
+    ORDINARY_USER("ordinary_user", "普通员工"),
     ;
 
     /**

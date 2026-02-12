@@ -45,4 +45,10 @@ public class FeatureUpdateParam implements Serializable {
      */
     private String featureScope;
 
+    /**
+     * 行业类型
+     * 枚举 {@link com.yuansaas.app.common.enums.IndustryTypeEnum}
+     */
+    private String industryType;
+
 }

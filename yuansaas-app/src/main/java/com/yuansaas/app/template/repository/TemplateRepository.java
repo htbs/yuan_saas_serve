@@ -10,4 +10,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author LXZ 2026/2/3 17:57
  */
 public interface TemplateRepository extends JpaRepository<Template , Long> {
+
+    /**
+     * 获取模版code数量
+     */
+    Integer countByTemplateCode(String templateCode);
 }

@@ -1,31 +1,21 @@
-package com.yuansaas.app.template.entity;
+package com.yuansaas.app.template.vo;
 
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import com.yuansaas.app.template.model.ImagesUrlModel;
 import com.yuansaas.common.constants.AppConstants;
-import com.yuansaas.core.jpa.model.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.Data;
-import org.hibernate.annotations.Type;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  *
- * 模版配置表
+ * 模版配置分页列表vo
  *
  * @author LXZ 2026/2/3 17:48
  */
 @Data
-@Entity
-@Table(name = "template")
-public class Template extends BaseEntity {
-    /**
-     * 模版code
-     */
-    private String templateCode;
+public class TemplatePageVo{
+    private Long id;
     /**
      * 模版name
      */
@@ -41,8 +31,6 @@ public class Template extends BaseEntity {
     /**
      * 预览图
      */
-    @Type(value = JsonStringType.class)
-    @Column(columnDefinition = "json")
     private List<ImagesUrlModel> imagesUrl;
     /**
      * 预览视频
@@ -61,7 +49,11 @@ public class Template extends BaseEntity {
      */
     private String lockStatus = AppConstants.N;
     /**
-     * 删除状态
+     * 操作人
      */
-    private String deleteStatus = AppConstants.N;
+    private String updateBy;
+    /**
+     * 操作时间
+     */
+    private LocalDateTime updateAt;
 }

@@ -1,6 +1,5 @@
 package com.yuansaas.user.menu.model;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public class MenuModel {
     /**
      * 授权
      */
-    private List<String> permissionCodes;
+    private List<String> permissions;
     /**
      * 菜单类型 0：菜单 1：按钮
      */

@@ -27,4 +27,16 @@ public interface FeatureRepository extends JpaRepository<Feature , Long> {
      */
     @Query(value = "select feature_code from feature where feature_code in (:featureCodes) and lock_status = 'N' and  delete_status = 'N' " , nativeQuery = true)
     List<String> getFeatureCodeListByFeatureCodes(@Param("featureCodes") List<String> featureCode);
+
+    /**
+     *  根据功能code查询功能
+     */
+    @Query(value = "select * from feature where feature_code in (:featureCodes) and lock_status = 'N' and  delete_status = 'N' " , nativeQuery = true)
+    List<Feature> getFeatureListByFeatureCodes(@Param("featureCodes") List<String> featureCode);
+
+    /**
+     *  根据行业类型获取功能code
+     */
+    @Query(value = "select * from feature where industryType =:industryType and  delete_status = 'N' " , nativeQuery = true)
+    List<Feature> getFeatureCodeListByIndustryType(@Param("industryType") String industryType);
 }

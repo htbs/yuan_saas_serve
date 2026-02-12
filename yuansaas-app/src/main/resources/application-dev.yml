@@ -91,3 +91,7 @@ ys:
         fields: "password,password_confirmation" # 敏感字段不打印日志
       slow:
         threshold: 5 # 打印慢请求日志，单位ms
+
+
+app:
+  default_password: "DC483E80A7A0BD9EF71D8CF973673924"

@@ -28,15 +28,20 @@ public class FeatureCreateParam implements Serializable {
      */
     private String description;
     /**
-     * 功能类型  默认类型 BUY
+     * 功能类型  默认类型 DEFAULT
      * 枚举 {@link com.yuansaas.app.feature.enums.FeatureTypeEnum}
      */
-    private String featureType = FeatureTypeEnum.BUY.getName();
+    private String featureType = FeatureTypeEnum.DEFAULT.getName();
     /**
      * 作用域  默认类型  ALL
      * 枚举 {@link com.yuansaas.app.feature.enums.FeatureScopeEnum}
      */
     private String featureScope = FeatureScopeEnum.ALL.getName();
+    /**
+     * 行业类型
+     * 枚举 {@link com.yuansaas.app.common.enums.IndustryTypeEnum}
+     */
+    private String industryType;
 
 
 }

@@ -1,5 +1,6 @@
 package com.yuansaas.app.feature.entity;
 
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.jpa.model.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -27,6 +28,12 @@ public class Feature extends BaseEntity {
      * 功能描述
      */
     private String description;
+
+    /**
+     * 行业类型
+     * 枚举 {@link com.yuansaas.app.common.enums.IndustryTypeEnum}
+     */
+    private String industryType;
     /**
      * 功能类型
      * 枚举 {@link com.yuansaas.app.feature.enums.FeatureTypeEnum}
@@ -40,9 +47,9 @@ public class Feature extends BaseEntity {
     /**
      * 锁定状态
      */
-    private String lockStatus;
+    private String lockStatus = AppConstants.N;
     /**
      * 删除状态
      */
-    private String deleteStatus;
+    private String deleteStatus = AppConstants.N;
 }

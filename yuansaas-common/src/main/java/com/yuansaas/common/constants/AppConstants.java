@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AppConstants {
 
-    public static final String PWD = "DC483E80A7A0BD9EF71D8CF973673924";
 
     public static final String ADMIN = "admin";
     public static final String UNKNOWN = "unknown";

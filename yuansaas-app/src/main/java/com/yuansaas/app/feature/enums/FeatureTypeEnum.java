@@ -14,9 +14,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FeatureTypeEnum implements IBaseEnum<FeatureTypeEnum> {
 
-    INIT   ("开店初始化"),
-    PACKAGE("买套餐送"),
-    BUY    ("单独购买"),
+    DEFAULT("平台默认"),
+    INIT   ("初始化"),
     CUSTOM ("商户自己创建"),
 
     ;
