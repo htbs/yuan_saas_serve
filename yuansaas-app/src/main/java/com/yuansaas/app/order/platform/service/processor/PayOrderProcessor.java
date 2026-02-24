@@ -1,9 +1,11 @@
 package com.yuansaas.app.order.platform.service.processor;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.yuansaas.app.order.platform.entity.Order;
 import com.yuansaas.app.order.platform.enums.OrderStatusEnum;
 import com.yuansaas.app.order.platform.enums.PayStatusEnum;
 import com.yuansaas.app.order.platform.model.OrderPayParam;
+import com.yuansaas.app.order.platform.repository.OrderItemRepository;
 import com.yuansaas.app.order.platform.repository.OrderRepository;
 import com.yuansaas.app.order.platform.service.OrderService;
 import com.yuansaas.core.context.AppContextUtil;
@@ -21,12 +23,13 @@ import java.time.LocalDateTime;
  * @author LXZ 2026/1/19 17:25
  */
 @Slf4j
-@Component("payProcessor")
+@Component("payOrderProcessor")
 @RequiredArgsConstructor
-public class PayProcessor extends ActionProcessor{
+public class PayOrderProcessor extends ActionProcessor{
 
     private final OrderService orderService;
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Override
     @Transactional
@@ -34,6 +37,9 @@ public class PayProcessor extends ActionProcessor{
         OrderPayParam orderPayParam = null;
         if (t instanceof OrderPayParam) {
             orderPayParam = (OrderPayParam)t;
+        }
+        if (ObjectUtil.isEmpty(orderPayParam)) {
+            return true;
         }
         Order orderByOrderNo = orderService.findOrderByOrderNo(orderPayParam.getOrderNo());
         orderByOrderNo.setOrderStatus(OrderStatusEnum.COMPLETE.getName());
@@ -46,7 +52,7 @@ public class PayProcessor extends ActionProcessor{
         orderByOrderNo.setUpdateBy(AppContextUtil.getUserInfo());
         orderRepository.save(orderByOrderNo);
 
-        //todo 账户入账
+        // todo 账户入账
 
         return true;
     }

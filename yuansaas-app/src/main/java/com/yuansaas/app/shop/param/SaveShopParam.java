@@ -4,8 +4,9 @@ import com.yuansaas.app.shop.enums.ShopSignedStatusEnum;
 import com.yuansaas.app.shop.enums.ShopTypeEnum;
 import com.yuansaas.common.model.AddressModel;
 import com.yuansaas.core.annotation.EnumValidate;
+import com.yuansaas.core.valid.Phone;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -58,11 +59,13 @@ public class SaveShopParam {
      * 法人手机号
      */
     @NotBlank(message = "法人手机号不能为空")
+    @Phone
     private String legalPersonPhone;
     /**
      * 法人邮箱
      */
     @NotBlank(message = "法人邮箱不能为空")
+    @Email
     private String legalPersonEmail;
     /**
      * 法人身份证正面照片

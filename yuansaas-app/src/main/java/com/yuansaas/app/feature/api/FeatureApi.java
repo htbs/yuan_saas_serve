@@ -3,8 +3,11 @@ package com.yuansaas.app.feature.api;
 import com.yuansaas.app.feature.params.AssignFeatureMenuParam;
 import com.yuansaas.app.feature.params.FeatureCreateParam;
 import com.yuansaas.app.feature.params.FeatureUpdateParam;
+import com.yuansaas.app.feature.params.FindFeatureParam;
 import com.yuansaas.app.feature.service.FeatureService;
+import com.yuansaas.app.feature.vo.FeaturePageListVo;
 import com.yuansaas.common.constants.AppConstants;
+import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
@@ -35,7 +38,6 @@ public class FeatureApi {
      */
     @SecurityAuth(permissions = "system:feature:create")
     @PostMapping
-//    @PreAuthorize("@ss.hasPermission('system:feature:create')")
     public ResponseEntity<ResponseModel<Boolean>> create(@RequestBody @Validated FeatureCreateParam featureCreateParam) {
         return ResponseBuilder.okResponse(featureService.create(featureCreateParam));
     }
@@ -47,9 +49,19 @@ public class FeatureApi {
      */
     @SecurityAuth(permissions = "system:feature:update")
     @PutMapping
-//    @PreAuthorize("@ss.hasPermission('system:feature:update')")
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated FeatureUpdateParam featureUpdateParam) {
         return ResponseBuilder.okResponse(featureService.update(featureUpdateParam));
+    }
+
+    /**
+     * 获取功能列表 （分页）
+     * @param findFeatureParam 功能编辑参数
+     * @author  lxz 2026/01/29 14:35
+     */
+    @SecurityAuth(permissions = "system:feature:find")
+    @GetMapping(value = "/page")
+    public ResponseEntity<ResponseModel<RPage<FeaturePageListVo>>> getByPage(FindFeatureParam findFeatureParam) {
+        return ResponseBuilder.okResponse(featureService.getByPage(findFeatureParam));
     }
 
 
@@ -61,7 +73,6 @@ public class FeatureApi {
      */
     @SecurityAuth(permissions = "system:feature:assign-feature-menu")
     @PutMapping(value = "/assign/menu")
-//    @PreAuthorize("@ss.hasPermission('system:feature:assign-feature-menu')")
     public ResponseEntity<ResponseModel<Boolean>> assignFeatureMenu(@RequestBody @Validated AssignFeatureMenuParam assignFeatureMenuParam) {
         return ResponseBuilder.okResponse(featureService.assignFeatureMenu(assignFeatureMenuParam));
     }
@@ -72,9 +83,8 @@ public class FeatureApi {
      * @param featureCode  功能code
      * @author lxz 2026/01/29 14:35
      */
-    @SecurityAuth(permissions = "system:featureId:assign-featureId-menu")
-    @GetMapping
-//    @PreAuthorize("@ss.hasPermission('system:featureId:assign-featureId-menu')")
+    @SecurityAuth(permissions = "system:featureId:assign-feature-menu")
+    @GetMapping(value = "/find/assign/menu")
     public ResponseEntity<ResponseModel<List<Long>>> getFeatureMenuListByFeature(@RequestParam(name = "featureCode") String featureCode) {
         return ResponseBuilder.okResponse(featureService.getMenuCodeListByFeatureCodeAndLockStatus(featureCode, AppConstants.N));
     }

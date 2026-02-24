@@ -17,8 +17,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
  *
  * 商铺用户 Service 实现类
@@ -40,7 +38,7 @@ public class ShopUserServiceImpl implements ShopUserService {
      * @return 用户编号
      */
     @Override
-    public Long createUser(@Valid ShopUserSaveParam shopUserSaveParam) {
+    public Boolean createUser(@Valid ShopUserSaveParam shopUserSaveParam) {
         if (ObjectUtil.isEmpty(shopUserSaveParam.getShopCode())) {
             throw ParamErrorCode.PARAMETER_REQUIRED.buildException("商铺code不能为空");
         }
@@ -56,7 +54,7 @@ public class ShopUserServiceImpl implements ShopUserService {
         permissionService.assignUserRole(AssignUserRoleParam.builder().userId(shopUserSave.getId()).roleId(shopUserSaveParam.getRoleId()).build());
         // 授权部门权限
         permissionService.assignUserDept(AssignUserDeptParam.builder().shopCode(shopUserSaveParam.getShopCode()).userId(shopUserSave.getId()).build());
-        return 0L;
+        return true;
     }
 
     /**

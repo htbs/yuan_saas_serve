@@ -3,21 +3,26 @@ package com.yuansaas.app.feature.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.app.feature.entity.Feature;
 import com.yuansaas.app.feature.entity.FeatureMenuLink;
+import com.yuansaas.app.feature.entity.QFeature;
 import com.yuansaas.app.feature.entity.QFeatureMenuLink;
 import com.yuansaas.app.feature.params.AssignFeatureMenuParam;
 import com.yuansaas.app.feature.params.FeatureCreateParam;
 import com.yuansaas.app.feature.params.FeatureUpdateParam;
+import com.yuansaas.app.feature.params.FindFeatureParam;
 import com.yuansaas.app.feature.repository.FeatureMenuLinkRepository;
 import com.yuansaas.app.feature.repository.FeatureRepository;
 import com.yuansaas.app.feature.service.FeatureService;
+import com.yuansaas.app.feature.vo.FeaturePageListVo;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
+import com.yuansaas.core.page.RPage;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.entity.QMenu;
 import com.yuansaas.user.menu.service.MenuService;
@@ -80,6 +85,45 @@ public class FeatureServiceImpl implements FeatureService {
             throw DataErrorCode.DATA_NOT_FOUND.buildException();
         });
         return true;
+    }
+
+    /**
+     * 获取功能列表 （分页）
+     *
+     * @param findFeatureParam 功能编辑参数
+     * @author lxz 2026/01/29 14:35
+     */
+    @Override
+    public RPage<FeaturePageListVo> getByPage(FindFeatureParam findFeatureParam) {
+        QFeature qFeature = QFeature.feature;
+        BooleanBuilder boolBuilder = BoolBuilder.getInstance()
+                .and(findFeatureParam.getFeatureName() , qFeature.featureName::contains)
+                .and(findFeatureParam.getFeatureScope() , qFeature.featureScope::eq)
+                .and(findFeatureParam.getFeatureType() , qFeature.featureType::eq)
+                .and(findFeatureParam.getIndustryType() , qFeature.industryType::eq)
+                .and(AppConstants.N , qFeature.deleteStatus::eq)
+                .getWhere();
+        return findFeatureParam.getPage(()->
+                 jpaQueryFactory.select(Projections.bean(FeaturePageListVo.class,
+                         qFeature.id,
+                         qFeature.featureName,
+                         qFeature.featureScope,
+                         qFeature.featureType,
+                         qFeature.featureCode,
+                         qFeature.industryType,
+                         qFeature.description,
+                         qFeature.lockStatus,
+                         qFeature.updateBy,
+                         qFeature.updateAt
+                         ))
+                         .from(qFeature)
+                         .where(boolBuilder)
+                         .orderBy(qFeature.createAt.desc())
+                , ()->
+                        jpaQueryFactory.select(qFeature.id.countDistinct())
+                                .from(qFeature)
+                                .where(boolBuilder)
+        );
     }
 
     /**

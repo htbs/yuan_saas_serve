@@ -1,10 +1,10 @@
 package com.yuansaas.app.template.params;
 
-import com.yuansaas.app.common.enums.IndustryTypeEnum;
 import com.yuansaas.app.template.enums.TemplateTypeEnum;
 import com.yuansaas.app.template.model.ImagesUrlModel;
 import com.yuansaas.core.annotation.EnumValidate;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import java.util.List;
@@ -21,7 +21,7 @@ public class TemplateUpdateParam {
     /**
      * 模版id
      */
-    @NotBlank(message = "模版id")
+    @NotNull(message = "模版id不能为空")
     private Long templateId;
     /**
      * 模版name
@@ -35,12 +35,6 @@ public class TemplateUpdateParam {
      */
     @EnumValidate(enumClass = TemplateTypeEnum.class , message = "模版类型无效")
     private String templateType;
-    /**
-     * 行业类型
-     * 枚举 {@link IndustryTypeEnum}
-     */
-    @EnumValidate(enumClass = IndustryTypeEnum.class , message = "行业类型无效")
-    private String industryType;
     /**
      * 预览图
      */

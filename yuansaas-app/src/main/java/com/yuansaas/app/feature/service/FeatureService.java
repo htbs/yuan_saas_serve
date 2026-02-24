@@ -4,6 +4,9 @@ import com.yuansaas.app.feature.entity.Feature;
 import com.yuansaas.app.feature.params.AssignFeatureMenuParam;
 import com.yuansaas.app.feature.params.FeatureCreateParam;
 import com.yuansaas.app.feature.params.FeatureUpdateParam;
+import com.yuansaas.app.feature.params.FindFeatureParam;
+import com.yuansaas.app.feature.vo.FeaturePageListVo;
+import com.yuansaas.core.page.RPage;
 import com.yuansaas.user.menu.vo.MenuVo;
 import jakarta.validation.Valid;
 
@@ -29,6 +32,13 @@ public interface FeatureService {
      * @author  lxz 2026/01/29 14:35
      */
     Boolean update(@Valid FeatureUpdateParam featureUpdateParam);
+
+    /**
+     * 获取功能列表 （分页）
+     * @param findFeatureParam 功能编辑参数
+     * @author  lxz 2026/01/29 14:35
+     */
+    RPage<FeaturePageListVo> getByPage(FindFeatureParam findFeatureParam);
 
     /**
      * 获取功能code列表

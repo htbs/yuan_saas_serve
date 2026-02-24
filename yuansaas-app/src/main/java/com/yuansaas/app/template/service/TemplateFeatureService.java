@@ -6,6 +6,8 @@ import com.yuansaas.app.template.params.FindTemplateFeatureRPageParam;
 import com.yuansaas.app.template.vo.TemplateFeaturePageVo;
 import com.yuansaas.core.page.RPage;
 
+import java.util.List;
+
 /**
  *
  * 模版功能关系  - server
@@ -45,5 +47,12 @@ public interface TemplateFeatureService {
      *
      * @param findTemplateFeatureRPageParam 功能列表查询
      */
-     RPage<TemplateFeaturePageVo> getFeatureByTemplateCode(FindTemplateFeatureRPageParam findTemplateFeatureRPageParam);
+     RPage<TemplateFeaturePageVo> getFeatureByPage(FindTemplateFeatureRPageParam findTemplateFeatureRPageParam);
+
+    /**
+     * 获取模版关联的功能
+     *
+     * @param templateCode 功能列表查询
+     */
+    List<TemplateFeaturePageVo> getFeatureListByTemplateCode(List<String> templateCode);
 }

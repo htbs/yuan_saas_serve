@@ -3,6 +3,7 @@ package com.yuansaas.app.shop.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.yuansaas.app.common.enums.IndustryTypeEnum;
 import com.yuansaas.app.order.enums.PayChannelEnum;
 import com.yuansaas.app.order.platform.entity.Order;
 import com.yuansaas.app.order.platform.enums.OrderStatusEnum;
@@ -14,6 +15,7 @@ import com.yuansaas.app.shop.entity.Shop;
 import com.yuansaas.app.shop.entity.ShopDataConfig;
 import com.yuansaas.app.shop.entity.ShopRegularHours;
 import com.yuansaas.app.shop.entity.ShopSpecialHours;
+import com.yuansaas.app.shop.enums.ShopFeatureSourceEnum;
 import com.yuansaas.app.shop.model.*;
 import com.yuansaas.app.shop.param.*;
 import com.yuansaas.app.shop.repository.ShopDataConfigRepository;
@@ -21,9 +23,15 @@ import com.yuansaas.app.shop.repository.ShopRegularHoursRepository;
 import com.yuansaas.app.shop.repository.ShopRepository;
 import com.yuansaas.app.shop.repository.ShopSpecialHoursRepository;
 import com.yuansaas.app.shop.service.ShopDataService;
+import com.yuansaas.app.shop.service.ShopFeatureService;
 import com.yuansaas.app.shop.service.ShopUserService;
 import com.yuansaas.app.shop.service.mapstruct.ShopMapStruct;
 import com.yuansaas.app.shop.vo.ShopBusinessHoursVo;
+import com.yuansaas.app.template.params.FindTemplateRPageParam;
+import com.yuansaas.app.template.service.TemplateFeatureService;
+import com.yuansaas.app.template.service.TemplateService;
+import com.yuansaas.app.template.vo.TemplateFeaturePageVo;
+import com.yuansaas.app.template.vo.TemplateInfoVo;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
@@ -35,6 +43,7 @@ import com.yuansaas.user.role.enums.RoleTypeEnum;
 import com.yuansaas.user.role.params.SaveRoleParam;
 import com.yuansaas.user.role.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +52,7 @@ import org.springframework.util.ObjectUtils;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 商家基本配置服务实现类
@@ -51,6 +61,7 @@ import java.util.*;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ShopDataServiceImpl implements ShopDataService {
 
 
@@ -65,6 +76,9 @@ public class ShopDataServiceImpl implements ShopDataService {
     private final ShopUserService shopUserService;
     private final AppProperties appProperties;
     private final PasswordEncoder passwordEncoder;
+    private final TemplateService templateService;
+    private final TemplateFeatureService templateFeatureService;
+    private final ShopFeatureService shopFeatureService;
 
     /**
      * 激活商家
@@ -86,8 +100,8 @@ public class ShopDataServiceImpl implements ShopDataService {
         initUserAccount(shopInitModel.getShop().getCode(),shopInitModel.getShop().getName() , roleId);
         // 修改初始化功能订单状态
         updateInitOrder(shopInitModel.getShop(),shopInitModel.getPayChannel(),shopInitModel.getPayAmount());
-        // todo 初始化店铺功能
-
+        //  初始化店铺功能
+        initTemplate(shopInitModel.getShop());
         // todo 后期可以考虑是否通过短信的方式通知商铺法人的账号和密码
         return true;
     }
@@ -387,6 +401,33 @@ public class ShopDataServiceImpl implements ShopDataService {
         shopUserSaveParam.setNickName(shopName);
         shopUserSaveParam.setRoleId(Collections.singletonList(roleId));
         shopUserService.createUser(shopUserSaveParam);
+    }
+
+    /**
+     * 初始化模版
+     */
+    private void initTemplate (Shop shop) {
+        // 判断行业类型
+        IndustryTypeEnum exists = IndustryTypeEnum.isExists(shop.getType());
+        if (ObjectUtil.isEmpty(exists)) {
+            return;
+        }
+        // 获取行业下的默认模版
+        List<TemplateInfoVo> infoByParam = templateService.getInfoByParam(FindTemplateRPageParam.builder().industryType(exists.getName()).isDefault(AppConstants.Y).lockStatus(AppConstants.Y).build());
+        if (ObjectUtil.isEmpty(infoByParam)) {
+            log.error("{}场景下没有默认模版", IndustryTypeEnum.valueOf(shop.getType()).getMessage());
+        }
+        // 获取模版下的功能
+        List<TemplateFeaturePageVo> featureListByTemplateCode = templateFeatureService.getFeatureListByTemplateCode(infoByParam.stream().map(TemplateInfoVo::getTemplateCode).toList());
+        if (ObjectUtil.isEmpty(featureListByTemplateCode)){
+            return;
+        }
+        // 保存商家和功能的列表关系
+        ShopFeatureLinkModel shopFeatureLinkModel = new ShopFeatureLinkModel();
+        shopFeatureLinkModel.setFeatureCode(new ArrayList<>(featureListByTemplateCode.stream().map(TemplateFeaturePageVo::getFeatureCode).collect(Collectors.toSet())));
+        shopFeatureLinkModel.setShopCode(shop.getCode());
+        shopFeatureLinkModel.setSource(ShopFeatureSourceEnum.INIT);
+        shopFeatureService.saveLink(shopFeatureLinkModel);
     }
 
 }

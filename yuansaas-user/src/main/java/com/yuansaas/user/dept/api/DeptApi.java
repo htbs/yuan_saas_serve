@@ -35,7 +35,7 @@ public class DeptApi {
      * @return 部门列表 DeptTreeListVo
      */
     @GetMapping("/list")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth(permissions = "system:dept:find")
     public ResponseEntity<ResponseModel<List<DeptTreeListVo>>> list(FindDeptParam findDeptParam) {
         return ResponseBuilder.okResponse(deptService.list(findDeptParam));
     }
@@ -46,7 +46,7 @@ public class DeptApi {
      * @return 新增结果 true/false
      */
     @PostMapping("/save")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth(permissions = "system:dept:create")
     public ResponseEntity<ResponseModel<Boolean>> save(@Validated @RequestBody SaveDeptParam saveDeptParam) {
         return ResponseBuilder.okResponse(deptService.save(saveDeptParam));
     }
@@ -56,7 +56,7 @@ public class DeptApi {
      * @return 修改结果 true/false
      */
     @PutMapping("/update")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth(permissions = "system:dept:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@Validated @RequestBody UpdateDeptParam updateDeptParam) {
         return ResponseBuilder.okResponse(deptService.update(updateDeptParam));
     }
@@ -66,6 +66,7 @@ public class DeptApi {
      * @return 删除结果 true/false
      */
     @DeleteMapping("/delete/{id}")
+    @SecurityAuth(permissions = "system:dept:delete")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable(value = "id") Long id ) {
         return ResponseBuilder.okResponse(deptService.delete(id));
     }
@@ -75,7 +76,7 @@ public class DeptApi {
      * @return 部门详情 DeptListVo
      */
     @GetMapping("/{id}")
-    @SecurityAuth(authenticated = false)
+    @SecurityAuth(permissions = "system:dept:find")
     public ResponseEntity<ResponseModel<DeptListVo>> getById(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(deptService.getById("0", id));
     }

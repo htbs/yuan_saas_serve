@@ -44,15 +44,14 @@ public class ShopMapStruct {
         shop.setLegalPersonPhone(shopParam.getLegalPersonPhone());
         shop.setLegalPersonEmail(shopParam.getLegalPersonEmail());
         shop.setUnifiedCreditCode(shopParam.getUnifiedCreditCode());
-        shop.setLegalPersonSex(shop.getLegalPersonSex());
+        shop.setLegalPersonSex(shopParam.getLegalPersonSex());
         shop.setIdCardFront(shopParam.getIdCardFront());
         shop.setIdCardBack(shopParam.getIdCardBack());
         shop.setBusinessLicense(shopParam.getBusinessLicense());
         shop.setSignedStatus(shopParam.getSignedStatus().name());
         shop.setLockStatus(AppConstants.N);
         shop.setDeleteStatus(AppConstants.N);
-        shop.setCreateBy(AppContextUtil.getUserInfo());
-        shop.setCreateAt(LocalDateTime.now());
+        shop.init();
         return shop;
     }
     /**

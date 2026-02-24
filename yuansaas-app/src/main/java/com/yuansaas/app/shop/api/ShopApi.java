@@ -35,8 +35,8 @@ public class ShopApi {
      * @param saveShopParam 商家参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/add",method = RequestMethod.POST)
-    @SecurityAuth
+    @PostMapping(value = "/add")
+    @SecurityAuth(permissions = "system:shop:create")
     public ResponseEntity<ResponseModel<Boolean>> add(@RequestBody @Validated SaveShopParam saveShopParam) {
         return ResponseBuilder.okResponse(shopService.add(saveShopParam));
     }
@@ -46,8 +46,8 @@ public class ShopApi {
      * @param updateShopParam 商家参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/updateInfoData",method = RequestMethod.POST)
-    @SecurityAuth
+    @PostMapping(value = "/update")
+    @SecurityAuth(permissions = "system:shop:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated UpdateShopParam updateShopParam) {
         return ResponseBuilder.okResponse(shopService.update(updateShopParam));
     }
@@ -57,8 +57,8 @@ public class ShopApi {
      * @param id 商家id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/disable/{id}",method = RequestMethod.PUT)
-    @SecurityAuth
+    @PutMapping(value = "/disable/{id}")
+    @SecurityAuth(permissions = "system:shop:lock")
     public ResponseEntity<ResponseModel<Boolean>> disable(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.lock(id));
     }
@@ -68,8 +68,8 @@ public class ShopApi {
      * @param id 商家id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/enable/{id}",method = RequestMethod.PUT)
-    @SecurityAuth
+    @PutMapping(value = "/enable/{id}")
+    @SecurityAuth(permissions = "system:shop:lock")
     public ResponseEntity<ResponseModel<Boolean>> enable(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.lock(id));
     }
@@ -79,20 +79,20 @@ public class ShopApi {
      * @param id 商家id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/delete/{id}",method = RequestMethod.DELETE)
-    @SecurityAuth
+    @DeleteMapping(value = "/delete/{id}")
+    @SecurityAuth(permissions = "system:shop:delete")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.delete(id));
     }
 
     /**
-     * 查询商家列表
+     * 查询商家列表(分页)
      * @param findShopParam 查询参数
      * @return 商家列表
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/page",method = RequestMethod.GET)
-    @SecurityAuth
+    @GetMapping(value = "/page")
+    @SecurityAuth(permissions = "system:shop:find")
     public ResponseEntity<ResponseModel<RPage<ShopListVo>>> getByPage( FindShopParam findShopParam) {
         return ResponseBuilder.okResponse(shopService.getByPage(findShopParam));
     }
@@ -104,8 +104,8 @@ public class ShopApi {
      * @return 商家详情
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/get/{id}",method = RequestMethod.GET)
-    @SecurityAuth
+    @GetMapping(value = "/get/{id}")
+    @SecurityAuth(permissions = "system:shop:find")
     public ResponseEntity<ResponseModel<ShopVo>> getById(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.getById(id));
     }
@@ -116,8 +116,8 @@ public class ShopApi {
      * @param signedParam 签约参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/signed",method = RequestMethod.PUT)
-    @SecurityAuth
+    @PutMapping(value = "/signed")
+    @SecurityAuth(permissions = "system:shop:signed")
     public ResponseEntity<ResponseModel<Boolean>> signed(@RequestBody  @Validated SignedParam signedParam) {
         return ResponseBuilder.okResponse(shopService.signed(signedParam));
     }

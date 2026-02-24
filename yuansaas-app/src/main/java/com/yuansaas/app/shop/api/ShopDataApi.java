@@ -30,8 +30,8 @@ public class ShopDataApi {
      * @param updateShopDataParam 店铺参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/update/info",method = RequestMethod.POST)
-    @SecurityAuth
+    @PostMapping(value = "/update/info")
+    @SecurityAuth(permissions = "shop:data:update")
     public ResponseEntity<ResponseModel<Boolean>> updateInfoData(@RequestBody @Validated UpdateShopDataParam updateShopDataParam) {
         return ResponseBuilder.okResponse(shopDataService.updateInfoData(updateShopDataParam));
     }
@@ -42,8 +42,8 @@ public class ShopDataApi {
      * @param businessHoursParam 营业时间参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/business/hours",method = RequestMethod.POST)
-    @SecurityAuth
+    @PostMapping(value = "/business/hours")
+    @SecurityAuth(permissions = "shop:data:business_hours")
     public ResponseEntity<ResponseModel<Boolean>> saveBusinessHours(@RequestBody @Validated BusinessHoursParam businessHoursParam) {
         return ResponseBuilder.okResponse(shopDataService.saveBusinessHours(businessHoursParam));
     }
@@ -52,8 +52,8 @@ public class ShopDataApi {
      * @param shopCode 店铺编码
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/get/business/hours",method = RequestMethod.GET)
-    @SecurityAuth
+    @PostMapping(value = "/get/business/hours")
+    @SecurityAuth(permissions = "shop:data:business_hours")
     public ResponseEntity<ResponseModel<ShopBusinessHoursVo>> getBusinessHoursByShopCode(@RequestParam String shopCode) {
         return ResponseBuilder.okResponse(shopDataService.getBusinessHoursByShopCode(shopCode));
     }

@@ -190,6 +190,7 @@ public class ShopServiceImpl implements ShopService {
      * @author lxz 2025/11/16 14:35
      */
     @Override
+    @Transactional
     public Boolean signed(SignedParam signedParam) {
         Shop shop = shopRepository.findById(signedParam.getId()).orElseThrow(DataErrorCode.DATA_NOT_FOUND::buildException);
         // 修改签约数据
@@ -264,16 +265,14 @@ public class ShopServiceImpl implements ShopService {
             OrderItemModel orderItemModel = new OrderItemModel();
             orderItemModel.setType(OrderItemTypeEnum.FUNCTION_TEMPLATE);
             orderItemModel.setMerchandiseName(f.getName());
-            // todo 每个菜单应该有对应的价格
-            orderItemModel.setMerchandiseAmount(1);
+            orderItemModel.setMerchandiseAmount(0);
             FunctionTemplateModel functionTemplateModel = new FunctionTemplateModel();
             functionTemplateModel.setFunctionCode(f.getMenuCode());
-            // todo 在签约后给菜单设值开始和结束时间
             orderItemModel.setMerchantOrderExtModel(functionTemplateModel);
             orderItemModelList.add(orderItemModel);
         });
 
-        // todo  创建功能订单
+        // 创建功能订单
         SubmitOrderParam submitOrderParam = new SubmitOrderParam();
         submitOrderParam.setShopCode(shop.getCode());
         submitOrderParam.setOrderType(OrderTypeEnum.INIT_TEMPLATE.getName());

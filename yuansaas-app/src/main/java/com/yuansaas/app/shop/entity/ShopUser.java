@@ -1,5 +1,6 @@
 package com.yuansaas.app.shop.entity;
 
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.jpa.model.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -66,9 +67,9 @@ public class ShopUser extends BaseEntity {
     /**
      * 锁定状态( N 未锁定| Y 锁定)
      */
-    private String lockStatus;
+    private String lockStatus = AppConstants.N;
     /**
      * 删除状态( N 未删除| Y 删除)
      */
-    private String deleteStatus;
+    private String deleteStatus = AppConstants.N;
 }

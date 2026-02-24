@@ -22,6 +22,9 @@ import com.yuansaas.core.page.RPage;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  *
@@ -44,6 +47,7 @@ public class TemplateServiceImpl implements TemplateService {
      * @author lxz 2025/11/16 14:35
      */
     @Override
+    @Transactional
     public Boolean add(@Valid TemplateCreateParam templateCreateParam) {
         Template template = new Template();
         BeanUtil.copyProperties(templateCreateParam , template);
@@ -69,7 +73,6 @@ public class TemplateServiceImpl implements TemplateService {
             template.setCoverImage(templateUpdateParam.getCoverImage());
             template.setImagesUrl(templateUpdateParam.getImagesUrl());
             template.setVideoUrl(templateUpdateParam.getVideoUrl());
-            template.setIndustryType(templateUpdateParam.getIndustryType());
             template.setIsDefault(templateUpdateParam.getIsDefault());
             template.update();
             templateRepository.save(template);
@@ -118,24 +121,19 @@ public class TemplateServiceImpl implements TemplateService {
     /**
      * 获取模版分页列表
      *
-     * @param findTemplateRPageParam 模版
+     * @param findTemplateRpageParam 模版
      * @author lxz 2025/11/16 14:35
      */
     @Override
-    public RPage<TemplatePageVo> getByRPage(FindTemplateRPageParam findTemplateRPageParam) {
+    public RPage<TemplatePageVo> getByRPage(FindTemplateRPageParam findTemplateRpageParam) {
         QTemplate template = QTemplate.template;
-        BooleanBuilder booleanBuilder = BoolBuilder.getInstance()
-                .and(findTemplateRPageParam.getTemplateName() , template.templateName::contains )
-                .and(findTemplateRPageParam.getTemplateType() , template.templateType::eq)
-                .and(findTemplateRPageParam.getIsDefault() , template.isDefault::eq)
-                .and(findTemplateRPageParam.getIndustryType() , template.industryType::eq)
-                .and(findTemplateRPageParam.getLockStatus() , template.lockStatus::eq)
-                .getWhere();
 
-        return  findTemplateRPageParam.getPage(() ->
+        BooleanBuilder booleanBuilder = queryDsl(template , findTemplateRpageParam);
+        return  findTemplateRpageParam.getPage(() ->
              jpaQueryFactory.select(Projections.bean(TemplatePageVo.class,
                             template.id,
                             template.templateName,
+                            template.templateCode,
                             template.templateType,
                             template.industryType,
                             template.imagesUrl,
@@ -163,6 +161,32 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     /**
+     * 根据条件查询模版信息
+     *
+     * @param findTemplateRpageParam 查询条件
+     */
+    @Override
+    public List<TemplateInfoVo> getInfoByParam(FindTemplateRPageParam findTemplateRpageParam) {
+
+        QTemplate qTemplate = QTemplate.template;
+        return  jpaQueryFactory.select(Projections.bean(TemplateInfoVo.class,
+                        qTemplate.id,
+                        qTemplate.templateCode,
+                        qTemplate.templateName,
+                        qTemplate.templateType,
+                        qTemplate.videoUrl,
+                        qTemplate.imagesUrl,
+                        qTemplate.industryType,
+                        qTemplate.isDefault,
+                        qTemplate.updateAt,
+                        qTemplate.updateBy
+                        ))
+                .from(qTemplate)
+                .where(queryDsl(qTemplate , findTemplateRpageParam))
+                .fetch();
+    }
+
+    /**
      * 生成 模版code
      */
     private String getCode() {
@@ -175,5 +199,19 @@ public class TemplateServiceImpl implements TemplateService {
         }
         return code;
 
+    }
+
+    /**
+     * 模版查询条件的构建
+     */
+    private BooleanBuilder  queryDsl (QTemplate template , FindTemplateRPageParam findTemplateRpageParam) {
+        return BoolBuilder.getInstance()
+                .and(findTemplateRpageParam.getTemplateName() , template.templateName::contains )
+                .and(findTemplateRpageParam.getTemplateType() , template.templateType::eq)
+                .and(findTemplateRpageParam.getIsDefault() , template.isDefault::eq)
+                .and(findTemplateRpageParam.getIndustryType() , template.industryType::eq)
+                .and(findTemplateRpageParam.getLockStatus() , template.lockStatus::eq)
+                .and(AppConstants.N , template.deleteStatus::eq)
+                .getWhere();
     }
 }

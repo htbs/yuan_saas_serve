@@ -93,7 +93,7 @@ public class TemplateApi {
      */
     @GetMapping(value = "/page")
     @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:find")
-    public ResponseEntity<ResponseModel<RPage<TemplatePageVo>>> getByRpage(@RequestBody FindTemplateRPageParam findTemplateRpageParam) {
+    public ResponseEntity<ResponseModel<RPage<TemplatePageVo>>> getByRpage(FindTemplateRPageParam findTemplateRpageParam) {
         return ResponseBuilder.okResponse(templateService.getByRPage(findTemplateRpageParam));
     }
 
@@ -121,13 +121,13 @@ public class TemplateApi {
 
     /**
      * 获取模版名下分配的功能列表
-     * @param findTemplateFeatureRPageParam 分配参数
+     * @param findTemplateFeatureRpageParam 分配参数
      * @author lxz 2025/11/16 14:35
      */
-    @PostMapping(value = "/find/feature")
+    @GetMapping(value = "/find/feature")
     @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:assign_feature_template")
-    public ResponseEntity<ResponseModel<RPage<TemplateFeaturePageVo>>> getFeatureByTemplateCode(@RequestBody @Validated FindTemplateFeatureRPageParam findTemplateFeatureRPageParam ){
-        return ResponseBuilder.okResponse(templateFeatureService.getFeatureByTemplateCode(findTemplateFeatureRPageParam));
+    public ResponseEntity<ResponseModel<RPage<TemplateFeaturePageVo>>> getFeatureByTemplateCode(@Validated FindTemplateFeatureRPageParam findTemplateFeatureRpageParam ){
+        return ResponseBuilder.okResponse(templateFeatureService.getFeatureByPage(findTemplateFeatureRpageParam));
     }
 
     /**

@@ -37,6 +37,6 @@ public interface FeatureRepository extends JpaRepository<Feature , Long> {
     /**
      *  根据行业类型获取功能code
      */
-    @Query(value = "select * from feature where industryType =:industryType and  delete_status = 'N' " , nativeQuery = true)
+    @Query(value = "select * from feature where industry_type =:industryType and  delete_status = 'N' " , nativeQuery = true)
     List<Feature> getFeatureCodeListByIndustryType(@Param("industryType") String industryType);
 }

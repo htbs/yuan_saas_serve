@@ -55,7 +55,7 @@ public class Template extends BaseEntity {
     /**
      * 是否默认
      */
-    private String isDefault;
+    private String isDefault = AppConstants.N;
     /**
      * 锁定状态
      */

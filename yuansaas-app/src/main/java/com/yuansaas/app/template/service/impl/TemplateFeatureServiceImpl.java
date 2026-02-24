@@ -20,10 +20,12 @@ import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
 import com.yuansaas.core.page.RPage;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -72,7 +74,7 @@ public class TemplateFeatureServiceImpl implements TemplateFeatureService {
      * @param assignTemplateFeatureParam 删除参数
      */
     @Override
-    public Boolean removeFeature(AssignTemplateFeatureParam assignTemplateFeatureParam) {
+    public Boolean removeFeature(@Valid AssignTemplateFeatureParam assignTemplateFeatureParam) {
         templateFeatureRepository.removeByFeatureCodesAndTemplateCode(assignTemplateFeatureParam.getTemplateCode() , assignTemplateFeatureParam.getFeatureCodes());
         return true;
     }
@@ -84,8 +86,10 @@ public class TemplateFeatureServiceImpl implements TemplateFeatureService {
      */
     @Override
     public Boolean lock(Long id) {
-        templateFeatureRepository.findById(id).ifPresentOrElse(templateFeature ->
-            templateFeature.setLockStatus(AppConstants.N.equals(templateFeature.getLockStatus()) ? AppConstants.Y : AppConstants.N)
+        templateFeatureRepository.findById(id).ifPresentOrElse(templateFeature -> {
+                    templateFeature.setLockStatus(AppConstants.N.equals(templateFeature.getLockStatus()) ? AppConstants.Y : AppConstants.N);
+                    templateFeatureRepository.save(templateFeature);
+                }
         ,()->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("不存在的功能");
         });
@@ -93,15 +97,10 @@ public class TemplateFeatureServiceImpl implements TemplateFeatureService {
     }
 
     @Override
-    public RPage<TemplateFeaturePageVo> getFeatureByTemplateCode(FindTemplateFeatureRPageParam findTemplateFeatureRpageParam) {
+    public RPage<TemplateFeaturePageVo> getFeatureByPage(FindTemplateFeatureRPageParam findTemplateFeatureRpageParam) {
 
         QFeature qFeature = QFeature.feature;
         QTemplateFeature qTemplateFeature = QTemplateFeature.templateFeature;
-        BooleanBuilder builder = BoolBuilder.getInstance()
-                .and(findTemplateFeatureRpageParam.getFeatureName() ,  qFeature.featureName::contains)
-                .and(findTemplateFeatureRpageParam.getTemplateCode() , qTemplateFeature.templateCode::eq)
-                .and(findTemplateFeatureRpageParam.getLockStatus() , qTemplateFeature.lockStatus::eq)
-                .getWhere();
         return findTemplateFeatureRpageParam.getPage(()->
                         jpaQueryFactory.select(Projections.bean(TemplateFeaturePageVo.class,
                            qTemplateFeature.id,
@@ -112,12 +111,29 @@ public class TemplateFeatureServiceImpl implements TemplateFeatureService {
                            ))
                     .from(qTemplateFeature)
                     .leftJoin(qFeature).on(qTemplateFeature.featureCode.eq(qFeature.featureCode))
-                    .where(builder)
+                    .where(querydsl(qFeature,qTemplateFeature,findTemplateFeatureRpageParam))
                     ,
                 ()-> jpaQueryFactory.select(qTemplateFeature.id.countDistinct())
                     .from(qTemplateFeature)
                     .leftJoin(qFeature).on(qTemplateFeature.featureCode.eq(qFeature.featureCode))
-                    .where(builder));
+                    .where(querydsl(qFeature,qTemplateFeature,findTemplateFeatureRpageParam)));
+    }
+
+    @Override
+    public List<TemplateFeaturePageVo> getFeatureListByTemplateCode(List<String> templateCode) {
+        QFeature qFeature = QFeature.feature;
+        QTemplateFeature qTemplateFeature = QTemplateFeature.templateFeature;
+        return jpaQueryFactory.select(Projections.bean(TemplateFeaturePageVo.class,
+                        qTemplateFeature.id,
+                        qFeature.featureName,
+                        qFeature.featureCode,
+                        qFeature.description,
+                        qTemplateFeature.lockStatus
+                ))
+                .from(qTemplateFeature)
+                .leftJoin(qFeature).on(qTemplateFeature.featureCode.eq(qFeature.featureCode))
+                .where(querydsl(qFeature,qTemplateFeature,FindTemplateFeatureRPageParam.builder().templateCodes(templateCode).build()))
+                .fetch();
     }
 
 
@@ -143,6 +159,18 @@ public class TemplateFeatureServiceImpl implements TemplateFeatureService {
             // 保存
             templateFeatureRepository.saveAll(templateFeatureList);
         }
+    }
+
+    /**
+     * 构建查询条件
+     */
+    private BooleanBuilder querydsl (QFeature qFeature , QTemplateFeature qTemplateFeature , FindTemplateFeatureRPageParam findTemplateFeatureRpageParam) {
+        return BoolBuilder.getInstance()
+                .and(findTemplateFeatureRpageParam.getFeatureName() ,  qFeature.featureName::contains)
+                .and(findTemplateFeatureRpageParam.getTemplateCode() , qTemplateFeature.templateCode::eq)
+                .and(findTemplateFeatureRpageParam.getTemplateCodes() , qTemplateFeature.templateCode::in)
+                .and(findTemplateFeatureRpageParam.getLockStatus() , qTemplateFeature.lockStatus::eq)
+                .getWhere();
     }
 
 }

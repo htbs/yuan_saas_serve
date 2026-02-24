@@ -19,7 +19,7 @@ public interface ShopUserService {
      * @param shopUserSaveParam 用户信息
      * @return 用户编号
      */
-    Long createUser(@Valid ShopUserSaveParam shopUserSaveParam);
+    Boolean createUser(@Valid ShopUserSaveParam shopUserSaveParam);
 
 
     /**

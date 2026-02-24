@@ -8,6 +8,8 @@ import com.yuansaas.app.template.vo.TemplatePageVo;
 import com.yuansaas.core.page.RPage;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  *
  * 模版操作 Service
@@ -47,10 +49,10 @@ public interface TemplateService {
     /**
      * 获取模版分页列表
      *
-     * @param findTemplateRPageParam 模版
+     * @param findTemplateRpageParam 模版
      * @author lxz 2025/11/16 14:35
      */
-    RPage<TemplatePageVo> getByRPage(FindTemplateRPageParam findTemplateRPageParam);
+    RPage<TemplatePageVo> getByRPage(FindTemplateRPageParam findTemplateRpageParam);
 
     /**
      * 获取模版详情
@@ -58,4 +60,11 @@ public interface TemplateService {
      * @author lxz 2025/11/16 14:35
      */
     TemplateInfoVo getInfoById(Long id);
+
+    /**
+     * 根据条件查询模版信息
+     */
+    List<TemplateInfoVo> getInfoByParam(@Valid  FindTemplateRPageParam findTemplateRpageParam);
+
+
 }

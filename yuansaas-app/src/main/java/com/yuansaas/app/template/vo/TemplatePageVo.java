@@ -21,6 +21,10 @@ public class TemplatePageVo{
      */
     private String templateName;
     /**
+     * 模版code
+     */
+    private String templateCode;
+    /**
      * 模版类型  H5/MINI/APP
      */
     private String templateType;

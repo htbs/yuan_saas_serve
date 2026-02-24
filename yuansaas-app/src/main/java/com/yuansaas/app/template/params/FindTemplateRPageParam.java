@@ -4,7 +4,9 @@ import com.yuansaas.app.common.enums.IndustryTypeEnum;
 import com.yuansaas.app.template.enums.TemplateTypeEnum;
 import com.yuansaas.core.annotation.EnumValidate;
 import com.yuansaas.core.page.PageModel;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
@@ -14,7 +16,9 @@ import java.io.Serializable;
  *
  * @author LXZ 2026/2/3 18:28
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
 public class FindTemplateRPageParam extends PageModel implements Serializable {
     /**
      * 模版name

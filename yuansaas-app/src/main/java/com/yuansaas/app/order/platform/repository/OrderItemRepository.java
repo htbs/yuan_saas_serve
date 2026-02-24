@@ -3,6 +3,8 @@ package com.yuansaas.app.order.platform.repository;
 import com.yuansaas.app.order.platform.entity.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 /**
  *
  * 订单子项数据库操作
@@ -10,4 +12,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author LXZ 2026/1/18 18:59
  */
 public interface OrderItemRepository extends JpaRepository<OrderItem , Long > {
+
+    List<OrderItem> findByOrderNo(Long orderNo);
 }

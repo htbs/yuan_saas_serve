@@ -1,7 +1,9 @@
 package com.yuansaas.app.feature.params;
 
+import com.yuansaas.app.common.enums.IndustryTypeEnum;
 import com.yuansaas.app.feature.enums.FeatureScopeEnum;
 import com.yuansaas.app.feature.enums.FeatureTypeEnum;
+import com.yuansaas.core.annotation.EnumValidate;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -38,17 +40,20 @@ public class FeatureUpdateParam implements Serializable {
      * 功能类型  默认类型 BUY
      * 枚举 {@link com.yuansaas.app.feature.enums.FeatureTypeEnum}
      */
+    @EnumValidate(enumClass = FeatureScopeEnum.class , message = "功能类型无效")
     private String featureType ;
     /**
      * 作用域  默认类型  ALL
      * 枚举 {@link com.yuansaas.app.feature.enums.FeatureScopeEnum}
      */
+    @EnumValidate(enumClass = FeatureScopeEnum.class , message = "作用域类型无效")
     private String featureScope;
 
     /**
      * 行业类型
      * 枚举 {@link com.yuansaas.app.common.enums.IndustryTypeEnum}
      */
+    @EnumValidate(enumClass = IndustryTypeEnum.class , message = "行业类型枚举无效")
     private String industryType;
 
 }
