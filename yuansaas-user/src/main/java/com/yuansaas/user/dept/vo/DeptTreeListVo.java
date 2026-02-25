@@ -1,12 +1,10 @@
 package com.yuansaas.user.dept.vo;
 
 import com.yuansaas.core.model.TreeNode;
-import com.yuansaas.user.dept.model.DeptTreeModel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -14,8 +12,9 @@ import java.util.List;
  *
  * @author LXZ 2025/10/16 16:44
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class DeptTreeListVo extends TreeNode {
+public class DeptTreeListVo extends TreeNode<DeptTreeListVo> {
 
     /**
      * 部门id
