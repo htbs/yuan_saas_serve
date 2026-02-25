@@ -1,4 +1,4 @@
-package com.yuansaas.user.system.param;
+package com.yuansaas.user.users.param;
 
 import com.yuansaas.integration.sms.enums.SendTypeEnum;
 import jakarta.validation.constraints.NotBlank;

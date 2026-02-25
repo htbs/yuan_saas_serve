@@ -1,4 +1,4 @@
-package com.yuansaas.user.system.param;
+package com.yuansaas.user.users.param;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

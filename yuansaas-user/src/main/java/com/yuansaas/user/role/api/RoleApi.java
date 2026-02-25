@@ -35,7 +35,7 @@ public class RoleApi {
      * @return roleListVo
      */
     @GetMapping("/page")
-    @SecurityAuth(permissions = "system:role:find")
+    @SecurityAuth(permissions = "users:role:find")
     public ResponseEntity<ResponseModel<RPage<RoleListVo>>> getByPage(FindRoleParam findRoleParam) {
         return ResponseBuilder.okResponse(roleService.getByPage(findRoleParam));
     }
@@ -46,7 +46,7 @@ public class RoleApi {
      * @return true/false
      */
     @PostMapping("/save")
-    @SecurityAuth(permissions = "system:role:create")
+    @SecurityAuth(permissions = "users:role:create")
     public ResponseEntity<ResponseModel<Boolean>> save(@Validated @RequestBody SaveRoleParam saveRoleParam) {
         roleService.save(saveRoleParam);
         return ResponseBuilder.okResponse(true);
@@ -57,7 +57,7 @@ public class RoleApi {
      * @return true/false
      */
     @PutMapping("/update")
-    @SecurityAuth(permissions = "system:role:update")
+    @SecurityAuth(permissions = "users:role:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@Validated @RequestBody UpdateRoleParam updateRoleParam) {
         return ResponseBuilder.okResponse(roleService.update(updateRoleParam));
     }
@@ -67,7 +67,7 @@ public class RoleApi {
      * @return true/false
      */
     @DeleteMapping("/delete/{id}")
-    @SecurityAuth(permissions = "system:role:delete")
+    @SecurityAuth(permissions = "users:role:delete")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.delete(id));
     }
@@ -77,7 +77,7 @@ public class RoleApi {
      * @return roleVo
      */
     @GetMapping("/{id}")
-    @SecurityAuth(permissions = "system:role:find")
+    @SecurityAuth(permissions = "users:role:find")
     public ResponseEntity<ResponseModel<RoleVo>> getById(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(roleService.getById(id));
     }

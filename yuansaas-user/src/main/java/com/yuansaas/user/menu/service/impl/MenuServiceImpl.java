@@ -30,8 +30,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -235,6 +235,47 @@ public class MenuServiceImpl implements MenuService {
                     ).fetch();
         } );
 
+    }
+
+    @Override
+    public List<Menu> completeParentMenus(List<Menu> menuList) {
+        if (ObjectUtil.isEmpty(menuList)) {
+            return Collections.emptyList();
+        }
+
+        Map<Long, Menu> resultMap = menuList.stream().collect(Collectors.toMap(Menu::getId, m -> m));
+
+        Set<Long> parentIds = menuList.stream().map(Menu::getPid).filter(p -> ObjectUtil.isNotEmpty(p) && !AppConstants.ZERO_L.equals(p)).collect(Collectors.toSet());
+
+        if (ObjectUtil.isEmpty(parentIds)) {
+            return menuList;
+        }
+        int safetCounter = 0;
+        final int maxDepth = 5;
+        while (!parentIds.isEmpty() &&  safetCounter++ < maxDepth ) {
+            // 过滤已存在的
+            Set<Long> missingParentIds = parentIds.stream().filter(p -> !resultMap.containsKey(p)).collect(Collectors.toSet());
+            if (missingParentIds.isEmpty()) {
+                parentIds = Collections.emptySet();
+            } else {
+                // 父级数据
+                List<Menu> parentMenus = this.getByList(new ArrayList<>(missingParentIds), AppConstants.N);
+                if (ObjectUtil.isEmpty(parentMenus)) {
+                    parentIds = Collections.emptySet();
+                } else {
+                    parentMenus.forEach(f -> resultMap.put(f.getId(), f));
+                    // 判断是否到最顶级
+                    parentIds = parentMenus.stream()
+                            .map(Menu::getPid)
+                            .filter(p -> ObjectUtil.isNotEmpty(p) && !AppConstants.ZERO_L.equals(p))
+                            .collect(Collectors.toSet());
+                }
+            }
+        }
+        if (safetCounter >= maxDepth) {
+            throw  DataErrorCode.DATA_VALIDATION_FAILED.buildException("菜单层级异常，可能存在循环引用");
+        }
+        return new ArrayList<>(resultMap.values());
     }
 
     /**

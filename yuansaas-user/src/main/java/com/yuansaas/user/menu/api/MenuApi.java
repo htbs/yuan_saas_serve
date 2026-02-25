@@ -36,7 +36,7 @@ public class MenuApi {
      * @return 新增结果
      */
     @PostMapping("/save")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:menu:create")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "users:menu:create")
     public ResponseEntity<ResponseModel<Boolean>> save(@Validated @RequestBody SaveMenuParam saveMenuParam) {
         return ResponseBuilder.okResponse(menuService.save(saveMenuParam));
     }
@@ -46,7 +46,7 @@ public class MenuApi {
      * @return 修改结果
      */
     @PutMapping("/update")
-    @SecurityAuth(permissions = "system:menu:update")
+    @SecurityAuth(permissions = "users:menu:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@Validated @RequestBody UpdateMenuParam updateMenuParam) {
         return ResponseBuilder.okResponse(menuService.update(updateMenuParam));
     }
@@ -56,7 +56,7 @@ public class MenuApi {
      * @return 删除结果
      */
     @GetMapping("/delete/{id}")
-    @SecurityAuth(permissions = "system:menu:delete")
+    @SecurityAuth(permissions = "users:menu:delete")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(menuService.delete(id));
     }
@@ -66,7 +66,7 @@ public class MenuApi {
      * @return 禁用结果
      */
     @GetMapping("/lock/{id}")
-    @SecurityAuth(permissions = "system:menu:lock")
+    @SecurityAuth(permissions = "users:menu:lock")
     public ResponseEntity<ResponseModel<Boolean>> lock(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(menuService.lock(id));
     }
@@ -76,7 +76,7 @@ public class MenuApi {
      * @return 菜单详情
      */
     @GetMapping("/{id}")
-    @SecurityAuth(permissions = "system:menu:query")
+    @SecurityAuth(permissions = "users:menu:query")
     public ResponseEntity<ResponseModel<MenuVo>> getById(@PathVariable("id") Long id ) {
         return ResponseBuilder.okResponse(menuService.getById(id));
     }
@@ -87,7 +87,7 @@ public class MenuApi {
      *
      */
     @GetMapping("/list")
-    @SecurityAuth(permissions = "system:menu:query")
+    @SecurityAuth(permissions = "users:menu:query")
     public ResponseEntity<ResponseModel<List<MenuListVo>>> list(FindMenuParam findMenuParam) {
         return ResponseBuilder.okResponse(menuService.list(findMenuParam));
     }

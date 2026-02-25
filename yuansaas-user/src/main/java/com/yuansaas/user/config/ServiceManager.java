@@ -1,8 +1,8 @@
 package com.yuansaas.user.config;
 
 import com.yuansaas.user.permission.service.PermissionService;
-import com.yuansaas.user.permission.service.RoleMenuService;
-import com.yuansaas.user.system.service.SysUserService;
+import com.yuansaas.user.users.service.ShopUserService;
+import com.yuansaas.user.users.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +17,7 @@ public class ServiceManager {
 
     public static SysUserService sysUserService;
     public static PermissionService permissionService;
+    public static ShopUserService shopUserService;
 
 
 
@@ -29,5 +30,8 @@ public class ServiceManager {
     public void setPermissionService(PermissionService permissionService) {
         ServiceManager.permissionService = permissionService;
     }
+
+    @Autowired
+    public void setShopUserService(ShopUserService shopUserService) {ServiceManager.shopUserService = shopUserService;}
 
 }

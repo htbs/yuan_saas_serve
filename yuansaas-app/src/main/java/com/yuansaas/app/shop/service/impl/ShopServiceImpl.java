@@ -127,6 +127,7 @@ public class ShopServiceImpl implements ShopService {
         }
         shop.setDeleteStatus(AppConstants.Y);
         shopRepository.save(shop);
+        // 删除商家相关信息
         return true;
     }
 

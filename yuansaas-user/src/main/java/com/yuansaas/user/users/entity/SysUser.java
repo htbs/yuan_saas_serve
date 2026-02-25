@@ -1,4 +1,4 @@
-package com.yuansaas.user.system.entity;
+package com.yuansaas.user.users.entity;
 
 import com.yuansaas.core.jpa.model.BaseEntity;
 import com.yuansaas.user.common.enums.UserStatus;

@@ -1,21 +1,24 @@
-package com.yuansaas.app.shop.service.impl;
+package com.yuansaas.user.users.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.yuansaas.app.shop.entity.ShopUser;
-import com.yuansaas.app.shop.param.ShopUserSaveParam;
-import com.yuansaas.app.shop.param.ShopUserUpdateParam;
-import com.yuansaas.app.shop.repository.ShopUserRepository;
-import com.yuansaas.app.shop.service.ShopUserService;
-import com.yuansaas.app.shop.service.mapstruct.ShopMapStruct;
 import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.exception.ex.ParamErrorCode;
+import com.yuansaas.user.config.AppProperties;
 import com.yuansaas.user.permission.params.AssignUserDeptParam;
 import com.yuansaas.user.permission.params.AssignUserRoleParam;
 import com.yuansaas.user.permission.service.PermissionService;
+import com.yuansaas.user.users.entity.ShopUser;
+import com.yuansaas.user.users.param.ShopUserSaveParam;
+import com.yuansaas.user.users.param.ShopUserUpdateParam;
+import com.yuansaas.user.users.repository.ShopUserRepository;
+import com.yuansaas.user.users.service.ShopUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  *
@@ -27,9 +30,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ShopUserServiceImpl implements ShopUserService {
 
-    private final ShopMapStruct shopMapStruct;
     private final ShopUserRepository shopUserRepository;
     private final PermissionService permissionService;
+    private final PasswordEncoder passwordEncoder;
+    private final AppProperties appProperties;
 
     /**
      * 创建用户
@@ -43,7 +47,7 @@ public class ShopUserServiceImpl implements ShopUserService {
             throw ParamErrorCode.PARAMETER_REQUIRED.buildException("商铺code不能为空");
         }
         // 组装用户数据 并保存
-        ShopUser shopUserSave = shopMapStruct.toShopUserSave(shopUserSaveParam);
+        ShopUser shopUserSave = toShopUserSave(shopUserSaveParam);
         // 获取用户的岗位编号
         shopUserSave.setPostCode(getPostCode(shopUserSaveParam.getShopCode()));
         shopUserSave.init();
@@ -81,6 +85,16 @@ public class ShopUserServiceImpl implements ShopUserService {
           throw DataErrorCode.DATA_NOT_FOUND.buildException();
         }
         );
+    }
+
+    @Override
+    public Optional<ShopUser> getUserByUsername(String username) {
+        return shopUserRepository.findByUserName(username);
+    }
+
+    @Override
+    public Optional<ShopUser> getUserById(Long id) {
+        return shopUserRepository.findById(id);
     }
 
 //    /**
@@ -197,5 +211,23 @@ public class ShopUserServiceImpl implements ShopUserService {
             return String.format("%03d" , code);
         }
 
+    }
+
+
+    /**
+     * 商铺用户信息映射方法
+     */
+    private ShopUser toShopUserSave(ShopUserSaveParam shopUserSaveParam) {
+        ShopUser shopUser = new ShopUser();
+        shopUser.setShopCode(shopUserSaveParam.getShopCode());
+        shopUser.setUserName(shopUserSaveParam.getUserName());
+        shopUser.setPassword(passwordEncoder.encode(appProperties.getDefaultPassword()));
+        shopUser.setNickName(shopUserSaveParam.getNickName());
+        shopUser.setRealName(shopUserSaveParam.getRealName());
+        shopUser.setEmail(shopUserSaveParam.getEmail());
+        shopUser.setHeadUrl(shopUserSaveParam.getAvatar());
+        shopUser.setSex(shopUserSaveParam.getSex());
+        shopUser.setPhone(shopUserSaveParam.getPhone());
+        return shopUser;
     }
 }

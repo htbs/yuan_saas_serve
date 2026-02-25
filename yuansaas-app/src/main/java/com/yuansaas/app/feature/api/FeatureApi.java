@@ -36,7 +36,7 @@ public class FeatureApi {
      * @param featureCreateParam 功能保存参数
      * @author  lxz 2026/01/29 14:35
      */
-    @SecurityAuth(permissions = "system:feature:create")
+    @SecurityAuth(permissions = "users:feature:create")
     @PostMapping
     public ResponseEntity<ResponseModel<Boolean>> create(@RequestBody @Validated FeatureCreateParam featureCreateParam) {
         return ResponseBuilder.okResponse(featureService.create(featureCreateParam));
@@ -47,7 +47,7 @@ public class FeatureApi {
      * @param featureUpdateParam 功能编辑参数
      * @author  lxz 2026/01/29 14:35
      */
-    @SecurityAuth(permissions = "system:feature:update")
+    @SecurityAuth(permissions = "users:feature:update")
     @PutMapping
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated FeatureUpdateParam featureUpdateParam) {
         return ResponseBuilder.okResponse(featureService.update(featureUpdateParam));
@@ -58,7 +58,7 @@ public class FeatureApi {
      * @param findFeatureParam 功能编辑参数
      * @author  lxz 2026/01/29 14:35
      */
-    @SecurityAuth(permissions = "system:feature:find")
+    @SecurityAuth(permissions = "users:feature:find")
     @GetMapping(value = "/page")
     public ResponseEntity<ResponseModel<RPage<FeaturePageListVo>>> getByPage(FindFeatureParam findFeatureParam) {
         return ResponseBuilder.okResponse(featureService.getByPage(findFeatureParam));
@@ -71,7 +71,7 @@ public class FeatureApi {
      * @param assignFeatureMenuParam 功能编辑参数
      * @author lxz 2026/01/29 14:35
      */
-    @SecurityAuth(permissions = "system:feature:assign-feature-menu")
+    @SecurityAuth(permissions = "users:feature:assign-feature-menu")
     @PutMapping(value = "/assign/menu")
     public ResponseEntity<ResponseModel<Boolean>> assignFeatureMenu(@RequestBody @Validated AssignFeatureMenuParam assignFeatureMenuParam) {
         return ResponseBuilder.okResponse(featureService.assignFeatureMenu(assignFeatureMenuParam));
@@ -83,7 +83,7 @@ public class FeatureApi {
      * @param featureCode  功能code
      * @author lxz 2026/01/29 14:35
      */
-    @SecurityAuth(permissions = "system:featureId:assign-feature-menu")
+    @SecurityAuth(permissions = "users:featureId:assign-feature-menu")
     @GetMapping(value = "/find/assign/menu")
     public ResponseEntity<ResponseModel<List<Long>>> getFeatureMenuListByFeature(@RequestParam(name = "featureCode") String featureCode) {
         return ResponseBuilder.okResponse(featureService.getMenuCodeListByFeatureCodeAndLockStatus(featureCode, AppConstants.N));

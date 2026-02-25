@@ -1,6 +1,6 @@
-package com.yuansaas.user.system.repository;
+package com.yuansaas.user.users.repository;
 
-import com.yuansaas.user.system.entity.SysUser;
+import com.yuansaas.user.users.entity.SysUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

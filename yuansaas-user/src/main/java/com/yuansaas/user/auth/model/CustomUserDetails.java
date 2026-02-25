@@ -5,7 +5,8 @@ import com.yuansaas.common.enums.UserBaseRoleEnum;
 import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.user.client.entity.ClientUser;
 import com.yuansaas.user.common.enums.UserStatus;
-import com.yuansaas.user.system.entity.SysUser;
+import com.yuansaas.user.users.entity.ShopUser;
+import com.yuansaas.user.users.entity.SysUser;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -100,12 +101,25 @@ public class CustomUserDetails implements UserDetails {
         this.userBaseRole = UserBaseRoleEnum.LOGIN_USER;
         this.username = sysUser.getUserName();
         this.avatar = null;
-//        this.userRole= null;
         this.userType = UserTypeEnum.YUAN_SHI_USER;
         this.enabled = UserStatus.active.matches(sysUser.getStatus());
         this.password = sysUser.getPassword() ;
         this.locked = UserStatus.active.matches(sysUser.getStatus());
         IBaseEnum.fromNameIgnoreCase(sysUser.getStatus() , UserStatus.class).ifPresent(userStatus -> this.status = userStatus);
+        this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_".concat(userBaseRole.getName())));
+    }
+
+    public CustomUserDetails(ShopUser shopUser){
+        this.userId = shopUser.getId();
+        this.userBaseRole = UserBaseRoleEnum.LOGIN_USER;
+        this.username = shopUser.getUserName();
+        this.avatar = null;
+        this.shopCode = shopUser.getShopCode();
+        this.userType = UserTypeEnum.MERCHANT_USER;
+        this.enabled = UserStatus.active.matches(shopUser.getStatus());
+        this.password = shopUser.getPassword() ;
+        this.locked = UserStatus.active.matches(shopUser.getStatus());
+        IBaseEnum.fromNameIgnoreCase(shopUser.getStatus() , UserStatus.class).ifPresent(userStatus -> this.status = userStatus);
         this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_".concat(userBaseRole.getName())));
     }
 

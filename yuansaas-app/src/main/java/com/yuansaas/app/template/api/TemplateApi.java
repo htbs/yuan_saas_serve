@@ -36,7 +36,7 @@ public class TemplateApi {
      * @author  lxz 2025/11/16 14:35
      */
     @PostMapping(value = "/create")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:create")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "users:template:create")
     public ResponseEntity<ResponseModel<Boolean>> add(@RequestBody @Validated TemplateCreateParam templateCreateParam) {
         return ResponseBuilder.okResponse(templateService.add(templateCreateParam));
     }
@@ -47,7 +47,7 @@ public class TemplateApi {
      * @author  lxz 2025/11/16 14:35
      */
     @PutMapping(value = "/update")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:update")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "users:template:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated TemplateUpdateParam templateUpdateParam) {
         return ResponseBuilder.okResponse(templateService.update(templateUpdateParam));
     }
@@ -58,7 +58,7 @@ public class TemplateApi {
      * @author lxz 2025/11/16 14:35
      */
     @PutMapping(value = "/disable/{id}")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:lock")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "users:template:lock")
     public ResponseEntity<ResponseModel<Boolean>> disable(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(templateService.lock(id));
     }
@@ -69,7 +69,7 @@ public class TemplateApi {
      * @author  lxz 2025/11/16 14:35
      */
     @PutMapping(value = "/enable/{id}")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:lock")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "users:template:lock")
     public ResponseEntity<ResponseModel<Boolean>> enable(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(templateService.lock(id));
     }
@@ -81,7 +81,7 @@ public class TemplateApi {
      * @author lxz 2025/11/16 14:35
      */
     @DeleteMapping(value = "/delete/{id}")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:delete")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "users:template:delete")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(templateService.delete(id));
     }
@@ -92,7 +92,7 @@ public class TemplateApi {
      * @author  lxz 2025/11/16 14:35
      */
     @GetMapping(value = "/page")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:find")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "users:template:find")
     public ResponseEntity<ResponseModel<RPage<TemplatePageVo>>> getByRpage(FindTemplateRPageParam findTemplateRpageParam) {
         return ResponseBuilder.okResponse(templateService.getByRPage(findTemplateRpageParam));
     }
@@ -103,7 +103,7 @@ public class TemplateApi {
      * @author lxz 2025/11/16 14:35
      */
     @GetMapping(value = "/get/{id}")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:find")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "users:template:find")
     public ResponseEntity<ResponseModel<TemplateInfoVo>> getInfoById(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(templateService.getInfoById(id));
     }
@@ -114,7 +114,7 @@ public class TemplateApi {
      * @author lxz 2025/11/16 14:35
      */
     @PostMapping(value = "/assign")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "'system:template:assign_feature_template")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "'users:template:assign_feature_template")
     public ResponseEntity<ResponseModel<Boolean>> assignFeature(@RequestBody @Validated AssignTemplateFeatureParam assignTemplateFeatureParam) {
         return ResponseBuilder.okResponse(templateFeatureService.assignFeature(assignTemplateFeatureParam));
     }
@@ -125,7 +125,7 @@ public class TemplateApi {
      * @author lxz 2025/11/16 14:35
      */
     @GetMapping(value = "/find/feature")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "system:template:assign_feature_template")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "users:template:assign_feature_template")
     public ResponseEntity<ResponseModel<RPage<TemplateFeaturePageVo>>> getFeatureByTemplateCode(@Validated FindTemplateFeatureRPageParam findTemplateFeatureRpageParam ){
         return ResponseBuilder.okResponse(templateFeatureService.getFeatureByPage(findTemplateFeatureRpageParam));
     }

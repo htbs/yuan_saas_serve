@@ -33,6 +33,6 @@ public interface RoleMenuRepository extends JpaRepository<RoleMenu, Long> {
     /**
      * 根据角色ID集合查询菜单ID集合
      */
-    @Query(value = "SELECT rm.menu_id FROM sys_role_menu rm WHERE rm.role_id IN ?1", nativeQuery = true)
+    @Query(value = "SELECT rm.menu_id FROM sys_role_menu rm WHERE rm.role_id IN (?1)", nativeQuery = true)
     List<Long> findMenuIdByRoleIdIn(List<Long> roleIds);
 }

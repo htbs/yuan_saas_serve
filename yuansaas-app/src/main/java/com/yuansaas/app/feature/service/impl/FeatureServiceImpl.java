@@ -206,6 +206,7 @@ public class FeatureServiceImpl implements FeatureService {
         Expression<MenuVo> menuExpr =
                 Projections.bean(
                         MenuVo.class,
+                        qMenu.id,
                         qMenu.menuCode,
                         qMenu.name,
                         qMenu.menuType,

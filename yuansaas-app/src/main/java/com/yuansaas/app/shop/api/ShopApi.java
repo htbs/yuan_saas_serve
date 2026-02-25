@@ -36,7 +36,7 @@ public class ShopApi {
      * @author  lxz 2025/11/16 14:35
      */
     @PostMapping(value = "/add")
-    @SecurityAuth(permissions = "system:shop:create")
+    @SecurityAuth(permissions = "users:shop:create")
     public ResponseEntity<ResponseModel<Boolean>> add(@RequestBody @Validated SaveShopParam saveShopParam) {
         return ResponseBuilder.okResponse(shopService.add(saveShopParam));
     }
@@ -47,7 +47,7 @@ public class ShopApi {
      * @author  lxz 2025/11/16 14:35
      */
     @PostMapping(value = "/update")
-    @SecurityAuth(permissions = "system:shop:update")
+    @SecurityAuth(permissions = "users:shop:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated UpdateShopParam updateShopParam) {
         return ResponseBuilder.okResponse(shopService.update(updateShopParam));
     }
@@ -58,7 +58,7 @@ public class ShopApi {
      * @author  lxz 2025/11/16 14:35
      */
     @PutMapping(value = "/disable/{id}")
-    @SecurityAuth(permissions = "system:shop:lock")
+    @SecurityAuth(permissions = "users:shop:lock")
     public ResponseEntity<ResponseModel<Boolean>> disable(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.lock(id));
     }
@@ -69,7 +69,7 @@ public class ShopApi {
      * @author  lxz 2025/11/16 14:35
      */
     @PutMapping(value = "/enable/{id}")
-    @SecurityAuth(permissions = "system:shop:lock")
+    @SecurityAuth(permissions = "users:shop:lock")
     public ResponseEntity<ResponseModel<Boolean>> enable(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.lock(id));
     }
@@ -80,7 +80,7 @@ public class ShopApi {
      * @author  lxz 2025/11/16 14:35
      */
     @DeleteMapping(value = "/delete/{id}")
-    @SecurityAuth(permissions = "system:shop:delete")
+    @SecurityAuth(permissions = "users:shop:delete")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.delete(id));
     }
@@ -92,7 +92,7 @@ public class ShopApi {
      * @author  lxz 2025/11/16 14:35
      */
     @GetMapping(value = "/page")
-    @SecurityAuth(permissions = "system:shop:find")
+    @SecurityAuth(permissions = "users:shop:find")
     public ResponseEntity<ResponseModel<RPage<ShopListVo>>> getByPage( FindShopParam findShopParam) {
         return ResponseBuilder.okResponse(shopService.getByPage(findShopParam));
     }
@@ -105,7 +105,7 @@ public class ShopApi {
      * @author  lxz 2025/11/16 14:35
      */
     @GetMapping(value = "/get/{id}")
-    @SecurityAuth(permissions = "system:shop:find")
+    @SecurityAuth(permissions = "users:shop:find")
     public ResponseEntity<ResponseModel<ShopVo>> getById(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.getById(id));
     }
@@ -117,7 +117,7 @@ public class ShopApi {
      * @author  lxz 2025/11/16 14:35
      */
     @PutMapping(value = "/signed")
-    @SecurityAuth(permissions = "system:shop:signed")
+    @SecurityAuth(permissions = "users:shop:signed")
     public ResponseEntity<ResponseModel<Boolean>> signed(@RequestBody  @Validated SignedParam signedParam) {
         return ResponseBuilder.okResponse(shopService.signed(signedParam));
     }

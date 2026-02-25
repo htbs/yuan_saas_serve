@@ -1,4 +1,4 @@
-package com.yuansaas.app.shop.param;
+package com.yuansaas.user.users.param;
 
 import com.yuansaas.core.valid.Http;
 import com.yuansaas.core.valid.Phone;
@@ -13,18 +13,36 @@ import java.util.List;
 
 /**
  *
- * 商铺用户修改参数
+ * 商铺用户保存参数
  *
  * @author LXZ 2026/1/28 19:44
  */
 @Data
-public class ShopUserUpdateParam implements Serializable {
+public class ShopUserSaveParam implements Serializable {
+
 
     /**
-     * 用户id
+     * 商铺code
      */
-    @NotBlank(message = "用户id不能为空")
-    private Long id;
+    private String shopCode;
+    /**
+     *  用户账号
+     */
+    @NotBlank(message = "用户账号不能为空")
+    @Pattern(regexp = "^[a-zA-Z0-9]{4,30}$", message = "用户账号由 数字、字母 组成")
+    @Size(min = 4, max = 30, message = "用户账号长度为 4-30 个字符")
+    private String userName;
+    /**
+     * 用户昵称
+     */
+    @Size(max = 30, message = "用户昵称长度不能超过30个字符")
+    private String nickName;
+    /**
+     * 用户名字
+     */
+    @Size(max = 30, message = "用户名字长度不能超过30个字符")
+    private String realName;
+
     /**
      * 部门id
      */
@@ -53,5 +71,10 @@ public class ShopUserUpdateParam implements Serializable {
      */
     @Http
     private String avatar;
+    /**
+     * 密码
+     */
+    @NotBlank(message = "密码不能为空")
+    private String password;
 
 }

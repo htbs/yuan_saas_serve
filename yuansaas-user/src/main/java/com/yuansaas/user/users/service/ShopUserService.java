@@ -1,8 +1,12 @@
-package com.yuansaas.app.shop.service;
+package com.yuansaas.user.users.service;
 
-import com.yuansaas.app.shop.param.ShopUserSaveParam;
-import com.yuansaas.app.shop.param.ShopUserUpdateParam;
+
+import com.yuansaas.user.users.entity.ShopUser;
+import com.yuansaas.user.users.param.ShopUserSaveParam;
+import com.yuansaas.user.users.param.ShopUserUpdateParam;
 import jakarta.validation.Valid;
+
+import java.util.Optional;
 
 
 /**
@@ -83,13 +87,21 @@ public interface ShopUserService {
 //     */
 //    void deleteUserList(List<Long> ids);
 //
-//    /**
-//     * 通过用户名查询用户
-//     *
-//     * @param username 用户名
-//     * @return 用户对象信息
-//     */
-//    AdminUserDO getUserByUsername(String username);
+    /**
+     * 通过用户名查询用户
+     *
+     * @param username 用户名
+     * @return 用户对象信息
+     */
+     Optional<ShopUser> getUserByUsername(String username);
+
+    /**
+     * 通过用户名查询用户
+     *
+     * @param id 用户id
+     * @return 用户对象信息
+     */
+    Optional<ShopUser> getUserById(Long id);
 //
 //    /**
 //     * 通过手机号获取用户

@@ -57,7 +57,7 @@ public enum IndustryTypeEnum implements IBaseEnum<IndustryTypeEnum> {
         if (ObjectUtil.isEmpty(shopTypeEnum1)) {
             return null;
         }
-        return Arrays.stream(IndustryTypeEnum.values()).filter(f -> ObjectUtil.isNotEmpty(f.getShopTypeEnums()) && f.getShopTypeEnums().contains(shopTypeEnum))
+        return Arrays.stream(IndustryTypeEnum.values()).filter(f -> ObjectUtil.isNotEmpty(f.getShopTypeEnums()) && f.getShopTypeEnums().contains(shopTypeEnum1))
                 .findFirst().orElse(null);
     }
 }

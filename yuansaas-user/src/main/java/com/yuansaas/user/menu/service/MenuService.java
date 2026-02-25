@@ -1,17 +1,10 @@
 package com.yuansaas.user.menu.service;
-
-import com.yuansaas.core.response.ResponseBuilder;
-import com.yuansaas.core.response.ResponseModel;
-import com.yuansaas.user.auth.security.annotations.SecurityAuth;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.params.FindMenuParam;
 import com.yuansaas.user.menu.params.SaveMenuParam;
 import com.yuansaas.user.menu.params.UpdateMenuParam;
 import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.menu.vo.MenuVo;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -67,4 +60,11 @@ public interface MenuService {
      * @param permission 权限点
      */
     List<Long> findByPermission(String permission);
+
+
+    /**
+     * 自动补齐父级
+     * @param menuList 菜单列表
+     */
+    List<Menu> completeParentMenus(List<Menu> menuList);
 }

@@ -37,7 +37,7 @@ public class PlanApi {
      * @author  lxz 2026/01/29 14:35
      */
     @PostMapping
-    @SecurityAuth(permissions = "system:plan:create")
+    @SecurityAuth(permissions = "users:plan:create")
     public ResponseEntity<ResponseModel<Boolean>> create(@RequestBody @Validated PlanCreateParam planCreateParam) {
         return ResponseBuilder.okResponse(planService.create(planCreateParam));
     }
@@ -48,7 +48,7 @@ public class PlanApi {
      * @author  lxz 2026/01/29 14:35
      */
     @PutMapping
-    @SecurityAuth(permissions = "system:plan:update")
+    @SecurityAuth(permissions = "users:plan:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated PlanUpdateParam planUpdateParam) {
         return ResponseBuilder.okResponse(planService.update(planUpdateParam));
     }
@@ -59,7 +59,7 @@ public class PlanApi {
      * @author  lxz 2026/01/29 14:35
      */
     @PutMapping(value = "/disable/{id}")
-    @SecurityAuth(permissions = "system:plan:lock")
+    @SecurityAuth(permissions = "users:plan:lock")
     public ResponseEntity<ResponseModel<Boolean>> disable( @PathVariable(value = "id") Long planId) {
         return ResponseBuilder.okResponse(planService.lock(planId));
     }
@@ -69,7 +69,7 @@ public class PlanApi {
      * @author  lxz 2026/01/29 14:35
      */
     @PutMapping(value = "/enable/{id}")
-    @SecurityAuth(permissions = "system:plan:lock")
+    @SecurityAuth(permissions = "users:plan:lock")
     public ResponseEntity<ResponseModel<Boolean>> enable( @PathVariable(value = "id") Long planId) {
         return ResponseBuilder.okResponse(planService.lock(planId));
     }
@@ -80,7 +80,7 @@ public class PlanApi {
      * @author  lxz 2026/01/29 14:35
      */
     @DeleteMapping("/delete/{id}")
-    @SecurityAuth(permissions = "system:plan:delete")
+    @SecurityAuth(permissions = "users:plan:delete")
     public ResponseEntity<ResponseModel<Boolean>> delete( @PathVariable(value = "id") Long planId) {
         return ResponseBuilder.okResponse(planService.delete(planId));
     }
@@ -91,7 +91,7 @@ public class PlanApi {
      * @author  lxz 2026/01/29 14:35
      */
     @GetMapping
-    @SecurityAuth(permissions = "system:plan:find")
+    @SecurityAuth(permissions = "users:plan:find")
     public ResponseEntity<ResponseModel<RPage<PlanPageListVo>>> findByPage(FindPlanParam findPlanParam) {
         return ResponseBuilder.okResponse(planService.findByPage(findPlanParam));
     }
@@ -103,7 +103,7 @@ public class PlanApi {
      * @author  lxz 2026/01/29 14:35
      */
     @PutMapping(value = "/assign/feature")
-    @SecurityAuth(permissions = "system:assign:plan-feature")
+    @SecurityAuth(permissions = "users:assign:plan-feature")
     public ResponseEntity<ResponseModel<Boolean>> assignPlanFeature(@RequestBody @Validated AssignPlanFeatureParam assignPlanFeatureParam) {
         return ResponseBuilder.okResponse(planService.assignPlanFeature(assignPlanFeatureParam));
     }
@@ -114,7 +114,7 @@ public class PlanApi {
      * @author  lxz 2026/01/29 14:35
      */
     @GetMapping( value = "/assign/feature/list"   )
-    @SecurityAuth(permissions = "system:assign:plan-feature")
+    @SecurityAuth(permissions = "users:assign:plan-feature")
     public ResponseEntity<ResponseModel<List<FeatureMenuBriefVo>>> findAssignFeatureListByPlanCode(@RequestParam String planCode) {
         return ResponseBuilder.okResponse(planService.findAssignFeatureListByPlanCode(planCode));
     }

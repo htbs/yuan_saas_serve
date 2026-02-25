@@ -1,4 +1,4 @@
-package com.yuansaas.user.system.param;
+package com.yuansaas.user.users.param;
 
 import com.yuansaas.core.page.PageModel;
 import com.yuansaas.user.common.enums.UserStatus;

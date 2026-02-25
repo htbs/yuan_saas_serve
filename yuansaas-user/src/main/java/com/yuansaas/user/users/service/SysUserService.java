@@ -1,22 +1,14 @@
-package com.yuansaas.user.system.service;
+package com.yuansaas.user.users.service;
 
 import com.yuansaas.core.page.RPage;
-import com.yuansaas.core.response.ResponseBuilder;
-import com.yuansaas.core.response.ResponseModel;
-import com.yuansaas.user.auth.security.annotations.SecurityAuth;
-import com.yuansaas.user.menu.vo.MenuListVo;
-import com.yuansaas.user.system.entity.SysUser;
-import com.yuansaas.user.system.param.FindUserParam;
-import com.yuansaas.user.system.param.SysUserCreateParam;
-import com.yuansaas.user.system.param.UpdateUserPwdParam;
-import com.yuansaas.user.system.param.UserUpdateParam;
-import com.yuansaas.user.system.vo.SysUserListVo;
-import com.yuansaas.user.system.vo.SysUserVo;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import com.yuansaas.user.users.entity.SysUser;
+import com.yuansaas.user.users.param.FindUserParam;
+import com.yuansaas.user.users.param.SysUserCreateParam;
+import com.yuansaas.user.users.param.UpdateUserPwdParam;
+import com.yuansaas.user.users.param.UserUpdateParam;
+import com.yuansaas.user.users.vo.SysUserListVo;
+import com.yuansaas.user.users.vo.SysUserVo;
 
-import java.util.List;
 import java.util.Optional;
 
 /**

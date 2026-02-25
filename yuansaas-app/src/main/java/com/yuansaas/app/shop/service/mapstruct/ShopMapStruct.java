@@ -2,9 +2,9 @@ package com.yuansaas.app.shop.service.mapstruct;
 
 import com.yuansaas.app.shop.entity.Shop;
 import com.yuansaas.app.shop.entity.ShopDataConfig;
-import com.yuansaas.app.shop.entity.ShopUser;
+import com.yuansaas.user.users.entity.ShopUser;
 import com.yuansaas.app.shop.param.SaveShopParam;
-import com.yuansaas.app.shop.param.ShopUserSaveParam;
+import com.yuansaas.user.users.param.ShopUserSaveParam;
 import com.yuansaas.app.shop.param.UpdateShopDataParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
 import com.yuansaas.common.constants.AppConstants;

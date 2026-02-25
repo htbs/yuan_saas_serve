@@ -1,4 +1,4 @@
-package com.yuansaas.app.shop.api;
+package com.yuansaas.user.users.api;
 
 /**
  *

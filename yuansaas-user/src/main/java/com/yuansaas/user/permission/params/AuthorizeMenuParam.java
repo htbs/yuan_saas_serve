@@ -1,6 +1,7 @@
 package com.yuansaas.user.permission.params;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  * @author LXZ 2025/10/24 12:26
  */
 @Data
+@Builder
 public class AuthorizeMenuParam {
     /**
      * 角色id

@@ -1,4 +1,4 @@
-package com.yuansaas.user.system.vo;
+package com.yuansaas.user.users.vo;
 
 import lombok.Data;
 

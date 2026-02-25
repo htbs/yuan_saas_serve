@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.yuansaas.app.common.enums.IndustryTypeEnum;
+import com.yuansaas.app.feature.service.FeatureService;
 import com.yuansaas.app.order.enums.PayChannelEnum;
 import com.yuansaas.app.order.platform.entity.Order;
 import com.yuansaas.app.order.platform.enums.OrderStatusEnum;
@@ -24,7 +25,8 @@ import com.yuansaas.app.shop.repository.ShopRepository;
 import com.yuansaas.app.shop.repository.ShopSpecialHoursRepository;
 import com.yuansaas.app.shop.service.ShopDataService;
 import com.yuansaas.app.shop.service.ShopFeatureService;
-import com.yuansaas.app.shop.service.ShopUserService;
+import com.yuansaas.user.users.param.ShopUserSaveParam;
+import com.yuansaas.user.users.service.ShopUserService;
 import com.yuansaas.app.shop.service.mapstruct.ShopMapStruct;
 import com.yuansaas.app.shop.vo.ShopBusinessHoursVo;
 import com.yuansaas.app.template.params.FindTemplateRPageParam;
@@ -38,6 +40,9 @@ import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jackson.JacksonUtil;
 import com.yuansaas.core.utils.id.SnowflakeIdGenerator;
 import com.yuansaas.user.config.AppProperties;
+import com.yuansaas.user.menu.vo.MenuVo;
+import com.yuansaas.user.permission.params.AuthorizeMenuParam;
+import com.yuansaas.user.permission.service.PermissionService;
 import com.yuansaas.user.role.enums.AuthorityEnum;
 import com.yuansaas.user.role.enums.RoleTypeEnum;
 import com.yuansaas.user.role.params.SaveRoleParam;
@@ -79,6 +84,8 @@ public class ShopDataServiceImpl implements ShopDataService {
     private final TemplateService templateService;
     private final TemplateFeatureService templateFeatureService;
     private final ShopFeatureService shopFeatureService;
+    private final FeatureService featureService;
+    private final PermissionService permissionService;
 
     /**
      * 激活商家
@@ -101,7 +108,7 @@ public class ShopDataServiceImpl implements ShopDataService {
         // 修改初始化功能订单状态
         updateInitOrder(shopInitModel.getShop(),shopInitModel.getPayChannel(),shopInitModel.getPayAmount());
         //  初始化店铺功能
-        initTemplate(shopInitModel.getShop());
+        initTemplate(shopInitModel.getShop() , roleId);
         // todo 后期可以考虑是否通过短信的方式通知商铺法人的账号和密码
         return true;
     }
@@ -304,7 +311,7 @@ public class ShopDataServiceImpl implements ShopDataService {
         // 从数据库获取
         List<ShopSpecialHours> shopSpecialHoursList = shopSpecialHoursRepository.findByShopCode(shopCode);
         if (ObjectUtil.isEmpty(shopSpecialHoursList)) {
-            return null;
+            return Collections.emptyList();
         }
         List<SpecialHoursModel> specialHoursModels = new ArrayList<>();
         shopSpecialHoursList.forEach(s -> {
@@ -406,16 +413,16 @@ public class ShopDataServiceImpl implements ShopDataService {
     /**
      * 初始化模版
      */
-    private void initTemplate (Shop shop) {
+    private void initTemplate (Shop shop , Long roleId ) {
         // 判断行业类型
         IndustryTypeEnum exists = IndustryTypeEnum.isExists(shop.getType());
         if (ObjectUtil.isEmpty(exists)) {
             return;
         }
         // 获取行业下的默认模版
-        List<TemplateInfoVo> infoByParam = templateService.getInfoByParam(FindTemplateRPageParam.builder().industryType(exists.getName()).isDefault(AppConstants.Y).lockStatus(AppConstants.Y).build());
+        List<TemplateInfoVo> infoByParam = templateService.getInfoByParam(FindTemplateRPageParam.builder().industryType(exists.getName()).isDefault(AppConstants.Y).lockStatus(AppConstants.N).build());
         if (ObjectUtil.isEmpty(infoByParam)) {
-            log.error("{}场景下没有默认模版", IndustryTypeEnum.valueOf(shop.getType()).getMessage());
+            log.error("{}场景下没有默认模版", exists.getMessage());
         }
         // 获取模版下的功能
         List<TemplateFeaturePageVo> featureListByTemplateCode = templateFeatureService.getFeatureListByTemplateCode(infoByParam.stream().map(TemplateInfoVo::getTemplateCode).toList());
@@ -428,6 +435,19 @@ public class ShopDataServiceImpl implements ShopDataService {
         shopFeatureLinkModel.setShopCode(shop.getCode());
         shopFeatureLinkModel.setSource(ShopFeatureSourceEnum.INIT);
         shopFeatureService.saveLink(shopFeatureLinkModel);
+
+        // 获取功能里面的菜单授权给角色
+        Map<String, List<MenuVo>> menuListByFeatureCodesAndMenuType = featureService.getMenuListByFeatureCodesAndMenuType(new ArrayList<>(featureListByTemplateCode.stream().map(TemplateFeaturePageVo::getFeatureCode).collect(Collectors.toSet())), null);
+        if (ObjectUtil.isEmpty(menuListByFeatureCodesAndMenuType)) {
+            return;
+        }
+        Set<MenuVo> menuVoSet = new HashSet<>();
+        menuListByFeatureCodesAndMenuType.keySet().forEach(f ->{
+            List<MenuVo> menuVos = menuListByFeatureCodesAndMenuType.get(f);
+            menuVoSet.addAll(new HashSet<>(menuVos));
+        });
+        // 分配菜单
+        permissionService.assignRoleMenu(AuthorizeMenuParam.builder().roleId(roleId).menuIds(menuVoSet.stream().map(MenuVo::getId).toList()).build());
     }
 
 }

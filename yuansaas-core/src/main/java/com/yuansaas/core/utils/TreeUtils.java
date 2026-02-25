@@ -1,20 +1,10 @@
-/**
- * Copyright (c) 2018 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.yuansaas.core.utils;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.model.TreeNode;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 /**
  * 树形结构工具类，如：菜单、部门等
@@ -23,10 +13,12 @@ import java.util.Map;
  */
 public class TreeUtils {
 
+    private TreeUtils(){}
+
     /**
      * 根据pid，构建树节点
      */
-    public static <T extends TreeNode> List<T> build(List<T> treeNodes, Long pid) {
+    public static <T extends TreeNode<T>> List<T> build(List<T> treeNodes, Long pid) {
         //pid不能为空
         if (ObjectUtil.isNull(pid)){
             throw DataErrorCode.DATA_VALIDATION_FAILED.buildException("pid不能为空");
@@ -38,14 +30,40 @@ public class TreeUtils {
                 treeList.add(findChildren(treeNodes, treeNode));
             }
         }
-
         return treeList;
+//        if (ObjectUtil.isEmpty(treeNodes)) {
+//            return Collections.emptyList();
+//        }
+//
+//        Map<Long, T> nodeMap = new HashMap<>(treeNodes.size());
+//        List<T> rootList = new ArrayList<>();
+//
+//        // 1. 预构建 map
+//        for (T node : treeNodes) {
+//            node.setChildren(new ArrayList<>());
+//            nodeMap.put(node.getId(), node);
+//        }
+//
+//        // 2. 组装树
+//        for (T node : treeNodes) {
+//            T parent = nodeMap.get(node.getPid());
+//
+//            if (parent == null) {
+//                rootList.add(node);
+//            } else {
+//                parent.getChildren().add(node);
+//            }
+//        }
+//
+//        // 3. 排序（可选）
+//        rootList.sort(Comparator.comparing(TreeNode::getSort));
+//        return rootList;
     }
 
     /**
      * 查找子节点
      */
-    private static <T extends TreeNode> T findChildren(List<T> treeNodes, T rootNode) {
+    private static <T extends TreeNode<T>> T findChildren(List<T> treeNodes, T rootNode) {
         for(T treeNode : treeNodes) {
             if(rootNode.getId().equals(treeNode.getPid())) {
                 rootNode.getChildren().add(findChildren(treeNodes, treeNode));
@@ -57,11 +75,11 @@ public class TreeUtils {
     /**
      * 构建树节点
      */
-    public static <T extends TreeNode> List<T> build(List<T> treeNodes) {
+    public static <T extends TreeNode<T>> List<T> build(List<T> treeNodes) {
         List<T> result = new ArrayList<>();
 
         //list转map
-        Map<Long, T> nodeMap = new LinkedHashMap<>(treeNodes.size());
+        Map<Long, T> nodeMap = LinkedHashMap.newLinkedHashMap(treeNodes.size());
         for(T treeNode : treeNodes){
             nodeMap.put(treeNode.getId(), treeNode);
         }

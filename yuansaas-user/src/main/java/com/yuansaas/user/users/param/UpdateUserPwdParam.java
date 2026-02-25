@@ -1,8 +1,7 @@
-package com.yuansaas.user.system.param;
+package com.yuansaas.user.users.param;
 
 import com.yuansaas.core.context.AppContextUtil;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**

@@ -1,10 +1,11 @@
-package com.yuansaas.app.shop.entity;
+package com.yuansaas.user.users.entity;
 
-import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.jpa.model.BaseEntity;
+import com.yuansaas.user.common.enums.UserStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *
@@ -12,6 +13,7 @@ import lombok.Data;
  *
  * @author LXZ 2026/1/22 18:19
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(name = "shop_user")
@@ -65,11 +67,7 @@ public class ShopUser extends BaseEntity {
      */
     private String loginDate;
     /**
-     * 锁定状态( N 未锁定| Y 锁定)
+     * 账户状态
      */
-    private String lockStatus = AppConstants.N;
-    /**
-     * 删除状态( N 未删除| Y 删除)
-     */
-    private String deleteStatus = AppConstants.N;
+    private String status = UserStatus.active.name();
 }

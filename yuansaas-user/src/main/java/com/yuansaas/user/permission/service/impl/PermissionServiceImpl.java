@@ -27,6 +27,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -146,10 +147,22 @@ public class PermissionServiceImpl implements PermissionService {
         return RedisUtil.getOrLoad(RedisUtil.genKey(MenuCacheEnum.USER_MENU_LIST, userId), new TypeReference<List<MenuListVo>>() {}, () -> {
             // 查询角色列表
             List<Long> roleIdList = roleUserService.getRoleIdList(userId);
-            // 查询菜单列表
+            if (ObjectUtil.isEmpty(roleIdList)) {
+                return Collections.emptyList();
+            }
+            // 查询菜单code列表
             List<Long> menuIdList = roleMenuService.getMenuIdList(roleIdList);
-            // 构建树形菜单
+            if (ObjectUtil.isEmpty(menuIdList)) {
+                return Collections.emptyList();
+            }
+            // 查询可用菜单列表
             List<Menu> menuList = menuService.getByList(menuIdList, AppConstants.N);
+            if (ObjectUtil.isEmpty(menuList)) {
+                return Collections.emptyList();
+            }
+            // 构建树形菜单
+            menuList =  menuService.completeParentMenus(menuList);
+
             return TreeUtils.build(BeanUtil.copyToList(menuList, MenuListVo.class), AppConstants.ZERO_L);
         });
     }
