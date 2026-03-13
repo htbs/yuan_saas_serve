@@ -198,7 +198,7 @@ public class SmsVerifyServiceImpl implements SmsVerifyService {
 
         // 3. 校验 nonce（防重放）
         String nonceKey = RedisUtil.genKey(SmsCacheEnum.SMS_NONCE, verifyCodeModel.getNonce());
-        if (Boolean.TRUE.equals(RedisUtil.hasKey(nonceKey))) {
+        if (RedisUtil.hasKey(nonceKey)) {
             throw SmsErrorCode.SMS_REPEAT_REQUEST.buildException();
         }
         RedisUtil.set(nonceKey , "1", 60 , TimeUnit.SECONDS);

@@ -34,9 +34,9 @@ public class SmsApi {
      *
      * @apiNote 该token 在发送短信之前调用， 并且只能使用一次，有效期60s ,为了防止短信盗刷、幂等性等
      */
-    @RequestMapping(value = "/token/{phone}" , method = RequestMethod.GET)
-    public ResponseModel<String> getToken(@PathVariable(value = "phone" ) String phone , HttpServletRequest httpServletRequest) {
-        return ResponseBuilder.success(smsVerifyService.getToken(phone , httpServletRequest));
+    @GetMapping(value = "/token/{phone}")
+    public ResponseEntity<ResponseModel<String>> getToken(@PathVariable(value = "phone" ) String phone , HttpServletRequest httpServletRequest) {
+        return ResponseBuilder.okResponse(smsVerifyService.getToken(phone , httpServletRequest));
     }
 
     /**
@@ -44,7 +44,7 @@ public class SmsApi {
      * @param param 短信验证码发送参数
      * @author LXZ 2025/12/23  15:25
      */
-    @RequestMapping(value = "/get/verify/code" , method = RequestMethod.POST)
+    @PostMapping(value = "/get/verify/code" )
     public ResponseEntity<ResponseModel<SendVerifyCodeVo>> getVerifyCode(@RequestBody @Validated SmsVerifyCodeSendParam param , HttpServletRequest httpServletRequest) {
         // 发送验证码
         return ResponseBuilder.okResponse(smsVerifyService.getVerifyCode(VerifyCodeModel.builder()
@@ -63,9 +63,9 @@ public class SmsApi {
      * @param updatePhoneVerifyParam 校验参数
      * @author LXZ 2025/12/23  15:24
      */
-    @RequestMapping(value = "/check/verify/code" , method = RequestMethod.POST)
-    public ResponseModel<Boolean> checkVerifyCode(@RequestBody @Validated UpdatePhoneVerifyParam updatePhoneVerifyParam) {
-        return ResponseBuilder.success(smsVerifyService.checkVerifyCode(CheckVerifyCodeModel.builder()
+    @PostMapping(value = "/check/verify/code" )
+    public ResponseEntity<ResponseModel<Boolean>> checkVerifyCode(@RequestBody @Validated UpdatePhoneVerifyParam updatePhoneVerifyParam) {
+        return ResponseBuilder.okResponse(smsVerifyService.checkVerifyCode(CheckVerifyCodeModel.builder()
                         .phone(updatePhoneVerifyParam.getPhone())
                         .verifyContent(updatePhoneVerifyParam.getVerifyCode())
                         .serialNo(updatePhoneVerifyParam.getSerialNo())

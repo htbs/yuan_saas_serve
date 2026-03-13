@@ -38,7 +38,7 @@ public class RoleUserServiceImpl implements RoleUserService {
     @Override
     @Transactional
     public void assignUserRole(Long userId, List<Long> roleIdList) {
-        // 获取未删除的角色
+        // 查看角色是否存在
         List<Role> byIdAll = roleRepository.findByIdInAndDeleteStatus(roleIdList , AppConstants.N);
         if(ObjectUtil.isEmpty(byIdAll)){
             return ;

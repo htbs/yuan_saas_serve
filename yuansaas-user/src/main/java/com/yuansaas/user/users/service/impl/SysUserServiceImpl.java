@@ -109,7 +109,6 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public SysUser saveUser(SysUserCreateParam sysUserCreateParam) {
-
         // 校验用户名是否存在
         if (findByUsername(sysUserCreateParam.getUserName()).isPresent()) {
             throw BizErrorCode.BUSINESS_VALIDATION_FAILED.buildException("用户名已存在");
