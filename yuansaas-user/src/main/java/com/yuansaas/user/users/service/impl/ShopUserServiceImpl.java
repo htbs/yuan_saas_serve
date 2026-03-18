@@ -2,8 +2,11 @@ package com.yuansaas.user.users.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.yuansaas.common.constants.AppConstants;
+import com.yuansaas.core.context.AppContextUtil;
+import com.yuansaas.core.exception.ex.AuthErrorCode;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.exception.ex.ParamErrorCode;
+import com.yuansaas.user.common.enums.UserStatus;
 import com.yuansaas.user.config.AppProperties;
 import com.yuansaas.user.permission.params.AssignUserDeptParam;
 import com.yuansaas.user.permission.params.AssignUserRoleParam;
@@ -11,6 +14,7 @@ import com.yuansaas.user.permission.service.PermissionService;
 import com.yuansaas.user.users.entity.ShopUser;
 import com.yuansaas.user.users.param.ShopUserSaveParam;
 import com.yuansaas.user.users.param.ShopUserUpdateParam;
+import com.yuansaas.user.users.param.UpdateUserPwdParam;
 import com.yuansaas.user.users.repository.ShopUserRepository;
 import com.yuansaas.user.users.service.ShopUserService;
 import jakarta.validation.Valid;
@@ -18,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -97,103 +102,108 @@ public class ShopUserServiceImpl implements ShopUserService {
         return shopUserRepository.findById(id);
     }
 
-//    /**
-//     * 更新用户的最后登陆信息
-//     *
-//     * @param id      用户编号
-//     * @param loginIp 登陆 IP
-//     */
-//    @Override
-//    public void updateUserLogin(Long id, String loginIp) {
-//
-//    }
-//
-//    /**
-//     * 修改用户个人信息
-//     *
-//     * @param id    用户编号
-//     * @param reqVO 用户个人信息
-//     */
-//    @Override
-//    public void updateUserProfile(Long id, UserProfileUpdateReqVO reqVO) {
-//
-//    }
-//
-//    /**
-//     * 修改用户个人密码
-//     *
-//     * @param id    用户编号
-//     * @param reqVO 更新用户个人密码
-//     */
-//    @Override
-//    public void updateUserPassword(Long id, UserProfileUpdatePasswordReqVO reqVO) {
-//
-//    }
-//
-//    /**
-//     * 修改密码
-//     *
-//     * @param id       用户编号
-//     * @param password 密码
-//     */
-//    @Override
-//    public void updateUserPassword(Long id, String password) {
-//
-//    }
-//
-//    /**
-//     * 修改状态
-//     *
-//     * @param id     用户编号
-//     * @param status 状态
-//     */
-//    @Override
-//    public void updateUserStatus(Long id, Integer status) {
-//
-//    }
-//
-//    /**
-//     * 删除用户
-//     *
-//     * @param id 用户编号
-//     */
-//    @Override
-//    public void deleteUser(Long id) {
-//
-//    }
-//
-//    /**
-//     * 批量删除用户
-//     *
-//     * @param ids 用户编号数组
-//     */
-//    @Override
-//    public void deleteUserList(List<Long> ids) {
-//
-//    }
-//
-//    /**
-//     * 通过用户名查询用户
-//     *
-//     * @param username 用户名
-//     * @return 用户对象信息
-//     */
-//    @Override
-//    public AdminUserDO getUserByUsername(String username) {
-//        return null;
-//    }
-//
-//    /**
-//     * 通过手机号获取用户
-//     *
-//     * @param mobile 手机号
-//     * @return 用户对象信息
-//     */
-//    @Override
-//    public AdminUserDO getUserByMobile(String mobile) {
-//        return null;
-//    }
+    /**
+     * 修改密码
+     *
+     * @param updateUserPwd 用户修改请求
+     * @return 修改成功的用户信息
+     */
+    @Override
+    public Boolean updateUserPwd(UpdateUserPwdParam updateUserPwd) {
+        shopUserRepository.findById(updateUserPwd.getUserId()).ifPresentOrElse(sysUser -> {
+                    // 加密密码：passwordEncoder.encode(request.getPassword())
+                    if (!passwordEncoder.matches(updateUserPwd.getOldPassword(), sysUser.getPassword())) {
+                        throw AuthErrorCode.AUTHENTICATION_FAILED.buildException("旧密码输入错误，请重新输入") ;
+                    }
+                    sysUser.setPassword(passwordEncoder.encode(updateUserPwd.getNewPassword()));
+                    sysUser.setUpdateAt(LocalDateTime.now());
+                    sysUser.setUpdateBy(AppContextUtil.getUserInfo());
+                    shopUserRepository.save(sysUser);
+                }
+                ,() ->{
+                    throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+                }
+        );
+        return true;
+    }
 
+    /**
+     * 重置密码
+     *
+     * @param id 用户修改请求
+     * @return 修改成功的用户信息
+     */
+    @Override
+    public Boolean resetUserResetPwd(Long id) {
+        shopUserRepository.findById(id).ifPresentOrElse(sysUser -> {
+                    sysUser.setPassword(passwordEncoder.encode(appProperties.getDefaultPassword()));
+                    sysUser.setUpdateAt(LocalDateTime.now());
+                    sysUser.setUpdateBy(AppContextUtil.getUserInfo());
+                    shopUserRepository.save(sysUser);
+                }
+                ,() ->{
+                    throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+                }
+        );
+        return true;
+    }
+
+    /**
+     * 冻结用户
+     *
+     * @param id 用户id
+     * @return 冻结成功的用户信息 true or false
+     */
+    @Override
+    public Boolean lockUser(Long id) {
+        shopUserRepository.findById(id).ifPresentOrElse(user -> {
+            user.setStatus(UserStatus.suspended.name());
+            user.setUpdateAt(LocalDateTime.now());
+            user.setUpdateBy(AppContextUtil.getUserInfo());
+            shopUserRepository.save(user);
+        }, () -> {
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+        });
+        return true;
+    }
+
+    /**
+     * 解锁用户
+     *
+     * @param id 用户id
+     * @return 解释成功的用户信息 true or false
+     */
+    @Override
+    public Boolean unlockUser(Long id) {
+        shopUserRepository.findById(id).ifPresentOrElse(user -> {
+            user.setStatus(UserStatus.active.name());
+            user.setUpdateAt(LocalDateTime.now());
+            user.setUpdateBy(AppContextUtil.getUserInfo());
+            shopUserRepository.save(user);
+        }, () -> {
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+        });
+        return true;
+    }
+
+    /**
+     * 删除用户
+     *
+     * @param id 用户id
+     * @return 删除成功的用户信息 true or false
+     */
+    @Override
+    public Boolean deleteUser(Long id) {
+        shopUserRepository.findById(id).ifPresentOrElse(user -> {
+            user.setStatus(UserStatus.deleted.name());
+            user.setUpdateAt(LocalDateTime.now());
+            user.setUpdateBy(AppContextUtil.getUserInfo());
+            shopUserRepository.save(user);
+        }, () -> {
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+        });
+        return true;
+    }
 
 
     /**
