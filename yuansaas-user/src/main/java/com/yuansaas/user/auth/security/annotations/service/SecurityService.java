@@ -35,18 +35,18 @@ public class SecurityService {
         String[] roles = annotation.roles();
         String permissions = annotation.permissions();
 
-        // 检查接口是否需要token
-        if (annotation.authenticated() ) {
-            if (authentication instanceof UsernamePasswordAuthenticationToken && ObjectUtil.isNull(authentication.getPrincipal())) {
-                return false;
-            }
-            if (authentication instanceof AnonymousAuthenticationToken) {
-                return false;
-            }
+        boolean requireIdentity = annotation.authenticated()
+                || (userTypes != null && userTypes.length > 0)
+                || (roles != null && roles.length > 0)
+                || ObjectUtil.isNotEmpty(permissions);
+
+        // 显式标注为匿名可访问且无附加约束时，直接放行
+        if (!requireIdentity) {
+            return true;
         }
 
         // 1. 检查认证状态
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (!isAuthenticatedUser(authentication)) {
             return false;
         }
 
@@ -65,6 +65,19 @@ public class SecurityService {
             return false;
         }
 
+        return true;
+    }
+
+    private boolean isAuthenticatedUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        if (authentication instanceof AnonymousAuthenticationToken) {
+            return false;
+        }
+        if (authentication instanceof UsernamePasswordAuthenticationToken && ObjectUtil.isNull(authentication.getPrincipal())) {
+            return false;
+        }
         return true;
     }
 

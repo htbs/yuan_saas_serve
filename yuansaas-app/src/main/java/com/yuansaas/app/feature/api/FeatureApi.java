@@ -83,7 +83,7 @@ public class FeatureApi {
      * @param featureCode  功能code
      * @author lxz 2026/01/29 14:35
      */
-    @SecurityAuth(permissions = "users:featureId:assign-feature-menu")
+    @SecurityAuth(permissions = "users:feature:assign-feature-menu")
     @GetMapping(value = "/find/assign/menu")
     public ResponseEntity<ResponseModel<List<Long>>> getFeatureMenuListByFeature(@RequestParam(name = "featureCode") String featureCode) {
         return ResponseBuilder.okResponse(featureService.getMenuCodeListByFeatureCodeAndLockStatus(featureCode, AppConstants.N));

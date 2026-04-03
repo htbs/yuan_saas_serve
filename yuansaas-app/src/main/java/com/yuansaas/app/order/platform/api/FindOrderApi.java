@@ -46,7 +46,7 @@ public class FindOrderApi {
      */
     @RequestMapping(value = "/item/{orderNo}",method = RequestMethod.GET)
     @SecurityAuth
-    public ResponseEntity<ResponseModel<List<OrderItemDataVo>>> findOrderItemByOrderNo(@RequestParam(value = "orderNo") Long orderNo) {
+    public ResponseEntity<ResponseModel<List<OrderItemDataVo>>> findOrderItemByOrderNo(@PathVariable(value = "orderNo") Long orderNo) {
         return ResponseBuilder.okResponse(orderService.findOrderItemByOrderNo(orderNo));
     }
 }

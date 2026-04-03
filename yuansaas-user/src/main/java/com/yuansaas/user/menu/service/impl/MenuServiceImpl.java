@@ -303,9 +303,10 @@ public class MenuServiceImpl implements MenuService {
     }
 
     public String getMenuCode(Menu pMenu) {
-        String code = pMenu.getMenuCode().concat("-").concat(RandomUtil.randomStringUpper(AppConstants.FOUR));
+        String parentMenuCode = ObjectUtil.isNull(pMenu) ? "" : pMenu.getMenuCode().concat("-");
+        String code = parentMenuCode.concat(RandomUtil.randomStringUpper(AppConstants.FOUR));
         if (validatedMenuCodeIsExists(code)) {
-            getMenuCode(pMenu);
+            return getMenuCode(pMenu);
         }
         return code ;
     }

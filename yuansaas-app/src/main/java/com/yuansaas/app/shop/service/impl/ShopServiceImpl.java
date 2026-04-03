@@ -230,7 +230,7 @@ public class ShopServiceImpl implements ShopService {
         // 判断code是否存在
         Integer count = shopRepository.countByCode(code);
         if (count > 0) {
-            getCode(shopType);
+            return getCode(shopType);
         }
         return code;
 

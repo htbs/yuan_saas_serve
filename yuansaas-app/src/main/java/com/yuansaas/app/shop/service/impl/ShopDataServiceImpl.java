@@ -1,8 +1,10 @@
 package com.yuansaas.app.shop.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.yuansaas.app.common.enums.CacheEnum;
 import com.yuansaas.app.common.enums.IndustryTypeEnum;
 import com.yuansaas.app.feature.service.FeatureService;
 import com.yuansaas.app.order.enums.PayChannelEnum;
@@ -38,6 +40,7 @@ import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jackson.JacksonUtil;
+import com.yuansaas.core.redis.RedisUtil;
 import com.yuansaas.core.utils.id.SnowflakeIdGenerator;
 import com.yuansaas.user.config.AppProperties;
 import com.yuansaas.user.menu.vo.MenuVo;
@@ -135,9 +138,18 @@ public class ShopDataServiceImpl implements ShopDataService {
             shopRepository.save(shop);
             // 更新商家基本配置信息
             ShopDataConfig byShopCode = shopDataConfigRepository.findByShopCode(shop.getCode());
-            ShopDataConfig shopDataConfig = null;
-            if (ObjectUtil.isEmpty(byShopCode)) {
-               shopDataConfig = shopMapStruct.toShopInfoDataConfig(updateShopDataParam, shop);
+            ShopDataConfig shopDataConfig = byShopCode;
+            if (ObjectUtil.isEmpty(shopDataConfig)) {
+                shopDataConfig = shopMapStruct.toShopInfoDataConfig(updateShopDataParam, shop);
+            } else {
+                shopDataConfig.setIntro(updateShopDataParam.getIntro());
+                shopDataConfig.setLabel(JacksonUtil.toJson(updateShopDataParam.getLabel()));
+                shopDataConfig.setPhone(updateShopDataParam.getPhone());
+                shopDataConfig.setSubjectColor(updateShopDataParam.getSubjectColor());
+                shopDataConfig.setLogo(updateShopDataParam.getLogo());
+                shopDataConfig.setCustomerServiceWechat(updateShopDataParam.getCustomerServiceWechat());
+                shopDataConfig.setOfficialAccounts(updateShopDataParam.getOfficialAccounts());
+                shopDataConfig.update();
             }
             shopDataConfigRepository.save(shopDataConfig);
         } ,()->{
@@ -209,7 +221,7 @@ public class ShopDataServiceImpl implements ShopDataService {
                     BusinessDataModel businessData = new BusinessDataModel();
                     businessData.setIsBusiness(AppConstants.Y);
                     businessData.setStartTime(f.getTimeSlots().getStartTime());
-                    businessData.setEndTime(f.getTimeSlots().getStartTime());
+                    businessData.setEndTime(f.getTimeSlots().getEndTime());
                     return businessData;
                 }).orElseGet( () -> regularHoursByShopCode.stream()
                         .filter(f -> AppConstants.Y.equals(f.getIsOpen()))
@@ -219,7 +231,7 @@ public class ShopDataServiceImpl implements ShopDataService {
                             BusinessDataModel businessData = new BusinessDataModel();
                             businessData.setIsBusiness(AppConstants.Y);
                             businessData.setStartTime(f.getTimeSlots().getStartTime());
-                            businessData.setEndTime(f.getTimeSlots().getStartTime());
+                            businessData.setEndTime(f.getTimeSlots().getEndTime());
                             return businessData;
                         }).orElse(null));
     }
@@ -245,7 +257,9 @@ public class ShopDataServiceImpl implements ShopDataService {
             shopSpecialHoursList.add(shopSpecialHours);
         });
         shopSpecialHoursRepository.saveAll(shopSpecialHoursList);
-        // todo 保存到redis缓存
+        String cacheKey = buildShopSpecialHoursCacheKey(shopCode);
+        RedisUtil.delete(cacheKey);
+        RedisUtil.set(cacheKey, specialHoursModels);
     }
     /**
      * 保存或更新商家日常营业时间的配置
@@ -265,7 +279,9 @@ public class ShopDataServiceImpl implements ShopDataService {
             shopRegularHoursList.add(shopRegularHours);
         });
         shopRegularHoursRepository.saveAll(shopRegularHoursList);
-        // todo 保存到redis缓存
+        String cacheKey = buildShopRegularHoursCacheKey(shopCode);
+        RedisUtil.delete(cacheKey);
+        RedisUtil.set(cacheKey, regularHoursModels);
     }
 
     /**
@@ -283,48 +299,58 @@ public class ShopDataServiceImpl implements ShopDataService {
      * 获取商家日常营业时间配置
      */
     private List<RegularHoursModel> getRegularHoursByShopCode(String shopCode) {
-        // todo 保存到redis缓存
-
-        // 从数据库获取
-        List<ShopRegularHours> shopRegularHoursList = shopRegularHoursRepository.findByShopCode(shopCode);
-        if (ObjectUtil.isEmpty(shopRegularHoursList)) {
-            return null;
-        }
-        List<RegularHoursModel> regularHoursModels = new ArrayList<>();
-        shopRegularHoursList.forEach(r -> {
-            RegularHoursModel regularHoursModel = new RegularHoursModel();
-            regularHoursModel.setIsOpen(r.getIsOpen());
-            regularHoursModel.setDayOfWeek(r.getDayOfWeek());
-            regularHoursModel.setTimeSlots(JacksonUtil.convert(JSONUtil.parseObj(r.getTimeSlots()), TimeSlotsModel.class ));
-            regularHoursModel.setRemark(r.getRemark());
-            regularHoursModels.add(regularHoursModel);
+        String cacheKey = buildShopRegularHoursCacheKey(shopCode);
+        return RedisUtil.getOrLoad(cacheKey, new TypeReference<List<RegularHoursModel>>() {}, () -> {
+            // 从数据库获取
+            List<ShopRegularHours> shopRegularHoursList = shopRegularHoursRepository.findByShopCode(shopCode);
+            if (ObjectUtil.isEmpty(shopRegularHoursList)) {
+                return null;
+            }
+            List<RegularHoursModel> regularHoursModels = new ArrayList<>();
+            shopRegularHoursList.forEach(r -> {
+                RegularHoursModel regularHoursModel = new RegularHoursModel();
+                regularHoursModel.setIsOpen(r.getIsOpen());
+                regularHoursModel.setDayOfWeek(r.getDayOfWeek());
+                regularHoursModel.setTimeSlots(JacksonUtil.convert(JSONUtil.parseObj(r.getTimeSlots()), TimeSlotsModel.class ));
+                regularHoursModel.setRemark(r.getRemark());
+                regularHoursModels.add(regularHoursModel);
+            });
+            return regularHoursModels;
         });
-        return regularHoursModels;
     }
 
     /**
      * 获取商家特殊营业时间配置
      */
     private List<SpecialHoursModel> getSpecialHoursByShopCode(String shopCode) {
-        // todo 保存到redis缓存
-
-        // 从数据库获取
-        List<ShopSpecialHours> shopSpecialHoursList = shopSpecialHoursRepository.findByShopCode(shopCode);
-        if (ObjectUtil.isEmpty(shopSpecialHoursList)) {
-            return Collections.emptyList();
-        }
-        List<SpecialHoursModel> specialHoursModels = new ArrayList<>();
-        shopSpecialHoursList.forEach(s -> {
-            SpecialHoursModel specialHoursModel = new SpecialHoursModel();
-            specialHoursModel.setTitle(s.getTitle());
-            specialHoursModel.setStartDate(s.getStartDate());
-            specialHoursModel.setEndDate(s.getEndDate());
-            specialHoursModel.setIsOpen(s.getIsOpen());
-            specialHoursModel.setTimeSlots(JacksonUtil.convert(JSONUtil.parseObj(s.getTimeSlots()), TimeSlotsModel.class ));
-            specialHoursModel.setRemark(s.getRemark());
-            specialHoursModels.add(specialHoursModel);
+        String cacheKey = buildShopSpecialHoursCacheKey(shopCode);
+        return RedisUtil.getOrLoad(cacheKey, new TypeReference<List<SpecialHoursModel>>() {}, () -> {
+            // 从数据库获取
+            List<ShopSpecialHours> shopSpecialHoursList = shopSpecialHoursRepository.findByShopCode(shopCode);
+            if (ObjectUtil.isEmpty(shopSpecialHoursList)) {
+                return Collections.emptyList();
+            }
+            List<SpecialHoursModel> specialHoursModels = new ArrayList<>();
+            shopSpecialHoursList.forEach(s -> {
+                SpecialHoursModel specialHoursModel = new SpecialHoursModel();
+                specialHoursModel.setTitle(s.getTitle());
+                specialHoursModel.setStartDate(s.getStartDate());
+                specialHoursModel.setEndDate(s.getEndDate());
+                specialHoursModel.setIsOpen(s.getIsOpen());
+                specialHoursModel.setTimeSlots(JacksonUtil.convert(JSONUtil.parseObj(s.getTimeSlots()), TimeSlotsModel.class ));
+                specialHoursModel.setRemark(s.getRemark());
+                specialHoursModels.add(specialHoursModel);
+            });
+            return specialHoursModels;
         });
-        return specialHoursModels;
+    }
+
+    private String buildShopRegularHoursCacheKey(String shopCode) {
+        return RedisUtil.genKey(CacheEnum.SHOP_REGULAR_HOURS.getKey(), shopCode);
+    }
+
+    private String buildShopSpecialHoursCacheKey(String shopCode) {
+        return RedisUtil.genKey(CacheEnum.SHOP_SPECIAL_HOURS.getKey(), shopCode);
     }
 
     /**

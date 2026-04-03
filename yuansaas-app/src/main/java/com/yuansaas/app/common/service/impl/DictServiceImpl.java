@@ -185,7 +185,7 @@ public class DictServiceImpl implements DictService {
         // 判断code是否存在
         Integer count = dictRepository.countByDictCode(code);
         if (count > 0) {
-            getCode(platformTypeEnum);
+            return getCode(platformTypeEnum);
         }
         return code;
     }

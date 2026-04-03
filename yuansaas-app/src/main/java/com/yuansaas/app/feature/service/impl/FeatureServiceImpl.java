@@ -74,11 +74,11 @@ public class FeatureServiceImpl implements FeatureService {
     @Override
     public Boolean update(FeatureUpdateParam featureUpdateParam) {
         featureRepository.findById(featureUpdateParam.getId()).ifPresentOrElse(feature -> {
-            feature.setFeatureName(feature.getFeatureName());
-            feature.setFeatureType(feature.getFeatureType());
-            feature.setFeatureScope(feature.getFeatureScope());
-            feature.setIndustryType(feature.getIndustryType());
-            feature.setDescription(feature.getDescription());
+            feature.setFeatureName(featureUpdateParam.getFeatureName());
+            feature.setFeatureType(featureUpdateParam.getFeatureType());
+            feature.setFeatureScope(featureUpdateParam.getFeatureScope());
+            feature.setIndustryType(featureUpdateParam.getIndustryType());
+            feature.setDescription(featureUpdateParam.getDescription());
             feature.update();
             featureRepository.save(feature);
         } , ()->{
@@ -255,7 +255,7 @@ public class FeatureServiceImpl implements FeatureService {
     public String getFeatureCode() {
         String code = RandomUtil.randomStringUpper(AppConstants.FOUR);
         if (validatedFeatureCodeIsExists(code)) {
-            getFeatureCode();
+            return getFeatureCode();
         }
         return code ;
     }

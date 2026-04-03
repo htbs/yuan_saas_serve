@@ -44,7 +44,7 @@ public class TokenBlacklistManager {
             // 计算剩余有效时间（秒）
             long currentTimeMillis = System.currentTimeMillis();
             long expirationTimeMillis = expiration.getTime();
-            long ttlSeconds = (expirationTimeMillis - currentTimeMillis) ;
+            long ttlSeconds = (expirationTimeMillis - currentTimeMillis) / 1000;
 
             if (ttlSeconds > 0) {
                 // 存储令牌黑名单

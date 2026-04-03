@@ -114,7 +114,7 @@ public class TemplateApi {
      * @author lxz 2025/11/16 14:35
      */
     @PostMapping(value = "/assign")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "'users:template:assign_feature_template")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "users:template:assign_feature_template")
     public ResponseEntity<ResponseModel<Boolean>> assignFeature(@RequestBody @Validated AssignTemplateFeatureParam assignTemplateFeatureParam) {
         return ResponseBuilder.okResponse(templateFeatureService.assignFeature(assignTemplateFeatureParam));
     }
@@ -147,7 +147,7 @@ public class TemplateApi {
      * @author lxz 2025/11/16 14:35
      */
     @PutMapping(value = "/feature/enable/{id}")
-    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "template:feature:lock'")
+    @SecurityAuth(userTypes = {UserTypeEnum.YUAN_SHI_USER} , permissions = "template:feature:lock")
     public ResponseEntity<ResponseModel<Boolean>> enableFeature(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(templateFeatureService.lock(id));
     }

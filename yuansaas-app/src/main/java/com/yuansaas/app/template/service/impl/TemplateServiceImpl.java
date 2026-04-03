@@ -195,7 +195,7 @@ public class TemplateServiceImpl implements TemplateService {
         // 判断code是否存在
         Integer count =templateRepository.countByTemplateCode(code);
         if (count > 0) {
-            getCode();
+            return getCode();
         }
         return code;
 

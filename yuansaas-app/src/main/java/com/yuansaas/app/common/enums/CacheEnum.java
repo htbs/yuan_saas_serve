@@ -17,7 +17,11 @@ public enum CacheEnum implements IBaseEnum<CacheEnum> {
     DICT("DICT:VALUE", "字典缓存"),
 
 
-    AREA("AREA" , "地区缓存")
+    AREA("AREA" , "地区缓存"),
+
+    SHOP_REGULAR_HOURS("SHOP:REGULAR_HOURS", "店铺日常营业时间缓存"),
+
+    SHOP_SPECIAL_HOURS("SHOP:SPECIAL_HOURS", "店铺特殊营业时间缓存")
 
     ;
 
