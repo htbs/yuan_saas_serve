@@ -1,10 +1,12 @@
 package com.yuansaas.app.shop.param;
 
+import com.yuansaas.app.shop.enums.ShopSignedStatusEnum;
 import com.yuansaas.app.shop.enums.ShopTypeEnum;
 import com.yuansaas.common.model.AddressModel;
 import com.yuansaas.core.annotation.EnumValidate;
+import com.yuansaas.core.valid.Phone;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -23,6 +25,7 @@ public class SaveShopParam {
     private String name;
     /**
      * 商家类型
+     * @see ShopTypeEnum
      */
     @EnumValidate(enumClass = ShopTypeEnum.class, message = "商家类型不正确")
     private ShopTypeEnum type;
@@ -32,10 +35,11 @@ public class SaveShopParam {
     @NotNull(message = "商家地址不能为空")
     private AddressModel address;
     /**
-     * 签约状态 (N 已签约 | Y 未签约)
+     * 签约状态
+     * @see ShopSignedStatusEnum
      */
-    @NotBlank(message = "签约状态不能为空")
-    private String signedStatus;
+    @EnumValidate(enumClass = ShopSignedStatusEnum.class, message = "签约状态不正确")
+    private ShopSignedStatusEnum signedStatus;
     /**
      * 统一社会信用代码
      */
@@ -55,11 +59,13 @@ public class SaveShopParam {
      * 法人手机号
      */
     @NotBlank(message = "法人手机号不能为空")
+    @Phone
     private String legalPersonPhone;
     /**
      * 法人邮箱
      */
     @NotBlank(message = "法人邮箱不能为空")
+    @Email
     private String legalPersonEmail;
     /**
      * 法人身份证正面照片

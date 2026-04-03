@@ -11,14 +11,20 @@ import lombok.Data;
 @Data
 public class MenuVo {
 
+    private Long id;
+
     /**
      * 菜单code
      */
-    private Long   menuCode;
+    private String  menuCode;
     /**
      * 上级ID，一级菜单为0
      */
     private Long   pid;
+    /**
+     * 菜单类型 0：菜单 1：按钮
+     */
+    private Integer menuType;
     /**
      * 名称
      */

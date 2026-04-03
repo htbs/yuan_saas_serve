@@ -4,6 +4,8 @@ import cn.hutool.core.util.ObjectUtil;
 import com.yuansaas.common.enums.UserTypeEnum;
 import com.yuansaas.user.auth.model.CustomUserDetails;
 import com.yuansaas.user.auth.security.annotations.SecurityAuth;
+import com.yuansaas.user.auth.service.SecurityFrameworkService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,8 +22,10 @@ import java.util.stream.Collectors;
  * @author HTB 2025/8/12 16:16
  */
 @Service
+@RequiredArgsConstructor
 public class SecurityService {
 
+    private final SecurityFrameworkService securityFrameworkService;
     /**
      * 组合认证检查
      */
@@ -29,20 +33,20 @@ public class SecurityService {
         // 获取注解属性
         UserTypeEnum[] userTypes = annotation.userTypes();
         String[] roles = annotation.roles();
-        String[] permissions = annotation.permissions();
+        String permissions = annotation.permissions();
 
-        // 检查接口是否需要token
-        if (annotation.authenticated() ) {
-            if (authentication instanceof UsernamePasswordAuthenticationToken && ObjectUtil.isNull(authentication.getPrincipal())) {
-                return false;
-            }
-            if (authentication instanceof AnonymousAuthenticationToken) {
-                return false;
-            }
+        boolean requireIdentity = annotation.authenticated()
+                || (userTypes != null && userTypes.length > 0)
+                || (roles != null && roles.length > 0)
+                || ObjectUtil.isNotEmpty(permissions);
+
+        // 显式标注为匿名可访问且无附加约束时，直接放行
+        if (!requireIdentity) {
+            return true;
         }
 
         // 1. 检查认证状态
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (!isAuthenticatedUser(authentication)) {
             return false;
         }
 
@@ -57,10 +61,23 @@ public class SecurityService {
         }
 
         // 4. 检查权限
-        if (permissions!= null && permissions.length > 0 && !checkPermissions(authentication, permissions)) {
+        if (ObjectUtil.isNotEmpty(permissions) && !checkPermissions(permissions)) {
             return false;
         }
 
+        return true;
+    }
+
+    private boolean isAuthenticatedUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        if (authentication instanceof AnonymousAuthenticationToken) {
+            return false;
+        }
+        if (authentication instanceof UsernamePasswordAuthenticationToken && ObjectUtil.isNull(authentication.getPrincipal())) {
+            return false;
+        }
         return true;
     }
 
@@ -77,9 +94,8 @@ public class SecurityService {
         return Arrays.stream(requiredRoles).anyMatch(userRoles::contains);
     }
 
-    private boolean checkPermissions(Authentication authentication, String[] requiredPermissions) {
-        // todo 实现具体权限检查逻辑
-        return true;
+    private boolean checkPermissions( String requiredPermissions) {
+        return securityFrameworkService.hasPermission(requiredPermissions);
     }
 
     private UserTypeEnum extractUserType(Authentication authentication) {

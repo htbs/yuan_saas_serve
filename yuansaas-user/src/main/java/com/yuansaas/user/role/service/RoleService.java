@@ -1,25 +1,12 @@
 package com.yuansaas.user.role.service;
 
 import com.yuansaas.core.page.RPage;
-import com.yuansaas.core.response.ResponseBuilder;
-import com.yuansaas.core.response.ResponseModel;
-import com.yuansaas.user.auth.security.annotations.SecurityAuth;
-import com.yuansaas.user.dept.params.FindDeptParam;
-import com.yuansaas.user.dept.params.SaveDeptParam;
-import com.yuansaas.user.dept.params.UpdateDeptParam;
-import com.yuansaas.user.dept.vo.DeptListVo;
-import com.yuansaas.user.dept.vo.DeptTreeListVo;
-import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.role.entity.Role;
-import com.yuansaas.user.role.params.AuthorizeMenuParam;
 import com.yuansaas.user.role.params.FindRoleParam;
 import com.yuansaas.user.role.params.SaveRoleParam;
 import com.yuansaas.user.role.params.UpdateRoleParam;
 import com.yuansaas.user.role.vo.RoleListVo;
 import com.yuansaas.user.role.vo.RoleVo;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -39,7 +26,7 @@ public interface RoleService {
      * 新增角色
      * @param saveRoleParam  保存角色信息参数
      */
-    Boolean save(SaveRoleParam saveRoleParam);
+    Role save(SaveRoleParam saveRoleParam);
     /**
      * 修改角色
      * @param updateRoleParam  修改角色信息参数
@@ -56,22 +43,19 @@ public interface RoleService {
      */
     RoleVo getById(Long id );
     /**
-     * 角色授权菜单
-     * @param authorizeMenuParam 角色授权菜单参数
-     */
-    Boolean authorize( AuthorizeMenuParam authorizeMenuParam);
-
-    /**
      * 通过角色id查询角色信息
      * @param Id 角色id列表
      * @return 角色列表
      */
     List<Role> getByIdAll(List<Long> Id);
-
     /**
-     * 查询角色授权的菜单列表
-     * @param roleId 角色ID
-     * @return MenuListVo
+     * 判断角色数组中，是否有超级管理员
+     *
+     * @param ids 角色编号数组
+     * @return 是否有超级管理员
      */
-    List<MenuListVo> getAuthorizeMenuListByRoleId(Long roleId);
+    Boolean hasAnySuperAdmin(List<Long> ids);
+
+
+
 }

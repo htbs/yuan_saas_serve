@@ -20,7 +20,7 @@ public class SysDept extends BaseEntity {
     /**
      * 商家code
      */
-    private String merchantCode;
+    private String shopCode;
     /**
      * 上级id
      */

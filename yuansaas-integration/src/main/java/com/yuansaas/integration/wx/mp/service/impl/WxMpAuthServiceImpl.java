@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 public class WxMpAuthServiceImpl implements WxMpAuthService {
 
     private final WxMpService wxMpService;
-    private final RandomUtil randomUtil;
 
     @SneakyThrows
     @Override
@@ -54,7 +53,7 @@ public class WxMpAuthServiceImpl implements WxMpAuthService {
     @ThirdPartyLog(serviceName = ServiceType.WX_MP , action = "getTempQrCodeUrl" , callType = CallType.SDK)
     @Override
     public TempQrCodeVo getTempQrCodeUrl() {
-        int sceneId = randomUtil.generateRandomInt();
+        int sceneId = RandomUtil.generateRandomInt();
         WxMpQrCodeTicket tempQrCodeTicket = this.getTempQrCodeTicket(sceneId, 5 * 60);
         String tempQrCodeUrl = this.getTempQrCodeUrl(tempQrCodeTicket.getTicket());
         return TempQrCodeVo.builder().url(tempQrCodeUrl)

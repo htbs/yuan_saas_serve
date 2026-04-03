@@ -10,11 +10,8 @@ import lombok.Data;
  */
 @Data
 public class FindMenuParam {
-
-    private String merchantCode;
-
     /**
-     * 类型   0：菜单   1：按钮
+     * 菜单名字
      */
-    private Integer menuType;
+    private String name;
 }

@@ -7,14 +7,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
- *
- *
+ * 商铺表
  * @author LXZ 2025/12/12 15:12
  */
 @Data
@@ -33,40 +34,6 @@ public class Shop extends BaseEntity {
      * '店铺编号'
      */
     private String  code;
-    /**
-     * '店铺logo'
-     */
-    private String  logo;
-    /**
-     * '店铺简介'
-     */
-    private String  intro;
-    /**
-     * 手机号
-     */
-    private String  phone;
-    /**
-     * 主题色
-     */
-    private String subjectColor;
-    /**
-     * '标签'
-     */
-    @Type(value = JsonStringType.class)
-    @Column(columnDefinition = "json")
-    private String  label;
-    /**
-     * '所属行业'
-     */
-    private String  industry;
-    /**
-     * '营业开始时间'
-     */
-    private Date weekdayStartHours;
-    /**
-     * '营业结束时间'
-     */
-    private Date  weekdayEndHours;
     /**
      * '省编码'
      */
@@ -89,6 +56,10 @@ public class Shop extends BaseEntity {
      * '法人名字'
      */
     private String  legalPersonName;
+    /**
+     * 法人性别
+     */
+    private String  legalPersonSex;
     /**
      * '法人手机号'
      */
@@ -124,11 +95,11 @@ public class Shop extends BaseEntity {
     /**
      * '签约开始时间'
      */
-    private LocalDateTime signedStartAt;
+    private LocalDate signedStartAt;
     /**
      * '签约结束时间'
      */
-    private LocalDateTime  signedEndAt;
+    private LocalDate  signedEndAt;
     /**
      * '签约金额（分）'
      */

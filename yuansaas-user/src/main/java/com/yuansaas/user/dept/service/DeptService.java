@@ -1,5 +1,6 @@
 package com.yuansaas.user.dept.service;
 
+import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.params.FindDeptParam;
 import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.params.UpdateDeptParam;
@@ -40,8 +41,18 @@ public interface DeptService {
     Boolean delete(Long id );
     /**
      * 部门详情
-     * @param merchantCode 商家code
+     * @param shopCode 商家code
      * @param id 部门id
      */
-    DeptListVo getById(String merchantCode,Long id );
+    DeptListVo getById(String shopCode,Long id );
+
+    /**
+     * 通过商家code和父部门id查询部门信息
+     *
+     * @param shopCode 商家code
+     * @param pid          父部门id
+     * @author LXZ 2025/12/24  12:14
+     */
+    List<SysDept> findByShopCodeAndPid(String shopCode, Long pid);
+
 }

@@ -8,7 +8,8 @@ import com.yuansaas.user.client.entity.ClientUser;
 import com.yuansaas.user.client.service.ClientUserService;
 import com.yuansaas.user.common.enums.UserStatus;
 import com.yuansaas.user.config.ServiceManager;
-import com.yuansaas.user.system.entity.SysUser;
+import com.yuansaas.user.users.entity.ShopUser;
+import com.yuansaas.user.users.entity.SysUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class UserStatusCache {
 
-//    private final SysUserService sysUserService;
     private final ClientUserService clientUserService;
 
     /**
@@ -37,9 +37,8 @@ public class UserStatusCache {
         return  RedisUtil.getOrLoad(RedisUtil.genKey("userStatus", userType.name(), userId),
                 new TypeReference<Boolean>() {},
                 () -> loadUserStatus(userId, userType),
-                60 * 60 * 24,
+                60 * 60 * 24L,
                 TimeUnit.SECONDS);
-//         loadUserStatus(userId, userType);
     }
 
     /**
@@ -60,12 +59,14 @@ public class UserStatusCache {
         if (userType == UserTypeEnum.YUAN_SHI_USER) {
             // 元识管理用户
             SysUser user = ServiceManager.sysUserService.findById(userId)
-                    .orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在") );
+                    .orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("平台用户不存在") );
             return UserStatus.active.matches(user.getStatus()) ;
-        } if(userType == UserTypeEnum.MERCHANT_USER) {
-            // todo 商户用户
-            return false;
-        }if(userType == UserTypeEnum.CLIENT_USER) {
+        }else if(userType == UserTypeEnum.MERCHANT_USER) {
+            // 商户用户
+            ShopUser shopUser = ServiceManager.shopUserService.getUserById(userId)
+                    .orElseThrow(() -> DataErrorCode.DATA_NOT_FOUND.buildException("商家用户不存在"));
+            return UserStatus.active.matches(shopUser.getStatus());
+        }else if(userType == UserTypeEnum.CLIENT_USER) {
             // 客户端用户
             ClientUser user = clientUserService.findById(userId)
                     .orElseThrow(() ->DataErrorCode.DATA_NOT_FOUND.buildException("用户不存在"));

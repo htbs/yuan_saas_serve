@@ -20,7 +20,7 @@ import java.util.List;
  * @author lxz
  */
  @Data
-public class TreeNode<T> implements Serializable {
+public class TreeNode<T> {
     /**
      * 主键
      */

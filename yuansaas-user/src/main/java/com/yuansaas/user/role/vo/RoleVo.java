@@ -1,5 +1,7 @@
 package com.yuansaas.user.role.vo;
 
+import com.yuansaas.user.role.enums.AuthorityEnum;
+import com.yuansaas.user.role.enums.RoleTypeEnum;
 import lombok.Data;
 
 /**
@@ -18,6 +20,16 @@ public class RoleVo {
      * 角色名称
      */
     private String name;
+    /**
+     * 角色标识
+     * 枚举 {@link AuthorityEnum}
+     */
+    private String authorityType;
+    /**
+     * 角色类型
+     * 枚举 {@link RoleTypeEnum}
+     */
+    private String type;
     /**
      * 描述
      */

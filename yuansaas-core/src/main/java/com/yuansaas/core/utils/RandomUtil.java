@@ -1,8 +1,6 @@
 package com.yuansaas.core.utils;
 
-import com.yuansaas.core.utils.id.SnowflakeIdGenerator;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import com.yuansaas.core.utils.id.IdGenerator;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -15,35 +13,41 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * @author HTB 2025/8/26 18:39
  */
-@Component
-@RequiredArgsConstructor
 public class RandomUtil {
 
-    private final SnowflakeIdGenerator snowflakeIdGenerator;
-    private final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static IdGenerator SNOWFLAKE ;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
+    private RandomUtil(){}
+    /**
+     * 启动时注入
+     */
+    static void init(IdGenerator generator){
+        SNOWFLAKE = generator;
+    }
 
 
     /**
      * 使用雪花算法生成唯一ID
      * @return 雪花算法生成的long类型ID
      */
-    public long generateSnowflakeId() {
-        return snowflakeIdGenerator.nextId();
+    public static long generateSnowflakeId() {
+        return SNOWFLAKE.nextId();
     }
 
     /**
      * 使用雪花算法生成唯一ID
      * @return 雪花算法生成的String类型ID
      */
-    public String generateSnowflakeIdString() {
-        return String.valueOf(snowflakeIdGenerator.nextId());
+    public static String generateSnowflakeIdString() {
+        return String.valueOf(SNOWFLAKE.nextId());
     }
 
     /**
      * 生成高强度的int随机数（避免重复）
      * @return 随机int值（0到2,147,483,647）
      */
-    public int generateRandomInt() {
+    public static int generateRandomInt() {
         // 使用毫秒和纳秒时间戳
         long timestamp = System.currentTimeMillis();
         long nanoTime = System.nanoTime();
@@ -61,7 +65,7 @@ public class RandomUtil {
      * 使用加密安全的随机数生成器
      * @return 安全的随机int
      */
-    public int generateSecureRandomInt() {
+    public static int generateSecureRandomInt() {
         // 生成4字节随机数
         byte[] bytes = new byte[4];
         SECURE_RANDOM.nextBytes(bytes);
@@ -82,7 +86,7 @@ public class RandomUtil {
      * @param max 最大值（包含）
      * @return 范围内的随机int
      */
-    public int generateRandomIntInRange(int min, int max) {
+    public static int generateRandomIntInRange(int min, int max) {
         if (min >= max) {
             throw new IllegalArgumentException("最大值必须大于最小值");
         }
@@ -93,7 +97,7 @@ public class RandomUtil {
      * 生成当前时间的格式化字符串（YYYYMMDDHHMMSS）
      * @return 当前时间的格式化字符串
      */
-    public String generateTimestampString() {
+    public static String generateTimestampString() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
     }
 
@@ -102,7 +106,7 @@ public class RandomUtil {
      * @param length 字符串长度
      * @return 随机数字字符串
      */
-    public String generateRandomNumberString(int length) {
+    public static String generateRandomNumberString(int length) {
         if (length <= 0) {
             throw new IllegalArgumentException("长度必须大于0");
         }
@@ -125,7 +129,7 @@ public class RandomUtil {
      * 生成时间戳ID（时间戳+随机数）
      * @return 时间戳ID字符串
      */
-    public String generateTimestampId() {
+    public static String generateTimestampId() {
         String timestamp = generateTimestampString();
         int random = ThreadLocalRandom.current().nextInt(10000, 100000);
         return timestamp + random;
@@ -136,8 +140,8 @@ public class RandomUtil {
      * @param prefix 前缀字符串
      * @return 带前缀的雪花ID
      */
-    public String generatePrefixedSnowflakeId(String prefix) {
-        return prefix + snowflakeIdGenerator.nextId();
+    public static String generatePrefixedSnowflakeId(String prefix) {
+        return prefix + SNOWFLAKE.nextId();
     }
 
 
@@ -145,7 +149,7 @@ public class RandomUtil {
      * 生成简化的UUID（不带连字符）
      * @return 32字符的UUID
      */
-    public String generateSimpleUuid() {
+    public static String generateSimpleUuid() {
         return UUID.randomUUID().toString().replace("-", "");
     }
 }

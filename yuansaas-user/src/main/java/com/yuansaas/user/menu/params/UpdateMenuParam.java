@@ -1,5 +1,6 @@
 package com.yuansaas.user.menu.params;
 
+import com.yuansaas.core.context.AppContextUtil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -17,11 +18,6 @@ public class UpdateMenuParam {
      */
     @NotNull(message = "菜单ID不能为空")
     private Long id;
-    /**
-     * 商户编号
-     */
-    @NotBlank(message = "商户编号不能为空")
-    private String merchantCode;
     /**
      * 菜单名称
      */

@@ -25,8 +25,10 @@ import com.yuansaas.user.common.enums.UserWxAuthClient;
 import com.yuansaas.user.common.model.WechatUserInfoModel;
 import com.yuansaas.user.common.service.UserLoginLogService;
 import com.yuansaas.user.common.service.WechatBindingService;
-import com.yuansaas.user.system.entity.SysUser;
-import com.yuansaas.user.system.service.SysUserService;
+import com.yuansaas.user.users.entity.ShopUser;
+import com.yuansaas.user.users.entity.SysUser;
+import com.yuansaas.user.users.service.ShopUserService;
+import com.yuansaas.user.users.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +62,7 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
     private final ApplicationEventPublisher eventPublisher;
     private final TokenBlacklistManager tokenBlacklistManager;
     private final JwtProperties jwtProperties;
+    private final ShopUserService shopUserService;
 
     @Override
     public AuthVo login(UnifiedLoginParam loginParam, HttpServletRequest request) {
@@ -150,7 +153,14 @@ public class UnifiedAuthServiceImpl implements UnifiedAuthService {
             return new CustomUserDetails(user);
         }if(loginParam.getUserType() == UserTypeEnum.MERCHANT_USER){
             // 商家
-            // todo
+            ShopUser user = shopUserService.getUserByUsername(loginParam.getUsername())
+                    .orElseThrow(() -> AuthErrorCode.AUTHENTICATION_FAILED.buildException("用户名或密码错误"));
+
+            // 加密密码：passwordEncoder.encode(request.getPassword())
+            if (!passwordEncoder.matches(loginParam.getPassword(), user.getPassword())) {
+                throw AuthErrorCode.AUTHENTICATION_FAILED.buildException("用户名或密码错误") ;
+            }
+            return new CustomUserDetails(user);
         }
         throw AuthErrorCode.INVALID_USER.buildException() ;
     }

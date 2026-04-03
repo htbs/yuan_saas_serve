@@ -1,6 +1,8 @@
 package com.yuansaas.app.shop.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import com.yuansaas.common.constants.AppConstants;
 import com.yuansaas.common.model.AddressModel;
 import com.yuansaas.core.jpa.model.BaseEntity;
 import jakarta.persistence.Column;
@@ -9,7 +11,9 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
 /**
@@ -22,7 +26,7 @@ import java.util.Date;
 @Table(name = "shop_data_config")
 public class ShopDataConfig extends BaseEntity {
     /**
-     * '店铺名字'
+     * '店铺code'
      */
     private String  shopCode;
     /**
@@ -55,10 +59,20 @@ public class ShopDataConfig extends BaseEntity {
     @Type(value = JsonStringType.class)
     @Column(columnDefinition = "json")
     private String  label;
+
     /**
-     * '营业时间规则'
+     * 是否开启统一设置 (N 关闭| Y 开启)
      */
-    @Type(value = JsonStringType.class)
-    @Column(columnDefinition = "json")
-    private Object weekdayHours;
+    private String isUnified= AppConstants.N;
+    /**
+     * 统一开始时间，如 09:00
+     */
+    @JsonFormat(pattern = "HH:mm:ss" )
+    private LocalTime startTime;
+    /**
+     * 统一结束时间，如 18:00
+     */
+    @JsonFormat(pattern = "HH:mm:ss" )
+    private LocalTime endTime ;
+
 }

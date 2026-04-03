@@ -21,6 +21,11 @@ public interface DeptRepository extends JpaRepository<SysDept, Long> {
     /**
      * 根据商家id和部门id查询部门信息
      */
-    SysDept findByMerchantCodeAndId(String merchantCode, Long id);
+    SysDept findByShopCodeAndId(String shopCode, Long id);
+
+    /**
+     * 根据商家id和部门父级id查询部门信息
+     */
+    List<SysDept> findByShopCodeAndPid(String shopCode, Long pid);
 
 }

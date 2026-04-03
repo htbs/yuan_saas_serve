@@ -1,17 +1,10 @@
 package com.yuansaas.user.menu.service;
-
-import com.yuansaas.core.response.ResponseBuilder;
-import com.yuansaas.core.response.ResponseModel;
-import com.yuansaas.user.auth.security.annotations.SecurityAuth;
 import com.yuansaas.user.menu.entity.Menu;
 import com.yuansaas.user.menu.params.FindMenuParam;
 import com.yuansaas.user.menu.params.SaveMenuParam;
 import com.yuansaas.user.menu.params.UpdateMenuParam;
 import com.yuansaas.user.menu.vo.MenuListVo;
 import com.yuansaas.user.menu.vo.MenuVo;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -50,6 +43,28 @@ public interface MenuService {
     MenuVo getById(Long id);
     /**
      * 批量获取菜单 (原始信息)
+     * @param ids  id
+     * @param lockStatus 禁用状态
      */
     List<Menu> getByList(List<Long> ids , String lockStatus);
+
+    /**
+     * 通过菜单code和菜单类型查询菜单
+     * @param menuCode  菜单code
+     * @param menuType  菜单类型（0 ： 菜单 | 1 ：按钮）
+     */
+    List<Menu> findByMenuCode(String menuCode  , Integer menuType);
+
+    /**
+     * 获取权限关联的菜单按钮id
+     * @param permission 权限点
+     */
+    List<Long> findByPermission(String permission);
+
+
+    /**
+     * 自动补齐父级
+     * @param menuList 菜单列表
+     */
+    List<Menu> completeParentMenus(List<Menu> menuList);
 }

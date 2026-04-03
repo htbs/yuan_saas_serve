@@ -18,9 +18,9 @@ import lombok.Data;
 public class SysDictType extends BaseEntity {
 
     /**
-     * 字典类型
+     * 字典编码
      */
-    private String dictType;
+    private String dictCode;
     /**
      * 字典名称
      */
@@ -28,9 +28,21 @@ public class SysDictType extends BaseEntity {
     /**
      * 平台类型
      */
-    private DictPlatformTypeEnum platform;
+    private String platform;
     /**
      * 排序
      */
     private Integer sort;
+    /**
+     * '锁定状态(Y锁定|N不锁定)'
+     */
+    private String  lockStatus;
+    /**
+     * '删除状态(Y删除|N未删除)'
+     */
+    private String  deleteStatus;
+    /**
+     * 是否系统默认 （Y 默认 | N 不默认）
+     */
+    private String  isSysDefault;
 }

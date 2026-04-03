@@ -6,6 +6,13 @@ import com.yuansaas.app.common.params.UpdateDictParam;
 import com.yuansaas.app.common.params.UpdateSortParam;
 import com.yuansaas.app.common.vo.SysDictTypeVo;
 import com.yuansaas.core.page.RPage;
+import com.yuansaas.core.response.ResponseBuilder;
+import com.yuansaas.core.response.ResponseModel;
+import com.yuansaas.user.auth.security.annotations.SecurityAuth;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 
 /**
@@ -43,6 +50,13 @@ public interface DictService {
      * @author  lxz 2025/11/16 14:35
      */
     Boolean deleteDict(Long id);
+
+    /**
+     * 操作禁用/启用字典
+     * @param id 字典id
+     * @author  lxz 2025/11/16 14:35
+     */
+    Boolean lock(Long id) ;
 
     /**
      * 根据查询条件返回字典列表

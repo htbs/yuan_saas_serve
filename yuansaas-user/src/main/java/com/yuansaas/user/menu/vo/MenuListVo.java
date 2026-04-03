@@ -2,6 +2,7 @@ package com.yuansaas.user.menu.vo;
 
 import com.yuansaas.core.model.TreeNode;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -11,8 +12,9 @@ import java.util.List;
  *
  * @author LXZ 2025/10/21 11:54
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class MenuListVo extends TreeNode {
+public class MenuListVo extends TreeNode<MenuListVo> {
 
     /**
      * 菜单code

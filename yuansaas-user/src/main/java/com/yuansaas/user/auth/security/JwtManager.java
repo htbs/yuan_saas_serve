@@ -9,7 +9,8 @@ import com.yuansaas.user.client.entity.ClientUser;
 import com.yuansaas.user.client.service.ClientUserService;
 import com.yuansaas.user.common.service.UserStatusCache;
 import com.yuansaas.user.config.ServiceManager;
-import com.yuansaas.user.system.entity.SysUser;
+import com.yuansaas.user.users.entity.ShopUser;
+import com.yuansaas.user.users.entity.SysUser;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,6 @@ public class JwtManager {
     private final UserStatusCache userStatusCache;
 
     private final JwtTokenParser jwtTokenParser;
-
 
     /**
      * 生成 JWT 访问令牌
@@ -112,26 +112,27 @@ public class JwtManager {
         Claims claims = jwtTokenParser.extractAllClaims(token);
         Long userId = claims.get("userId", Long.class);
         UserTypeEnum userType = UserTypeEnum.getByCode(claims.get("userType", String.class));
-        String username = claims.getSubject();
-
         // 根据用户类型加载用户详情
-        return loadUserDetails(userType, userId, username);
+        return loadUserDetails(userType, userId);
     }
 
-    private CustomUserDetails loadUserDetails(UserTypeEnum userType, Long userId, String username) {
-        if (userType == UserTypeEnum.YUAN_SHI_USER) {
-            SysUser user = ServiceManager.sysUserService.findById(userId)
-                    .orElseThrow(() -> new UsernameNotFoundException("系统用户不存在"));
-            return new CustomUserDetails(user);
-        } if (userType == UserTypeEnum.CLIENT_USER){
-            ClientUser user = clientUserService.findById(userId)
-                    .orElseThrow(() -> new UsernameNotFoundException("客户端用户不存在"));
-            return new CustomUserDetails(user);
-        } if (userType == UserTypeEnum.MERCHANT_USER){
-            // TODO 商户用户
-            return null;
-        }else {
-            throw AuthErrorCode.AUTH_USER_NOT_FOUND.buildException();
+    private CustomUserDetails loadUserDetails(UserTypeEnum userType, Long userId) {
+        switch (userType) {
+            case UserTypeEnum.YUAN_SHI_USER -> {
+                SysUser user = ServiceManager.sysUserService.findById(userId)
+                        .orElseThrow(() -> new UsernameNotFoundException("系统用户不存在"));
+                return new CustomUserDetails(user);
+            }
+            case UserTypeEnum.CLIENT_USER -> {
+                ClientUser user = clientUserService.findById(userId)
+                        .orElseThrow(() -> new UsernameNotFoundException("客户端用户不存在"));
+                return new CustomUserDetails(user);
+            }
+            case UserTypeEnum.MERCHANT_USER -> {
+                ShopUser shopUser = ServiceManager.shopUserService.getUserById(userId).orElseThrow(() -> new UsernameNotFoundException("商户平台用户不存在"));
+                return new CustomUserDetails(shopUser);
+            }
+            default -> throw AuthErrorCode.AUTH_USER_NOT_FOUND.buildException();
         }
     }
 

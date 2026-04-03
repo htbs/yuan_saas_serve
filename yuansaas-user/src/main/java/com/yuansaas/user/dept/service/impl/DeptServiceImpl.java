@@ -6,8 +6,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yuansaas.common.constants.AppConstants;
-import com.yuansaas.core.context.AppContext;
-import com.yuansaas.core.context.AppContextHolder;
 import com.yuansaas.core.context.AppContextUtil;
 import com.yuansaas.core.exception.ex.DataErrorCode;
 import com.yuansaas.core.jpa.querydsl.BoolBuilder;
@@ -16,7 +14,6 @@ import com.yuansaas.core.utils.TreeUtils;
 import com.yuansaas.user.dept.entity.QSysDept;
 import com.yuansaas.user.dept.entity.SysDept;
 import com.yuansaas.user.dept.enums.DeptCacheEnum;
-import com.yuansaas.user.dept.model.DeptTreeModel;
 import com.yuansaas.user.dept.params.FindDeptParam;
 import com.yuansaas.user.dept.params.SaveDeptParam;
 import com.yuansaas.user.dept.params.UpdateDeptParam;
@@ -55,7 +52,7 @@ public class DeptServiceImpl implements DeptService {
      */
     @Override
     public List<DeptTreeListVo> list(FindDeptParam findDeptParam) {
-       return RedisUtil.getOrLoad(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, findDeptParam.getMerchantCode()), new TypeReference<>() {}, () -> {
+       return RedisUtil.getOrLoad(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, findDeptParam.getShopCode()), new TypeReference<>() {}, () -> {
            QSysDept qDept = QSysDept.sysDept;
            List<DeptTreeListVo> deptLists = jpaQueryFactory.select(Projections.bean(DeptTreeListVo.class,
                            qDept.id,
@@ -66,10 +63,10 @@ public class DeptServiceImpl implements DeptService {
                            qDept.createBy,
                            qDept.updateAt,
                            qDept.updateBy,
-                           qDept.merchantCode))
+                           qDept.shopCode))
                    .from(qDept)
                    .where(BoolBuilder.getInstance()
-                           .and(findDeptParam.getMerchantCode(), qDept.merchantCode::eq)
+                           .and(findDeptParam.getShopCode(), qDept.shopCode::eq)
                            .and(findDeptParam.getDeptName(), qDept.name::eq)
                            .and(qDept.lockStatus.eq(AppConstants.N))
                            .and(qDept.deleteStatus.eq(AppConstants.N))
@@ -95,7 +92,7 @@ public class DeptServiceImpl implements DeptService {
         sysDept.setCreateAt(LocalDateTime.now());
         deptRepository.save(sysDept);
         // 清除缓存
-        RedisUtil.delete(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, saveDeptParam.getMerchantCode()));
+        RedisUtil.delete(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, saveDeptParam.getShopCode()));
         return true;
     }
 
@@ -112,7 +109,7 @@ public class DeptServiceImpl implements DeptService {
             dept.setUpdateAt(LocalDateTime.now());
             deptRepository.save(dept);
             // 清除缓存
-            RedisUtil.delete(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, dept.getMerchantCode()));
+            RedisUtil.delete(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, dept.getShopCode()));
         } , () ->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("部门不存在");
         });
@@ -134,7 +131,7 @@ public class DeptServiceImpl implements DeptService {
             // 删除部门用户关联关系
             deptUserService.deleteByDeptIds(dept.getId());
             // 清除缓存
-            RedisUtil.delete(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, dept.getMerchantCode()));
+            RedisUtil.delete(RedisUtil.genKey(DeptCacheEnum.DEPT_TREE_LIST, dept.getShopCode()));
         } , () ->{
             throw DataErrorCode.DATA_NOT_FOUND.buildException("部门不存在");
         });
@@ -144,16 +141,28 @@ public class DeptServiceImpl implements DeptService {
     /**
      * 部门详情
      *
-     * @param merchantCode
+     * @param shopCode
      * @param id
      */
     @Override
-    public DeptListVo getById(String merchantCode, Long id) {
-        SysDept sysDept = deptRepository.findByMerchantCodeAndId(merchantCode,id);
+    public DeptListVo getById(String shopCode, Long id) {
+        SysDept sysDept = deptRepository.findByShopCodeAndId(shopCode,id);
         if (ObjectUtil.isEmpty(sysDept)) {
             throw DataErrorCode.DATA_NOT_FOUND.buildException("部门不存在");
         }
         return BeanUtil.copyProperties(sysDept , DeptListVo.class);
+    }
+
+    /**
+     * 通过商家code和父部门id查询部门信息
+     *
+     * @param shopCode 商家code
+     * @param pid          父部门id
+     * @author LXZ 2025/12/24  12:14
+     */
+    @Override
+    public List<SysDept> findByShopCodeAndPid(String shopCode, Long pid) {
+        return deptRepository.findByShopCodeAndPid(shopCode, pid);
     }
 
 

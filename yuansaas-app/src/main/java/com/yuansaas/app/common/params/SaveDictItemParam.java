@@ -13,10 +13,10 @@ import lombok.Data;
 public class SaveDictItemParam {
 
     /**
-     * 字典类型id
+     * 字典code
      */
-    @NotNull(message = "字典类型id不能为空")
-    private Long dictTypeId;
+    @NotNull(message = "字典code不能为空")
+    private String dictCode;
     /**
      * 字典key
      */

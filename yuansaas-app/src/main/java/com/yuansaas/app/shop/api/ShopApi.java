@@ -6,6 +6,7 @@ import com.yuansaas.app.shop.param.SignedParam;
 import com.yuansaas.app.shop.param.UpdateShopParam;
 import com.yuansaas.app.shop.service.ShopService;
 import com.yuansaas.app.shop.vo.ShopListVo;
+import com.yuansaas.app.shop.vo.ShopVo;
 import com.yuansaas.core.page.RPage;
 import com.yuansaas.core.response.ResponseBuilder;
 import com.yuansaas.core.response.ResponseModel;
@@ -34,8 +35,8 @@ public class ShopApi {
      * @param saveShopParam 商家参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/add",method = RequestMethod.POST)
-    @SecurityAuth
+    @PostMapping(value = "/add")
+    @SecurityAuth(permissions = "users:shop:create")
     public ResponseEntity<ResponseModel<Boolean>> add(@RequestBody @Validated SaveShopParam saveShopParam) {
         return ResponseBuilder.okResponse(shopService.add(saveShopParam));
     }
@@ -45,8 +46,8 @@ public class ShopApi {
      * @param updateShopParam 商家参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/update",method = RequestMethod.POST)
-    @SecurityAuth
+    @PostMapping(value = "/update")
+    @SecurityAuth(permissions = "users:shop:update")
     public ResponseEntity<ResponseModel<Boolean>> update(@RequestBody @Validated UpdateShopParam updateShopParam) {
         return ResponseBuilder.okResponse(shopService.update(updateShopParam));
     }
@@ -56,9 +57,20 @@ public class ShopApi {
      * @param id 商家id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/lock/{id}",method = RequestMethod.PUT)
-    @SecurityAuth
-    public ResponseEntity<ResponseModel<Boolean>> lock(@PathVariable(value = "id") Long id) {
+    @PutMapping(value = "/disable/{id}")
+    @SecurityAuth(permissions = "users:shop:lock")
+    public ResponseEntity<ResponseModel<Boolean>> disable(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(shopService.lock(id));
+    }
+
+    /**
+     * 启用商家
+     * @param id 商家id
+     * @author  lxz 2025/11/16 14:35
+     */
+    @PutMapping(value = "/enable/{id}")
+    @SecurityAuth(permissions = "users:shop:lock")
+    public ResponseEntity<ResponseModel<Boolean>> enable(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.lock(id));
     }
 
@@ -67,32 +79,45 @@ public class ShopApi {
      * @param id 商家id
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/delete/{id}",method = RequestMethod.DELETE)
-    @SecurityAuth
+    @DeleteMapping(value = "/delete/{id}")
+    @SecurityAuth(permissions = "users:shop:delete")
     public ResponseEntity<ResponseModel<Boolean>> delete(@PathVariable(value = "id") Long id) {
         return ResponseBuilder.okResponse(shopService.delete(id));
     }
 
     /**
-     * 查询商家列表
+     * 查询商家列表(分页)
      * @param findShopParam 查询参数
      * @return 商家列表
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/page",method = RequestMethod.GET)
-    @SecurityAuth
+    @GetMapping(value = "/page")
+    @SecurityAuth(permissions = "users:shop:find")
     public ResponseEntity<ResponseModel<RPage<ShopListVo>>> getByPage( FindShopParam findShopParam) {
         return ResponseBuilder.okResponse(shopService.getByPage(findShopParam));
     }
 
 
     /**
-     * 签约操作
+     * 查询商家详情
+     * @param id 商家id
+     * @return 商家详情
+     * @author  lxz 2025/11/16 14:35
+     */
+    @GetMapping(value = "/get/{id}")
+    @SecurityAuth(permissions = "users:shop:find")
+    public ResponseEntity<ResponseModel<ShopVo>> getById(@PathVariable(value = "id") Long id) {
+        return ResponseBuilder.okResponse(shopService.getById(id));
+    }
+
+
+    /**
+     * 签约操作 (签约成功后，商家的状态会变为已签约, 并生成店铺的基本数据信息)
      * @param signedParam 签约参数
      * @author  lxz 2025/11/16 14:35
      */
-    @RequestMapping(value = "/signed",method = RequestMethod.PUT)
-    @SecurityAuth
+    @PutMapping(value = "/signed")
+    @SecurityAuth(permissions = "users:shop:signed")
     public ResponseEntity<ResponseModel<Boolean>> signed(@RequestBody  @Validated SignedParam signedParam) {
         return ResponseBuilder.okResponse(shopService.signed(signedParam));
     }

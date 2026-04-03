@@ -23,11 +23,6 @@ public class UpdateRoleParam {
     @NotBlank(message = "角色名称不能为空")
     private String name;
     /**
-     * 部门id
-     */
-    @NotNull(message = "部门id不能为空")
-    private Long deptId;
-    /**
      * 描述
      */
     private String description;

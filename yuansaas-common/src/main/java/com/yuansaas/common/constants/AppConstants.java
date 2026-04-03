@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AppConstants {
 
-    public static final String PWD = "DC483E80A7A0BD9EF71D8CF973673924";
 
+    public static final String ADMIN = "admin";
     public static final String UNKNOWN = "unknown";
     public static final String DEFAULT = "default";
     public static final String N_A = "N/A";
@@ -50,6 +50,7 @@ public final class AppConstants {
     public static final int NINE = 9;
     public static final int TEN = 10;
     public static final int HUNDRED = 100;
+    public static final int NINE_HUNDRED_NINETY_NINE = 999;
     public static final int THOUSAND = 1000;
     public static final int MILLION = 1000000;
     public static final int BILLION = 1000000000;

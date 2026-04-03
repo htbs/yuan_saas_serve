@@ -2,6 +2,7 @@ package com.yuansaas.app.shop.vo;
 
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -34,11 +35,11 @@ public class ShopListVo {
     /**
      * 签约开始时间
      */
-    private LocalDateTime signedStartAt;
+    private LocalDate signedStartAt;
     /**
      * 签约结束时间
      */
-    private LocalDateTime signedEndAt;
+    private LocalDate signedEndAt;
     /**
      * 创建时间
      */

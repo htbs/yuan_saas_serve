@@ -1,0 +1,301 @@
+package com.yuansaas.user.users.service.impl;
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yuansaas.core.context.AppContextUtil;
+import com.yuansaas.core.exception.ex.AuthErrorCode;
+import com.yuansaas.core.exception.ex.BizErrorCode;
+import com.yuansaas.core.exception.ex.DataErrorCode;
+import com.yuansaas.core.jpa.querydsl.BoolBuilder;
+import com.yuansaas.core.page.RPage;
+import com.yuansaas.core.redis.RedisUtil;
+import com.yuansaas.integration.sms.model.CheckVerifyCodeModel;
+import com.yuansaas.integration.sms.service.SmsVerifyService;
+import com.yuansaas.user.common.enums.UserStatus;
+import com.yuansaas.user.config.AppProperties;
+import com.yuansaas.user.dept.entity.QSysDept;
+import com.yuansaas.user.dept.entity.QSysDeptUser;
+import com.yuansaas.user.dept.service.DeptUserService;
+import com.yuansaas.user.menu.enums.MenuCacheEnum;
+import com.yuansaas.user.menu.service.MenuService;
+import com.yuansaas.user.permission.params.AssignUserDeptParam;
+import com.yuansaas.user.permission.params.AssignUserRoleParam;
+import com.yuansaas.user.permission.service.PermissionService;
+import com.yuansaas.user.permission.service.RoleMenuService;
+import com.yuansaas.user.permission.service.RoleUserService;
+import com.yuansaas.user.users.entity.QSysUser;
+import com.yuansaas.user.users.entity.SysUser;
+import com.yuansaas.user.users.param.FindUserParam;
+import com.yuansaas.user.users.param.SysUserCreateParam;
+import com.yuansaas.user.users.param.UpdateUserPwdParam;
+import com.yuansaas.user.users.param.UserUpdateParam;
+import com.yuansaas.user.users.repository.SysUserRepository;
+import com.yuansaas.user.users.service.SysUserService;
+import com.yuansaas.user.users.vo.SysUserListVo;
+import com.yuansaas.user.users.vo.SysUserVo;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * 系统用户接口
+ *
+ * @author HTB 2025/8/8 14:41
+ */
+@Service
+@RequiredArgsConstructor
+public class SysUserServiceImpl implements SysUserService {
+
+    private final SysUserRepository sysUserRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AppProperties appProperties;
+    private final PermissionService permissionService;
+    private final RoleUserService roleUserService;
+    private final RoleMenuService roleMenuService;
+    private final DeptUserService deptUserService;
+    private final MenuService menuService;
+    private final JPAQueryFactory jpaQueryFactory;
+    private final SmsVerifyService smsVerifyService;
+
+
+    @Override
+    public Optional<SysUser> findById(Long id) {
+        // todo 优化查询 改成先查询缓存
+        return sysUserRepository.findById( id);
+    }
+
+    /**
+     * 通过id查询系统用户并关联的角色、部门信息
+     *
+     * @param id id
+     * @return 系统用户
+     */
+    @Override
+    public SysUserVo findLinkDateById(Long id) {
+        SysUser sysUser = findById(id).orElse(null);
+        if (ObjectUtil.isEmpty(sysUser)) {
+            return null;
+        }
+        // 查询部门id
+        Long deptId = deptUserService.getDeptIdList(id);
+        // 查询角色id
+        List<Long> roleIdList = roleUserService.getRoleIdList(id);
+        // 查询菜单列表
+        SysUserVo sysUserVo = new SysUserVo();
+        BeanUtil.copyProperties(sysUser , sysUserVo);
+        sysUserVo.setDeptId(deptId);
+        sysUserVo.setRoleIds(roleIdList);
+        return sysUserVo;
+    }
+
+    @Override
+    public Optional<SysUser> findByUsername(String username) {
+        return sysUserRepository.findByUserName(username);
+    }
+
+    /**
+     * 创建用户
+     *
+     * @param sysUserCreateParam 用户创建请求
+     * @return 创建成功的用户信息
+     */
+    @Override
+    public SysUser saveUser(SysUserCreateParam sysUserCreateParam) {
+        // 校验用户名是否存在
+        if (findByUsername(sysUserCreateParam.getUserName()).isPresent()) {
+            throw BizErrorCode.BUSINESS_VALIDATION_FAILED.buildException("用户名已存在");
+        }
+        // 保存用户信息
+        SysUser sysUser = new SysUser();
+        BeanUtils.copyProperties(sysUserCreateParam, sysUser);
+        sysUser.setPassword(passwordEncoder.encode(appProperties.getDefaultPassword()));
+        sysUser.setCreateAt(LocalDateTime.now());
+        sysUser.setCreateBy(AppContextUtil.getUserInfo());
+        sysUserRepository.save(sysUser);
+        // 授权角色权限
+        permissionService.assignUserRole(AssignUserRoleParam.builder().userId(sysUser.getId()).roleId(sysUserCreateParam.getRoleIds()).build());
+        // 授权部门权限
+        permissionService.assignUserDept(AssignUserDeptParam.builder().shopCode(AppContextUtil.getShopCode()).userId(sysUser.getId()).build());
+        return sysUser;
+    }
+
+    @Override
+    public Boolean updateUser(UserUpdateParam userUpdateParam) {
+        sysUserRepository.findById(userUpdateParam.getId()).ifPresentOrElse(sysUser -> {
+            // 手机号和验证码校验
+            if (!ObjectUtil.equals(userUpdateParam.getPhone(), sysUser.getPhone()) && ObjectUtil.hasEmpty(userUpdateParam.getPhone(),
+                        userUpdateParam.getVerifyCode(),
+                        userUpdateParam.getSerialNo(),
+                        userUpdateParam.getSendSceneType())
+                ) {
+                    smsVerifyService.checkVerifyCode(CheckVerifyCodeModel.builder()
+                            .phone(userUpdateParam.getPhone())
+                            .verifyContent(userUpdateParam.getVerifyCode())
+                            .type(userUpdateParam.getSendSceneType())
+                            .serialNo(userUpdateParam.getSerialNo())
+                            .build());
+                }
+
+
+            BeanUtils.copyProperties(userUpdateParam, sysUser);
+            sysUser.setUpdateBy(AppContextUtil.getUserInfo());
+            sysUser.setUpdateAt(LocalDateTime.now());
+            sysUserRepository.save(sysUser);
+            // 授权角色权限
+            permissionService.assignUserRole(AssignUserRoleParam.builder().userId(sysUser.getId()).roleId(userUpdateParam.getRoleIds()).build());
+        },()->{
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+        });
+        return true;
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param updateUserPwd 用户修改请求
+     * @return 修改成功的用户信息
+     */
+    @Override
+    public Boolean updateUserPwd(UpdateUserPwdParam updateUserPwd) {
+        sysUserRepository.findById(updateUserPwd.getUserId()).ifPresentOrElse(sysUser -> {
+                        // 加密密码：passwordEncoder.encode(request.getPassword())
+                        if (!passwordEncoder.matches(updateUserPwd.getOldPassword(), sysUser.getPassword())) {
+                            throw AuthErrorCode.AUTHENTICATION_FAILED.buildException("旧密码输入错误，请重新输入") ;
+                        }
+                        sysUser.setPassword(passwordEncoder.encode(updateUserPwd.getNewPassword()));
+                        sysUser.setUpdateAt(LocalDateTime.now());
+                        sysUser.setUpdateBy(AppContextUtil.getUserInfo());
+                        sysUserRepository.save(sysUser);
+                    }
+                    ,() ->{
+                        throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+                    }
+        );
+        return true;
+    }
+
+    /**
+     * 重置密码
+     *
+     * @param id 用户修改请求
+     * @return 修改成功的用户信息
+     */
+    @Override
+    public Boolean resetUserResetPwd(Long id) {
+        sysUserRepository.findById(id).ifPresentOrElse(sysUser -> {
+                    sysUser.setPassword(passwordEncoder.encode(appProperties.getDefaultPassword()));
+                    sysUser.setUpdateAt(LocalDateTime.now());
+                    sysUser.setUpdateBy(AppContextUtil.getUserInfo());
+                    sysUserRepository.save(sysUser);
+                }
+                ,() ->{
+                    throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+                }
+        );
+        return true;
+    }
+
+    @Override
+    public Boolean lockUser(Long userId) {
+        sysUserRepository.findById(userId).ifPresentOrElse(sysUser -> {
+            sysUser.setStatus(UserStatus.suspended.name());
+            sysUser.setUpdateAt(LocalDateTime.now());
+            sysUser.setUpdateBy(AppContextUtil.getUserInfo());
+            sysUserRepository.save(sysUser);
+        }, () -> {
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+        });
+        return true;
+    }
+
+    @Override
+    public Boolean unlockUser(Long userId) {
+        sysUserRepository.findById(userId).ifPresentOrElse(sysUser -> {
+            sysUser.setStatus(UserStatus.active.name());
+            sysUser.setUpdateAt(LocalDateTime.now());
+            sysUser.setUpdateBy(AppContextUtil.getUserInfo());
+            sysUserRepository.save(sysUser);
+        }, () -> {
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+        });
+        return true;
+    }
+
+    @Override
+    public Boolean deleteUser(Long userId) {
+        sysUserRepository.findById(userId).ifPresentOrElse(sysUser -> {
+            sysUser.setStatus(UserStatus.deleted.name());
+            sysUser.setUpdateAt(LocalDateTime.now());
+            sysUser.setUpdateBy(AppContextUtil.getUserInfo());
+            sysUserRepository.save(sysUser);
+            // 解除角色权限
+            roleUserService.deleteByUserIds(userId);
+            // 解除部门权限
+            deptUserService.deleteByUserId(userId);
+            // 删除菜单缓存
+            RedisUtil.delete(RedisUtil.genKey(MenuCacheEnum.USER_MENU_LIST, userId));
+        }, () -> {
+            throw  DataErrorCode.DATA_NOT_FOUND.buildException();
+        });
+        return true;
+    }
+
+    /**
+     * 列表查询
+     *
+     * @param findUserParam 查询参数
+     * @return roleListVo
+     */
+    @Override
+    public RPage<SysUserListVo> getByPage(FindUserParam findUserParam) {
+
+        List<String> status ;
+        if (ObjectUtil.isEmpty(findUserParam.getStatus())) {
+            status = List.of(UserStatus.active.name(),UserStatus.suspended.name());
+        } else {
+            status = List.of(findUserParam.getStatus().getName());
+        }
+
+        QSysUser sysUser = QSysUser.sysUser;
+        QSysDept qSysDept = QSysDept.sysDept;
+        QSysDeptUser qSysDeptUser = QSysDeptUser.sysDeptUser;
+        BooleanBuilder boolBuilder =  BoolBuilder.getInstance()
+                .and(findUserParam.getUserName(), sysUser.userName::contains)
+                .and(findUserParam.getPhone(), sysUser.phone::eq)
+                .and(sysUser.status.in(status))
+                .getWhere();
+        return findUserParam.getPage(()-> jpaQueryFactory.select(Projections.bean(SysUserListVo.class,
+                        sysUser.id,
+                        sysUser.userName,
+                        sysUser.realName,
+                        sysUser.phone,
+                        sysUser.email,
+                        sysUser.status,
+                        sysUser.createAt,
+                        sysUser.createBy,
+                        sysUser.updateAt,
+                        sysUser.updateBy,
+                        qSysDept.id.as("deptId"),
+                        qSysDept.name.as("deptName")))
+                .from(sysUser)
+                .leftJoin(qSysDeptUser).on(sysUser.id.eq(qSysDeptUser.userId))
+                .leftJoin(qSysDept).on(qSysDeptUser.deptId.eq(qSysDept.id))
+                .where(boolBuilder)
+                .orderBy(sysUser.createAt.desc())
+                ,
+                ()->
+                        jpaQueryFactory.select(sysUser.id.countDistinct())
+                                .from(sysUser)
+                                .where(boolBuilder)
+        );
+
+    }
+}

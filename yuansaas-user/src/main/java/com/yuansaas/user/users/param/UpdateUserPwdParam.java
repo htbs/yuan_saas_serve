@@ -1,0 +1,30 @@
+package com.yuansaas.user.users.param;
+
+import com.yuansaas.core.context.AppContextUtil;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
+
+/**
+ *
+ * 修改用户密码参数
+ *
+ * @author LXZ 2025/12/21 17:51
+ */
+@Data
+public class UpdateUserPwdParam {
+
+    /**
+     * 用户id
+     */
+    private Long userId = AppContextUtil.requireUserId();
+    /**
+     * 旧密码
+     */
+    @NotEmpty(message = "旧密码不能为空")
+    private String oldPassword;
+    /**
+     * 新密码
+     */
+    @NotEmpty(message = "新密码不能为空")
+    private String newPassword;
+}

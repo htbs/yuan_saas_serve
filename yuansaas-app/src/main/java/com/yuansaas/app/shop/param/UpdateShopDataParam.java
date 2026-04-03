@@ -1,14 +1,11 @@
 package com.yuansaas.app.shop.param;
 
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import com.yuansaas.app.shop.enums.ShopTypeEnum;
 import com.yuansaas.common.model.AddressModel;
 import com.yuansaas.core.annotation.EnumValidate;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.hibernate.annotations.Type;
 
 import java.util.List;
 

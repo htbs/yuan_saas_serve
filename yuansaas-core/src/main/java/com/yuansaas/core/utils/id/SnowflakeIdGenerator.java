@@ -2,6 +2,7 @@ package com.yuansaas.core.utils.id;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
@@ -22,8 +23,9 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author HTB 2025/7/31 15:31
  */
+@Primary
 @Component
-public class SnowflakeIdGenerator implements InitializingBean {
+public final class SnowflakeIdGenerator implements InitializingBean , IdGenerator{
 
     // 配置默认值（可通过Spring配置覆盖）
     // 数据中心ID
@@ -72,6 +74,10 @@ public class SnowflakeIdGenerator implements InitializingBean {
 
     // 最大时钟回拨容忍（10毫秒）
     private static final long MAX_CLOCK_BACKWARD_MS = 10;
+
+    public IdType type() {
+        return IdType.SNOWFLAKE;
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -159,6 +165,7 @@ public class SnowflakeIdGenerator implements InitializingBean {
     /**
      * 生成下一个ID
      */
+    @Override
     public synchronized long nextId() {
         long currentTimestamp = System.currentTimeMillis();
 
